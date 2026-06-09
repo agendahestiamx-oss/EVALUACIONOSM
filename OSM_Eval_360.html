@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OSM Eval 360°</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
+<style>
+:root{
+  --bg:#F5F4F0;--surface:#FFFFFF;--surface2:#EFEDE7;--border:#E0DDD5;--border2:#C8C4B8;
+  --text:#1C1A17;--text2:#6A6860;--text3:#A8A59E;
+  --green:#1A7A5E;--green-bg:#E6F4EF;--green-light:#B8E0D2;
+  --amber:#8A5700;--amber-bg:#FEF3D6;--amber-light:#FDE68A;
+  --red:#8B1E1E;--red-bg:#FDE8E8;
+  --blue:#1A3F8A;--blue-bg:#E8EFF8;
+  --purple:#5B21B6;--purple-bg:#EDE9FE;
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 3px 12px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+input,select,textarea,button{font-family:'DM Sans',sans-serif;font-size:14px}
+input,select,textarea{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text);width:100%;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(26,122,94,.1)}
+.app{max-width:860px;margin:0 auto;padding:24px 20px}
+
+/* ROLE COLORS */
+.role-rh{--rc:#5B21B6;--rc-bg:#EDE9FE;--rc-light:#DDD6FE}
+.role-cont{--rc:#1A3F8A;--rc-bg:#E8EFF8;--rc-light:#BFDBFE}
+.role-admin{--rc:#1A7A5E;--rc-bg:#E6F4EF;--rc-light:#B8E0D2}
+
+/* HOME */
+.home-hero{text-align:center;padding:2.5rem 0 2rem}
+.home-hero h1{font-size:22px;font-weight:600;margin-bottom:6px}
+.home-hero p{font-size:14px;color:var(--text2);max-width:480px;margin:0 auto}
+.role-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:2rem}
+.role-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
+.role-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.1)}
+.role-card.rh{border-top:3px solid #5B21B6}
+.role-card.cont{border-top:3px solid #1A3F8A}
+.role-card.admin{border-top:3px solid #1A7A5E}
+.role-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.role-ico.rh{background:#EDE9FE;color:#5B21B6}
+.role-ico.cont{background:#E8EFF8;color:#1A3F8A}
+.role-ico.admin{background:#E6F4EF;color:#1A7A5E}
+.role-name{font-size:15px;font-weight:600;margin-bottom:4px}
+.role-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.role-areas{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.area-chip{font-size:10px;padding:2px 7px;border-radius:3px;font-weight:500}
+.chip-rh{background:#EDE9FE;color:#5B21B6}
+.chip-cont{background:#E8EFF8;color:#1A3F8A}
+.chip-admin{background:#E6F4EF;color:#1A7A5E}
+.chip-shared{background:var(--surface2);color:var(--text2)}
+
+/* SCREEN */
+.screen{display:none}.screen.on{display:block}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.role-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-rh{background:#EDE9FE;color:#5B21B6}
+.badge-cont{background:#E8EFF8;color:#1A3F8A}
+.badge-admin{background:#E6F4EF;color:#1A7A5E}
+.topbar-title{font-size:15px;font-weight:600}
+.topbar-sub{font-size:12px;color:var(--text2);margin-top:1px}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fg.one{grid-template-columns:1fr}
+.fl{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:4px}
+
+/* AREA BLOCKS */
+.area-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow)}
+.area-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;background:var(--surface2);cursor:pointer;user-select:none}
+.area-hdr:hover{background:var(--border)}
+.area-hdr-l{display:flex;align-items:center;gap:8px}
+.area-ttl{font-size:13px;font-weight:600}
+.area-tag{font-size:10px;padding:2px 7px;border-radius:3px;font-weight:600}
+.tag-rh{background:#EDE9FE;color:#5B21B6}
+.tag-cont{background:#E8EFF8;color:#1A3F8A}
+.tag-admin{background:#E6F4EF;color:#1A7A5E}
+.tag-shared{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.chev{font-size:13px;color:var(--text3);transition:transform .2s}
+.area-body{display:none}.area-body.open{display:block}
+.crit-row{display:grid;grid-template-columns:1fr auto;align-items:start;gap:10px;padding:10px 15px;border-top:1px solid var(--border)}
+.crit-row.with-comment{grid-template-columns:1fr auto 180px}
+.crit-name{font-size:13px;color:var(--text);padding-top:2px}
+.pills{display:flex;gap:3px}
+.pill{width:29px;height:29px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;transition:all .1s;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace}
+.pill:hover{border-color:var(--border2);background:var(--border)}
+.pill.p1.on{background:#FDDEDE;color:#8B1E1E;border-color:#ECA0A0}
+.pill.p2.on{background:#FEF0C7;color:#8A5700;border-color:#FBCB5A}
+.pill.p3.on{background:#DCFCE7;color:#166534;border-color:#86EFAC}
+.pill.p4.on{background:#DBEAFE;color:#1E40AF;border-color:#93C5FD}
+.pill.p5.on{background:#1A7A5E;color:#fff;border-color:#1A7A5E}
+.com-input{font-size:12px;padding:5px 9px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);width:100%}
+.open-q{width:100%;font-size:13px;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);resize:vertical;min-height:60px}
+.open-q:focus{outline:none;border-color:var(--green)}
+.open-q-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;margin-top:10px;display:block}
+.area-res{display:flex;align-items:center;justify-content:space-between;padding:9px 15px;background:var(--surface2);border-top:1px solid var(--border)}
+.area-res-lbl{font-size:12px;font-weight:600;color:var(--text2)}
+.area-res-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
+
+/* PROG */
+.prog-wrap{margin-bottom:18px}
+.prog-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s}
+.prog-lbl{font-size:11px;color:var(--text3);margin-top:4px;text-align:right;font-family:'DM Mono',monospace}
+
+/* BUTTONS */
+.btn{padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--text);color:#fff}.btn-primary:hover{opacity:.85}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--text2)}.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{opacity:.88}
+.btn-full{width:100%;justify-content:center;padding:12px}
+
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.ld{width:9px;height:9px;border-radius:2px}
+
+/* ADMIN DASHBOARD */
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.status-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);text-align:center}
+.status-ico{font-size:22px;margin-bottom:6px}
+.status-name{font-size:12px;font-weight:600;margin-bottom:4px}
+.status-pct{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
+.status-lbl{font-size:11px;color:var(--text2);margin-top:3px}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.dot-done{background:#1A7A5E}.dot-partial{background:#D97706}.dot-empty{background:var(--border2)}
+
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;box-shadow:var(--shadow)}
+.mc-lbl{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.mc-val{font-size:22px;font-weight:700;font-family:'DM Mono',monospace}
+.mc-sub{font-size:11px;margin-top:3px}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.panel-ttl{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-name{font-size:12px;min-width:95px;flex-shrink:0}
+.bar-track{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.bar-val{font-size:12px;font-weight:600;min-width:28px;text-align:right;font-family:'DM Mono',monospace}
+
+.contrib-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
+.contrib-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.contrib-name{min-width:100px;flex-shrink:0;font-weight:500}
+.contrib-val{font-family:'DM Mono',monospace;font-weight:600}
+
+.rep-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:18px;box-shadow:var(--shadow)}
+.rep-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.rep-ttl{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.rep-body{font-size:13px;line-height:1.85;color:var(--text)}
+.rep-body h3{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.rep-body h3:first-child{margin-top:0}
+.rep-body p{margin-bottom:9px}.rep-body p:last-child{margin-bottom:0}
+.rep-body strong{font-weight:600}
+
+/* SESSION CODE */
+.session-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;text-align:center}
+.session-code{font-size:32px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text);margin:8px 0}
+.session-label{font-size:12px;color:var(--text2)}
+.share-links{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.share-link{padding:10px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+.share-link:hover{background:var(--surface2)}
+.share-link.rh{border-top:3px solid #5B21B6;color:#5B21B6}
+.share-link.cont{border-top:3px solid #1A3F8A;color:#1A3F8A}
+.share-link.admin{border-top:3px solid #1A7A5E;color:#1A7A5E}
+.share-link .sl-name{font-size:12px;font-weight:600;margin-bottom:2px}
+.share-link .sl-sub{font-size:10px;color:var(--text2);font-weight:400}
+
+.notif{position:fixed;top:20px;right:20px;background:var(--text);color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:var(--radius-sm);opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.18)}
+.notif.show{opacity:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite;display:inline-block}
+@media(max-width:580px){.two-col,.fg,.status-grid,.share-links{grid-template-columns:1fr}}
+
+/* COMPROMISOS */
+.comp-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
+.comp-num{font-size:12px;color:var(--text3);min-width:20px;text-align:right;font-family:'DM Mono',monospace;padding-top:10px}
+.comp-inputs{flex:1;display:flex;flex-direction:column;gap:6px}
+.comp-inputs input{font-size:13px}
+.comp-inputs select{font-size:12px}
+.comp-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.comp-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:4px}
+.cs-pending{background:var(--amber-bg);color:var(--amber)}
+.cs-approved{background:var(--green-bg);color:var(--green)}
+.cs-rejected{background:var(--red-bg);color:var(--red)}
+
+</style>
+</head>
+<body>
+<div class="notif" id="notif"></div>
+<div class="app">
+
+<!-- HOME -->
+<div id="scr-home" class="screen on">
+  <div class="home-hero">
+    <div style="font-size:32px;margin-bottom:10px">🔄</div>
+    <h1>Evaluación 360° — On Site Managers</h1>
+    <p>Cada evaluadora completa su sección de forma independiente. Los resultados se consolidan automáticamente.</p>
+  </div>
+
+  <div id="session-join-area"></div>
+
+  <div class="role-cards">
+    <div class="role-card rh" onclick="selectRole('rh')">
+      <div class="role-ico rh"><i class="ti ti-heart-handshake"></i></div>
+      <div class="role-name">Carmen — RH</div>
+      <div class="role-desc">Evalúa el trato humano, liderazgo de equipo y desempeño general del OSM</div>
+      <div class="role-areas">
+        <span class="area-chip chip-rh">Staff</span>
+        <span class="area-chip chip-rh">Actitud</span>
+        <span class="area-chip chip-shared">Comunicación</span>
+        <span class="area-chip chip-shared">Homeowners</span>
+      </div>
+    </div>
+    <div class="role-card cont" onclick="selectRole('cont')">
+      <div class="role-ico cont"><i class="ti ti-calculator"></i></div>
+      <div class="role-name">Contabilidad</div>
+      <div class="role-desc">Evalúa puntualidad de entregas, calidad de reportes y relación con el área contable</div>
+      <div class="role-areas">
+        <span class="area-chip chip-cont">Contabilidad</span>
+        <span class="area-chip chip-cont">Relación con equipo</span>
+        <span class="area-chip chip-shared">Comunicación</span>
+      </div>
+    </div>
+    <div class="role-card admin" onclick="selectRole('admin')">
+      <div class="role-ico admin"><i class="ti ti-crown"></i></div>
+      <div class="role-name">Responsable OSMs</div>
+      <div class="role-desc">Evalúa operación completa, ve todos los resultados y genera el reporte consolidado</div>
+      <div class="role-areas">
+        <span class="area-chip chip-admin">Todas las áreas</span>
+        <span class="area-chip chip-admin">Dashboard 360°</span>
+        <span class="area-chip chip-admin">Reporte final</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--amber-bg);border-color:var(--amber-light)">
+    <div style="font-size:12px;color:var(--amber);font-weight:600;margin-bottom:6px"><i class="ti ti-info-circle"></i> ¿Cómo funciona?</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.7">
+      1. La <strong>Responsable OSMs</strong> configura la evaluación y obtiene un código de sesión.<br>
+      2. Comparte el código con Carmen y Contabilidad — cada una entra con su rol.<br>
+      3. Cada quien llena su sección en ~5 minutos desde su computadora o cel.<br>
+      4. La Responsable ve el avance en tiempo real y genera el reporte final cuando todas terminaron.
+    </div>
+  </div>
+</div>
+
+<!-- SETUP (Admin) -->
+<div id="scr-setup" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="role-badge badge-admin"><i class="ti ti-crown"></i> Responsable OSMs</span>
+      <div><div class="topbar-title">Configurar evaluación</div></div>
+    </div>
+    <button class="btn btn-ghost" onclick="goHome()"><i class="ti ti-arrow-left"></i> Inicio</button>
+  </div>
+  <div class="card">
+    <div class="card-title">Datos del evaluado</div>
+    <div class="fg"><div><div class="fl">Nombre del OSM</div><input type="text" id="s-name" placeholder="Ej. Ana García"/></div><div><div class="fl">Mes de evaluación</div><input type="month" id="s-month"/></div></div>
+    <div class="fg"><div><div class="fl">Tu nombre (evaluadora)</div><input type="text" id="s-admin" placeholder="Tu nombre"/></div><div><div class="fl">Condominio(s)</div><input type="text" id="s-condos" placeholder="Ej. Ávida, Indah"/></div></div>
+    <div class="fg one"><div><div class="fl">Contexto del mes</div><textarea id="s-notas" rows="2" style="font-size:13px;width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);resize:vertical" placeholder="Incidencias, cambios de equipo, contexto especial..."></textarea></div></div>
+  </div>
+  <button class="btn btn-primary btn-full" onclick="createSession()"><i class="ti ti-sparkles"></i> Crear sesión de evaluación</button>
+</div>
+
+<!-- EVAL RH -->
+<div id="scr-rh" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="role-badge badge-rh"><i class="ti ti-heart-handshake"></i> Carmen — RH</span>
+      <div><div class="topbar-title" id="rh-title"></div><div class="topbar-sub" id="rh-sub"></div></div>
+    </div>
+    <button class="btn btn-green" onclick="submitRole('rh')"><i class="ti ti-send"></i> Enviar evaluación</button>
+  </div>
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #ECA0A0"></div>1 Deficiente</div>
+    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 Necesita mejora</div>
+    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 Cumple</div>
+    <div class="li"><div class="ld" style="background:#DBEAFE;border:1px solid #93C5FD"></div>4 Buen desempeño</div>
+    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 Excelencia</div>
+  </div>
+  <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="rh-prog"></div></div><div class="prog-lbl" id="rh-prog-lbl"></div></div>
+  <div id="rh-body"></div>
+</div>
+
+<!-- EVAL CONT -->
+<div id="scr-cont" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="role-badge badge-cont"><i class="ti ti-calculator"></i> Contabilidad</span>
+      <div><div class="topbar-title" id="cont-title"></div><div class="topbar-sub" id="cont-sub"></div></div>
+    </div>
+    <button class="btn btn-green" onclick="submitRole('cont')"><i class="ti ti-send"></i> Enviar evaluación</button>
+  </div>
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #ECA0A0"></div>1 Deficiente</div>
+    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 Necesita mejora</div>
+    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 Cumple</div>
+    <div class="li"><div class="ld" style="background:#DBEAFE;border:1px solid #93C5FD"></div>4 Buen desempeño</div>
+    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 Excelencia</div>
+  </div>
+  <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="cont-prog"></div></div><div class="prog-lbl" id="cont-prog-lbl"></div></div>
+  <div id="cont-body"></div>
+</div>
+
+<!-- EVAL ADMIN -->
+<div id="scr-admin" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="role-badge badge-admin"><i class="ti ti-crown"></i> Responsable OSMs</span>
+      <div><div class="topbar-title" id="admin-title"></div><div class="topbar-sub" id="admin-sub"></div></div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost" onclick="goS('dash');renderDashboard()"><i class="ti ti-chart-bar"></i> Dashboard</button>
+      <button class="btn btn-green" onclick="submitRole('admin')"><i class="ti ti-send"></i> Guardar</button>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #ECA0A0"></div>1 Deficiente</div>
+    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 Necesita mejora</div>
+    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 Cumple</div>
+    <div class="li"><div class="ld" style="background:#DBEAFE;border:1px solid #93C5FD"></div>4 Buen desempeño</div>
+    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 Excelencia</div>
+  </div>
+  <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="admin-prog"></div></div><div class="prog-lbl" id="admin-prog-lbl"></div></div>
+  <div id="admin-body"></div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="scr-dash" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="role-badge badge-admin"><i class="ti ti-chart-bar"></i> Dashboard 360°</span>
+      <div><div class="topbar-title" id="dash-title"></div><div class="topbar-sub" id="dash-sub"></div></div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost" onclick="goS('admin')"><i class="ti ti-arrow-left"></i> Mi evaluación</button>
+      <button class="btn btn-ghost" onclick="openCompromisos()"><i class="ti ti-checklist"></i> Compromisos</button>
+      <button class="btn btn-green" onclick="renderDashboard();genReport()"><i class="ti ti-file-text"></i> Reporte final</button>
+    </div>
+  </div>
+  <div id="dash-body"></div>
+</div>
+
+
+<!-- COMPROMISOS -->
+<div id="scr-compromisos" class="screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="role-badge badge-admin"><i class="ti ti-checklist"></i> Compromisos del mes</span>
+      <div><div class="topbar-title" id="comp-title"></div><div class="topbar-sub" id="comp-sub"></div></div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn btn-ghost" onclick="goS('dash');renderDashboard()"><i class="ti ti-arrow-left"></i> Dashboard</button>
+      <button class="btn btn-green" onclick="saveCompromisos()"><i class="ti ti-device-floppy"></i> Guardar compromisos</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <!-- OSM propone -->
+    <div class="card">
+      <div class="card-title" style="color:#1A3F8A;display:flex;align-items:center;gap:6px"><i class="ti ti-user"></i> El OSM propone</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">El OSM indica los compromisos que asume para el siguiente mes. La Responsable los revisa y aprueba.</p>
+      <div id="osm-comp-list"></div>
+      <button class="addb" onclick="addOsmComp()"><i class="ti ti-plus"></i> Agregar compromiso</button>
+    </div>
+    <!-- Responsable aprueba -->
+    <div class="card">
+      <div class="card-title" style="color:#1A7A5E;display:flex;align-items:center;gap:6px"><i class="ti ti-crown"></i> La Responsable define</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">Compromisos adicionales o ajustes definidos por la Responsable de OSMs.</p>
+      <div id="admin-comp-list"></div>
+      <button class="addb" onclick="addAdminComp()"><i class="ti ti-plus"></i> Agregar compromiso</button>
+    </div>
+  </div>
+  <div class="card" id="comp-preview-card" style="display:none">
+    <div class="card-title">Compromisos confirmados</div>
+    <div id="comp-preview"></div>
+  </div>
+</div>
+
+<!-- SUBMITTED -->
+<div id="scr-done" class="screen">
+  <div style="text-align:center;padding:3rem 0">
+    <div style="font-size:48px;margin-bottom:16px">✅</div>
+    <h2 style="font-size:20px;font-weight:600;margin-bottom:8px">¡Evaluación enviada!</h2>
+    <p style="font-size:14px;color:var(--text2);max-width:360px;margin:0 auto 24px">Tu sección ya está guardada. La Responsable de OSMs verá tus respuestas en el dashboard consolidado.</p>
+    <p style="font-size:13px;color:var(--text3)">Puedes cerrar esta ventana.</p>
+  </div>
+</div>
+
+</div><!-- .app -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+// ── DEFINICIÓN DE ÁREAS Y ROLES ────────────────────────────────────
+
+const AREAS_RH = [
+  {key:'staff', label:'Staff & Liderazgo', tag:'rh', icon:'ti-user-check', owner:'rh',
+   criteria:['Liderazgo con el equipo a cargo','Comunicación con colaboradores','Organización y distribución del trabajo','Seguimiento y supervisión del staff','Resolución de conflictos internos','Capacidad de delegar y confiar','Presencia y disponibilidad con el equipo','Motivación y clima laboral generado']},
+  {key:'actitud', label:'Actitud & Desempeño Personal', tag:'rh', icon:'ti-star', owner:'rh',
+   criteria:['Puntualidad y responsabilidad','Proactividad e iniciativa','Manejo del estrés y situaciones difíciles','Adaptabilidad ante cambios','Apertura a retroalimentación','Evolución y mejora mensual']},
+  {key:'homeowners_rh', label:'Trato con Homeowners', tag:'shared', icon:'ti-users', owner:'rh',
+   criteria:['Empatía y trato humano','Profesionalismo en comunicación','Manejo de situaciones difíciles con propietarios','Relación con consejo o comité'],
+   openQuestions:[
+     {key:'q_fortaleza_personas', label:'¿Qué fortaleza destaca este OSM en el trato con personas y equipo?'},
+     {key:'q_conflictos_staff', label:'¿Hubo conflictos o situaciones difíciles con el staff este mes? ¿Cómo se manejaron?'},
+     {key:'q_retencion_equipo', label:'¿Cómo calificarías su capacidad de motivar y retener al equipo?'},
+     {key:'q_mejora_rh', label:'¿Qué área de desarrollo humano recomendarías trabajar este mes?'}
+   ]
+  }
+];
+
+const AREAS_CONT = [
+  {key:'contabilidad', label:'Contabilidad & Reportes', tag:'cont', icon:'ti-report-money', owner:'cont',
+   criteria:['Reporte de gastos mensual — puntualidad','Reporte de ingresos mensual — puntualidad','Calidad y claridad de los reportes','Revisión y apego al presupuesto','Nómina — entrega a tiempo','Obligaciones patronales — cumplimiento','Impuestos — cumplimiento']},
+  {key:'relacion_cont', label:'Relación con el Equipo Contable', tag:'cont', icon:'ti-link', owner:'cont',
+   criteria:['Claridad al solicitar información o pagos','Tiempo de respuesta a solicitudes del área contable','Organización de documentos y comprobantes','Seguimiento a pendientes contables','Disposición para resolver inconsistencias'],
+   openQuestions:[
+     {key:'q_entrega_tard', label:'¿Hay algún reporte o entrega que consistentemente llega tarde o incompleta?'},
+     {key:'q_docs_calidad', label:'¿Los comprobantes y documentos llegan completos y organizados?'},
+     {key:'q_actitud_error', label:'¿Cómo es la actitud del OSM cuando hay un error o inconsistencia contable?'},
+     {key:'q_mejora_proceso', label:'¿Recomendarías algún cambio en el proceso de entrega de información?'}
+   ]
+  },
+  {key:'comunicacion_cont', label:'Comunicación con Contabilidad', tag:'shared', icon:'ti-message-circle', owner:'cont',
+   criteria:['Comunicación escrita clara y profesional','Seguimiento a correos y solicitudes','Organización de información enviada']}
+];
+
+const AREAS_ADMIN = [
+  {key:'operacion', label:'Operación', tag:'admin', icon:'ti-building', owner:'admin',
+   criteria:['Recorridos operativos','Seguimiento de pendientes','Anticipación de incidencias','Resolución de problemas','Supervisión general del inmueble','Organización operativa','Seguimiento de proyectos','Coordinación entre áreas','Gestión de emergencias','Cumplimiento operativo general']},
+  {key:'mantenimiento', label:'Mantenimiento', tag:'admin', icon:'ti-tool', owner:'admin',
+   criteria:['Seguimiento preventivo','Seguimiento correctivo','Planeación de mantenimientos','Supervisión de proveedores técnicos','Seguimiento de trabajos pendientes','Control de incidencias técnicas','Validación de trabajos realizados','Organización documental técnica']},
+  {key:'homeowners_admin', label:'Homeowners', tag:'admin', icon:'ti-users', owner:'admin',
+   criteria:['Atención al propietario','Tiempo de respuesta','Seguimiento a solicitudes','Resolución de conflictos','Experiencia general del homeowner']},
+  {key:'comunicacion_admin', label:'Comunicación & Reporting', tag:'admin', icon:'ti-message-circle', owner:'admin',
+   criteria:['Seguimiento de tickets CondoVive','Tiempo de respuesta','Actualización de SharePoint','Organización documental','Preparación de información para juntas','Trazabilidad y seguimiento']}
+];
+
+const ROLE_AREAS = {rh: AREAS_RH, cont: AREAS_CONT, admin: AREAS_ADMIN};
+const ROLE_COLORS = {rh:'#5B21B6', cont:'#1A3F8A', admin:'#1A7A5E'};
+const ROLE_NAMES = {rh:'Carmen — RH', cont:'Contabilidad', admin:'Responsable OSMs'};
+const ROLE_WEIGHTS = {rh:30, cont:30, admin:40}; // % del score final
+
+// ── STATE ──────────────────────────────────────────────────────────
+let session = null; // {id, osm, mo, admin, condos, notas, created}
+let evalData = {rh:{scores:{},comments:{},openAnswers:{},submitted:false}, cont:{scores:{},comments:{},openAnswers:{},submitted:false}, admin:{scores:{},comments:{},submitted:false}};
+let currentRole = null;
+let openAreas = {};
+let radarChart = null;
+
+// ── STORAGE ────────────────────────────────────────────────────────
+function saveToStorage(){
+  try{localStorage.setItem('osm360_session',JSON.stringify(session));localStorage.setItem('osm360_eval',JSON.stringify(evalData));}catch(e){}
+}
+function loadFromStorage(){
+  try{
+    const s=localStorage.getItem('osm360_session');const e=localStorage.getItem('osm360_eval');
+    if(s)session=JSON.parse(s);if(e)evalData=JSON.parse(e);
+    return !!s;
+  }catch(e){return false}
+}
+
+// ── UTILS ──────────────────────────────────────────────────────────
+function moLabel(mo){return mo?new Date(mo+'-02').toLocaleDateString('es',{month:'long',year:'numeric'}):''}
+function notify(msg,type='ok'){
+  const el=document.getElementById('notif');
+  const ic={ok:'ti-circle-check',err:'ti-circle-x',info:'ti-info-circle'}[type]||'ti-circle-check';
+  el.innerHTML=`<i class="ti ${ic}"></i> ${msg}`;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);
+}
+function interp(v){
+  if(v===null||v===undefined)return{label:'Sin datos',cls:'na',color:'#A8A59E'};
+  if(v<1.5)return{label:'Deficiente',cls:'1',color:'#DC2626'};
+  if(v<2.5)return{label:'Necesita mejora',cls:'2',color:'#D97706'};
+  if(v<3.5)return{label:'Cumple',cls:'3',color:'#16A34A'};
+  if(v<4.5)return{label:'Buen desempeño',cls:'4',color:'#2563EB'};
+  return{label:'Excelencia',cls:'5',color:'#1A7A5E'};
+}
+function badge(v){
+  const i=interp(v);
+  const s={na:'background:#EFEDE7;color:#A8A59E',1:'background:#FDDEDE;color:#8B1E1E',2:'background:#FEF0C7;color:#8A5700',3:'background:#DCFCE7;color:#166534',4:'background:#DBEAFE;color:#1E40AF',5:'background:#E6F4EF;color:#1A7A5E'}[i.cls];
+  return`<span class="badge" style="${s}">${v!==null&&v!==undefined?v.toFixed(1)+' ':''}<span style="font-weight:500">${i.label}</span></span>`;
+}
+function areaAvg(role, areaKey){
+  const areas=ROLE_AREAS[role];const area=areas.find(a=>a.key===areaKey);if(!area)return null;
+  const vals=area.criteria.map((_,i)=>evalData[role].scores[areaKey+'|'+i]).filter(v=>v!==null&&v!==undefined);
+  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+}
+function roleOverall(role){
+  const areas=ROLE_AREAS[role];
+  const avgs=areas.map(a=>areaAvg(role,a.key)).filter(v=>v!==null);
+  return avgs.length?avgs.reduce((a,b)=>a+b,0)/avgs.length:null;
+}
+function globalScore(){
+  let sum=0,w=0;
+  Object.keys(ROLE_WEIGHTS).forEach(role=>{const ov=roleOverall(role);if(ov!==null){sum+=ov*ROLE_WEIGHTS[role];w+=ROLE_WEIGHTS[role]}});
+  return w?sum/w:null;
+}
+function countFilled(role){
+  const areas=ROLE_AREAS[role];let n=0;
+  areas.forEach(a=>a.criteria.forEach((_,i)=>{if(evalData[role].scores[a.key+'|'+i]!==null&&evalData[role].scores[a.key+'|'+i]!==undefined)n++}));
+  return n;
+}
+function totalCrit(role){return ROLE_AREAS[role].reduce((s,a)=>s+a.criteria.length,0)}
+
+// ── NAVIGATION ─────────────────────────────────────────────────────
+function goS(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));document.getElementById('scr-'+s).classList.add('on')}
+function goHome(){goS('home')}
+
+// ── SESSION ────────────────────────────────────────────────────────
+function createSession(){
+  const nm=document.getElementById('s-name').value.trim();
+  const mo=document.getElementById('s-month').value;
+  const admin=document.getElementById('s-admin').value.trim();
+  if(!nm){notify('Ingresa el nombre del OSM','err');return}
+  if(!admin){notify('Ingresa tu nombre','err');return}
+  const id=Math.random().toString(36).slice(2,8).toUpperCase();
+  session={id,osm:nm,mo,admin,condos:document.getElementById('s-condos').value.trim(),notas:document.getElementById('s-notas').value.trim(),created:new Date().toISOString()};
+  evalData={rh:{scores:{},comments:{},openAnswers:{},submitted:false},cont:{scores:{},comments:{},openAnswers:{},submitted:false},admin:{scores:{},comments:{},submitted:false}};
+  saveToStorage();
+  renderAdminScreen();
+  goS('admin');
+}
+
+function selectRole(role){
+  currentRole=role;
+  if(role==='admin'){
+    if(!session){goS('setup');return}
+    renderAdminScreen();goS('admin');
+  } else {
+    // show code entry
+    const area=document.getElementById('session-join-area');
+    area.innerHTML=`<div class="card" style="margin-bottom:16px">
+      <div class="card-title">${role==='rh'?'Carmen — RH':'Contabilidad'} — Ingresar con código</div>
+      <div class="fg">
+        <div><div class="fl">Código de sesión (te lo da la Responsable)</div>
+          <input type="text" id="join-code" placeholder="Ej. A3B7C2" style="font-family:'DM Mono',monospace;font-size:18px;text-transform:uppercase;text-align:center" oninput="this.value=this.value.toUpperCase()"/>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-primary" onclick="joinSession('${role}')"><i class="ti ti-arrow-right"></i> Entrar</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('session-join-area').innerHTML=''">Cancelar</button>
+      </div>
+    </div>`;
+  }
+}
+
+function joinSession(role){
+  const code=document.getElementById('join-code').value.trim().toUpperCase();
+  if(!session||session.id!==code){notify('Código incorrecto. Pide el código a la Responsable de OSMs.','err');return}
+  currentRole=role;
+  if(evalData[role].submitted){notify('Ya enviaste tu evaluación este mes. Gracias!','info');return}
+  renderRoleScreen(role);goS(role);
+}
+
+// ── RENDER EVAL SCREENS ────────────────────────────────────────────
+function renderRoleScreen(role){
+  const areas=ROLE_AREAS[role];
+  const titleEl=document.getElementById(role+'-title');
+  const subEl=document.getElementById(role+'-sub');
+  if(titleEl)titleEl.textContent=session.osm;
+  if(subEl)subEl.textContent=moLabel(session.mo)+(session.condos?' · '+session.condos:'');
+  updateProgress(role);
+  const bodyEl=document.getElementById(role+'-body');
+  if(!bodyEl)return;
+  bodyEl.innerHTML=areas.map(area=>{
+    const avg=areaAvg(role,area.key);const isO=openAreas[area.key]!==false;
+    const tagClass={'rh':'tag-rh','cont':'tag-cont','admin':'tag-admin','shared':'tag-shared'}[area.tag]||'tag-shared';
+    const tagLabel={'rh':'RH','cont':'Contabilidad','admin':'Operaciones','shared':'Compartida'}[area.tag]||area.tag;
+    return`<div class="area-block">
+      <div class="area-hdr" onclick="toggleArea('${area.key}')">
+        <div class="area-hdr-l"><i class="ti ${area.icon}" style="font-size:15px;color:var(--text2)"></i>
+          <span class="area-ttl">${area.label}</span>
+          <span class="area-tag ${tagClass}">${tagLabel}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px" id="ahdr-${role}-${area.key}">${badge(avg)}<i class="ti ti-chevron-down chev" style="transform:rotate(${isO?180:0}deg)" id="chev-${area.key}"></i></div>
+      </div>
+      <div class="area-body${isO?' open':''}" id="ab-${area.key}">
+        ${area.criteria.map((cr,idx)=>{
+          const sc=evalData[role].scores[area.key+'|'+idx];
+          const com=evalData[role].comments[area.key+'|'+idx]||'';
+          return`<div class="crit-row with-comment"><span class="crit-name">${cr}</span>
+            <div class="pills">${[1,2,3,4,5].map(v=>`<button class="pill p${v}${sc===v?' on':''}" onclick="setSc('${role}','${area.key}',${idx},${v},this)">${v}</button>`).join('')}</div>
+            <input class="com-input" type="text" placeholder="Comentario..." value="${com.replace(/"/g,'&quot;')}" oninput="saveCom('${role}','${area.key}',${idx},this.value)"/>
+          </div>`;
+        }).join('')}
+        ${area.openQuestions?`<div style="padding:12px 15px;border-top:1px solid var(--border);background:var(--surface2)">
+          ${area.openQuestions.map(q=>`
+            <span class="open-q-label">${q.label}</span>
+            <textarea class="open-q" placeholder="Escribe aquí..." oninput="saveOpenQ('${role}','${q.key}',this.value)">${(evalData[role].openAnswers[q.key]||'').replace(/</g,'&lt;')}</textarea>
+          `).join('')}
+        </div>`:''}
+        <div class="area-res">
+          <span class="area-res-lbl">${area.label}</span>
+          <span id="ares-${role}-${area.key}">${badge(avg)}</span>
+        </div>
+      </div></div>`;
+  }).join('');
+}
+
+function renderAdminScreen(){
+  if(!session)return;
+  document.getElementById('admin-title').textContent=session.osm;
+  document.getElementById('admin-sub').textContent=moLabel(session.mo)+(session.condos?' · '+session.condos:'');
+  updateProgress('admin');
+  const bodyEl=document.getElementById('admin-body');
+  if(!bodyEl)return;
+  // Status of other evaluators
+  const rhPct=Math.round(countFilled('rh')/totalCrit('rh')*100);
+  const contPct=Math.round(countFilled('cont')/totalCrit('cont')*100);
+  bodyEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+    <div style="background:var(--purple-bg);border:1px solid #DDD6FE;border-radius:var(--radius);padding:12px;display:flex;align-items:center;gap:10px">
+      <div style="font-size:20px">💜</div>
+      <div><div style="font-size:12px;font-weight:600;color:#5B21B6">Carmen — RH</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">${evalData.rh.submitted?'✅ Completado':'🕐 '+(rhPct>0?rhPct+'% llenado':'Sin iniciar')}</div>
+      </div>
+    </div>
+    <div style="background:var(--blue-bg);border:1px solid #BFDBFE;border-radius:var(--radius);padding:12px;display:flex;align-items:center;gap:10px">
+      <div style="font-size:20px">💙</div>
+      <div><div style="font-size:12px;font-weight:600;color:#1A3F8A">Contabilidad</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">${evalData.cont.submitted?'✅ Completado':'🕐 '+(contPct>0?contPct+'% llenado':'Sin iniciar')}</div>
+      </div>
+    </div>
+  </div>`;
+  // Session code
+  bodyEl.innerHTML+=`<div class="session-box" style="margin-bottom:16px">
+    <div class="session-label">Código para compartir con el equipo</div>
+    <div class="session-code">${session.id}</div>
+    <div style="font-size:12px;color:var(--text2)">Carmen y Contabilidad usan este código para ingresar al sistema</div>
+    <button class="btn btn-ghost" style="margin-top:10px;font-size:12px" onclick="navigator.clipboard.writeText('${session.id}').then(()=>notify('Código copiado'))"><i class="ti ti-copy"></i> Copiar código</button>
+  </div>`;
+  // Admin eval areas
+  bodyEl.innerHTML+=`<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Tu evaluación — Operación completa</div>`;
+  bodyEl.innerHTML+=AREAS_ADMIN.map(area=>{
+    const avg=areaAvg('admin',area.key);const isO=openAreas[area.key]!==false;
+    return`<div class="area-block">
+      <div class="area-hdr" onclick="toggleArea('${area.key}')">
+        <div class="area-hdr-l"><i class="ti ${area.icon}" style="font-size:15px;color:var(--text2)"></i><span class="area-ttl">${area.label}</span></div>
+        <div style="display:flex;align-items:center;gap:8px" id="ahdr-admin-${area.key}">${badge(avg)}<i class="ti ti-chevron-down chev" style="transform:rotate(${isO?180:0}deg)" id="chev-${area.key}"></i></div>
+      </div>
+      <div class="area-body${isO?' open':''}" id="ab-${area.key}">
+        ${area.criteria.map((cr,idx)=>{const sc=evalData.admin.scores[area.key+'|'+idx];const com=evalData.admin.comments[area.key+'|'+idx]||'';
+          return`<div class="crit-row with-comment"><span class="crit-name">${cr}</span>
+            <div class="pills">${[1,2,3,4,5].map(v=>`<button class="pill p${v}${sc===v?' on':''}" onclick="setSc('admin','${area.key}',${idx},${v},this)">${v}</button>`).join('')}</div>
+            <input class="com-input" type="text" placeholder="Comentario..." value="${com.replace(/"/g,'&quot;')}" oninput="saveCom('admin','${area.key}',${idx},this.value)"/>
+          </div>`;
+        }).join('')}
+        <div class="area-res"><span class="area-res-lbl">${area.label}</span><span id="ares-admin-${area.key}">${badge(avg)}</span></div>
+      </div></div>`;
+  }).join('');
+}
+
+function toggleArea(ak){
+  openAreas[ak]=openAreas[ak]===false;
+  const b=document.getElementById('ab-'+ak),c=document.getElementById('chev-'+ak);
+  if(b)b.classList.toggle('open',!openAreas[ak]);
+  if(c)c.style.transform=`rotate(${openAreas[ak]?0:180}deg)`;
+}
+function setSc(role,ak,idx,val,btn){
+  const key=ak+'|'+idx;const prev=evalData[role].scores[key];
+  evalData[role].scores[key]=prev===val?null:val;
+  btn.parentElement.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  if(prev!==val)btn.classList.add('on');
+  const avg=areaAvg(role,ak);
+  const rb=document.getElementById('ares-'+role+'-'+ak)||document.getElementById('ares-admin-'+ak);
+  if(rb)rb.innerHTML=badge(avg);
+  const hdr=document.getElementById('ahdr-'+role+'-'+ak)||document.getElementById('ahdr-admin-'+ak);
+  if(hdr){const chev=document.getElementById('chev-'+ak);hdr.innerHTML=`${badge(avg)}<i class="ti ti-chevron-down chev" style="transform:rotate(${openAreas[ak]?0:180}deg)" id="chev-${ak}"></i>`;}
+  updateProgress(role);saveToStorage();
+}
+function saveCom(role,ak,idx,val){evalData[role].comments[ak+'|'+idx]=val;saveToStorage()}
+function saveOpenQ(role,key,val){evalData[role].openAnswers[key]=val;saveToStorage()}
+function updateProgress(role){
+  const f=countFilled(role),t=totalCrit(role),p=Math.round(f/t*100);
+  const pf=document.getElementById(role+'-prog');const pl=document.getElementById(role+'-prog-lbl');
+  if(pf)pf.style.width=p+'%';
+  if(pl)pl.textContent=f+' de '+t+' criterios ('+p+'%)';
+}
+function submitRole(role){
+  evalData[role].submitted=true;saveToStorage();
+  if(role==='rh'||role==='cont'){goS('done');}
+  else{notify('Evaluación guardada');renderDashboard();}
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────
+function renderDashboard(){
+  if(!session)return;
+  // Check if OSM submitted compromisos
+  try{
+    const cd=localStorage.getItem('osm360_compromisos');
+    if(cd){const parsed=JSON.parse(cd);if(parsed.sessionId===session.id)window._osmCompromisos=parsed;}
+  }catch(ex){}
+  document.getElementById('dash-title').textContent=session.osm+' — 360°';
+  document.getElementById('dash-sub').textContent=moLabel(session.mo)+(session.condos?' · '+session.condos:'');
+  const global=globalScore();
+  const rhOv=roleOverall('rh'),contOv=roleOverall('cont'),adminOv=roleOverall('admin');
+  let html='';
+
+  // Status evaluadoras
+  html+=`<div class="status-grid" style="margin-bottom:18px">
+    <div class="status-card">
+      <div class="status-ico">💜</div>
+      <div class="status-name">Carmen — RH</div>
+      <div class="status-pct">${rhOv!==null?rhOv.toFixed(2):'—'}</div>
+      <div class="status-lbl"><span class="status-dot ${evalData.rh.submitted?'dot-done':countFilled('rh')>0?'dot-partial':'dot-empty'}"></span>${evalData.rh.submitted?'Completado':countFilled('rh')>0?'En progreso':'Sin iniciar'}</div>
+    </div>
+    <div class="status-card">
+      <div class="status-ico">💙</div>
+      <div class="status-name">Contabilidad</div>
+      <div class="status-pct">${contOv!==null?contOv.toFixed(2):'—'}</div>
+      <div class="status-lbl"><span class="status-dot ${evalData.cont.submitted?'dot-done':countFilled('cont')>0?'dot-partial':'dot-empty'}"></span>${evalData.cont.submitted?'Completado':countFilled('cont')>0?'En progreso':'Sin iniciar'}</div>
+    </div>
+    <div class="status-card" style="border-top:3px solid #1A7A5E">
+      <div class="status-ico">💚</div>
+      <div class="status-name">Responsable OSMs</div>
+      <div class="status-pct">${adminOv!==null?adminOv.toFixed(2):'—'}</div>
+      <div class="status-lbl"><span class="status-dot ${evalData.admin.submitted?'dot-done':countFilled('admin')>0?'dot-partial':'dot-empty'}"></span>${evalData.admin.submitted?'Completado':countFilled('admin')>0?'En progreso':'Sin iniciar'}</div>
+    </div>
+  </div>
+  ${window._osmCompromisos?`<div style="background:var(--green-bg);border:1px solid var(--green-light);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px">
+    <i class="ti ti-checklist" style="font-size:20px;color:var(--green)"></i>
+    <div><div style="font-size:13px;font-weight:600;color:var(--green)">${window._osmCompromisos.osmName} envió sus compromisos</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:2px">${window._osmCompromisos.comps.length} compromisos · ${new Date(window._osmCompromisos.timestamp).toLocaleDateString('es',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div></div>
+    <button class="btn btn-ghost" style="margin-left:auto;font-size:11px;padding:4px 10px" onclick="approveCompromisos()"><i class="ti ti-check"></i> Revisar y aprobar</button>
+  </div>`:''}
+  <div style="display:none">
+  </div>`;
+
+  // Score global
+  html+=`<div class="metric-grid">
+    <div class="mc" style="grid-column:span 2;border-top:3px solid ${interp(global).color}">
+      <div class="mc-lbl">Score 360° consolidado</div>
+      <div class="mc-val" style="font-size:32px">${global!==null?global.toFixed(2):'—'}</div>
+      <div class="mc-sub">${badge(global)}</div>
+    </div>
+    <div class="mc"><div class="mc-lbl">RH (${ROLE_WEIGHTS.rh}%)</div><div class="mc-val">${rhOv!==null?rhOv.toFixed(2):'—'}</div><div class="mc-sub">${badge(rhOv)}</div></div>
+    <div class="mc"><div class="mc-lbl">Contabilidad (${ROLE_WEIGHTS.cont}%)</div><div class="mc-val">${contOv!==null?contOv.toFixed(2):'—'}</div><div class="mc-sub">${badge(contOv)}</div></div>
+    <div class="mc"><div class="mc-lbl">Operaciones (${ROLE_WEIGHTS.admin}%)</div><div class="mc-val">${adminOv!==null?adminOv.toFixed(2):'—'}</div><div class="mc-sub">${badge(adminOv)}</div></div>
+  </div>`;
+
+  // Scores por área
+  const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
+  const uniqueAreas=allAreas.filter((a,i,arr)=>arr.findIndex(x=>x.key===a.key)===i);
+  html+=`<div class="two-col">
+    <div class="panel"><div class="panel-ttl">Scores por área</div>
+      ${uniqueAreas.map(a=>{
+        const role=a.owner;const v=areaAvg(role,a.key);const p=v!==null?Math.round(v/5*100):0;
+        const roleColor=ROLE_COLORS[role];
+        return`<div class="bar-row">
+          <span class="bar-name" style="font-size:11px">${a.label}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${interp(v).color}"></div></div>
+          <span class="bar-val">${v!==null?v.toFixed(1):'—'}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="panel"><div class="panel-ttl">Contribución por evaluadora</div>
+      ${['rh','cont','admin'].map(role=>{const ov=roleOverall(role);return`<div class="contrib-row">
+        <div class="contrib-dot" style="background:${ROLE_COLORS[role]}"></div>
+        <span class="contrib-name">${ROLE_NAMES[role]}</span>
+        <span class="contrib-val">${ov!==null?ov.toFixed(2):'—'}</span>
+        <span style="font-size:11px;color:var(--text2);margin-left:4px">${ov!==null?'('+ROLE_WEIGHTS[role]+'% peso)':''}</span>
+      </div>`}).join('')}
+      ${Object.values(evalData).some(r=>r.openAnswers&&Object.keys(r.openAnswers).length)?`<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+        <div class="panel-ttl" style="margin-bottom:8px">Comentarios abiertos</div>
+        ${Object.entries({...evalData.rh.openAnswers,...evalData.cont.openAnswers}).map(([k,v])=>v?`<div style="font-size:12px;color:var(--text2);margin-bottom:6px"><span style="font-weight:500;color:var(--text)">${k.replace('q_','').replace(/_/g,' ')}: </span>${v}</div>`:'').join('')}
+      </div>`:''}
+    </div>
+  </div>`;
+
+  html+=`<div id="report-zone"></div>`;
+  document.getElementById('dash-body').innerHTML=html;
+}
+
+// ── REPORTE ────────────────────────────────────────────────────────
+function genReport(){
+  goS('dash');renderDashboard();
+  const zone=document.getElementById('report-zone');
+  if(!zone)return;
+  const global=globalScore();
+  if(global===null){zone.innerHTML=`<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Completa al menos una sección para generar el reporte.</p></div>`;return}
+
+  zone.innerHTML=`<div class="rep-card">
+    <div class="rep-hdr"><span class="rep-ttl"><i class="ti ti-loader spin"></i> Generando reporte ejecutivo...</span></div>
+    <p style="font-size:13px;color:var(--text2);padding:8px 0">Redactando informe profesional — tarda unos segundos...</p>
+  </div>`;
+
+  const rhOv=roleOverall('rh'),contOv=roleOverall('cont'),adminOv=roleOverall('admin');
+  const iL=v=>{if(v===null||v===undefined)return'Sin datos';if(v<1.5)return'Deficiente';if(v<2.5)return'Necesita mejora';if(v<3.5)return'Cumple';if(v<4.5)return'Buen desempeño';return'Excelencia'};
+
+  const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
+  const strong=allAreas.filter(a=>areaAvg(a.owner,a.key)!==null&&areaAvg(a.owner,a.key)>=4).map(a=>a.label+' ('+areaAvg(a.owner,a.key).toFixed(1)+')');
+  const medium=allAreas.filter(a=>areaAvg(a.owner,a.key)!==null&&areaAvg(a.owner,a.key)>=3&&areaAvg(a.owner,a.key)<4).map(a=>a.label+' ('+areaAvg(a.owner,a.key).toFixed(1)+')');
+  const weak=allAreas.filter(a=>areaAvg(a.owner,a.key)!==null&&areaAvg(a.owner,a.key)<3).map(a=>a.label+' ('+areaAvg(a.owner,a.key).toFixed(1)+')');
+
+  const openQsText=[
+    ...Object.entries(evalData.rh.openAnswers||{}),
+    ...Object.entries(evalData.cont.openAnswers||{})
+  ].filter(([k,v])=>v).map(([k,v])=>`${k.replace('q_','').replace(/_/g,' ')}: "${v}"`).join('\n');
+
+  // Include OSM compromisos from form if available
+  const osmFormComps=window._osmCompromisos?.comps||[];
+  const allOsmComps=[...osmComps.filter(c=>c.texto&&c.status==='approved'),...osmFormComps.filter(c=>c.texto&&!osmComps.find(x=>x.texto===c.texto))];
+  const compText=allOsmComps.map((c,i)=>`${i+1}. ${c.texto}${c.metrica?' — Métrica: '+c.metrica:''}${c.fecha?' — Fecha: '+moLabel(c.fecha):''}`).join('\n');
+  const osmReflexion=window._osmCompromisos?.reflexion?`\nReflexión del OSM: "${window._osmCompromisos.reflexion}"`:'' ;
+  const osmMensaje=window._osmCompromisos?.mensaje?`\nMensaje al equipo: "${window._osmCompromisos.mensaje}"`:'' ;
+  const adminCompText=adminComps.filter(c=>c.texto).map((c,i)=>`${i+1}. ${c.texto}${c.metrica?' — Métrica: '+c.metrica:''}${c.fecha?' — Fecha: '+moLabel(c.fecha):''}`).join('\n');
+
+  const prompt=`Eres consultor senior de Recursos Humanos en Hestia Management Co., empresa administradora de condominios residenciales de alto nivel en la Riviera Nayarit, México. Redacta un REPORTE EJECUTIVO 360° de evaluación mensual de desempeño.
+
+DATOS DE LA EVALUACIÓN:
+Colaborador: ${session.osm}
+Período: ${moLabel(session.mo)}
+Condominios: ${session.condos||'—'}
+Responsable OSMs: ${session.admin}
+${session.notas?'Contexto del mes: '+session.notas:''}
+
+SCORES 360° (ponderados):
+- Score consolidado: ${global.toFixed(2)}/5 — ${iL(global)}
+- RH / Personas (30%): ${rhOv?rhOv.toFixed(2)+'/5 — '+iL(rhOv):'No evaluado'}
+- Contabilidad (30%): ${contOv?contOv.toFixed(2)+'/5 — '+iL(contOv):'No evaluado'}
+- Operaciones (40%): ${adminOv?adminOv.toFixed(2)+'/5 — '+iL(adminOv):'No evaluado'}
+
+SCORES POR ÁREA:
+${allAreas.filter(a=>areaAvg(a.owner,a.key)!==null).map(a=>`- ${a.label}: ${areaAvg(a.owner,a.key).toFixed(2)}/5 — ${iL(areaAvg(a.owner,a.key))}`).join('\n')}
+
+Fortalezas (≥4.0): ${strong.join(', ')||'ninguna'}
+En desarrollo (3.0–3.9): ${medium.join(', ')||'ninguna'}
+Requieren atención (<3.0): ${weak.join(', ')||'ninguna'}
+
+${openQsText?'OBSERVACIONES CUALITATIVAS DE LAS EVALUADORAS:\n'+openQsText:''}
+
+${compText?'COMPROMISOS DEL OSM (aprobados):\n'+compText:''}
+${adminCompText?'COMPROMISOS DEFINIDOS POR LA RESPONSABLE:\n'+adminCompText:''}
+
+INSTRUCCIONES DE REDACCIÓN:
+Estructura el reporte con estas secciones claramente separadas. Redacta en párrafos narrativos profesionales, NO listas de bullets. Español neutro latinoamericano, tono directo y constructivo. 600-800 palabras totales.
+
+1. RESUMEN EJECUTIVO (1 párrafo): Síntesis del mes, score global, nivel general, tono del período. Nombra el condominio y al colaborador.
+
+2. PERSPECTIVA RH — PERSONAS Y LIDERAZGO (1-2 párrafos): Analiza staff, actitud y trato humano. Integra observaciones cualitativas de Carmen si las hay. Sé específico sobre el impacto en el equipo.
+
+3. PERSPECTIVA CONTABILIDAD — GESTIÓN FINANCIERA (1-2 párrafos): Analiza puntualidad, calidad de reportes y relación con el área. Integra comentarios de Contabilidad. Señala cualquier riesgo financiero-operativo.
+
+4. PERSPECTIVA OPERACIONES — GESTIÓN DEL CONDOMINIO (1-2 párrafos): Analiza operación, mantenimiento y homeowners. Qué funciona bien y qué no en la gestión diaria.
+
+5. SÍNTESIS Y PATRONES: 1 párrafo que identifique patrones transversales entre las tres perspectivas. ¿Hay consistencia entre lo que ven RH, Contabilidad y Operaciones?
+
+6. PLAN DE ACCIÓN: Para cada área con score <3.5, define en prosa: la acción, quién lidera, cuándo, y cómo se mide el avance. Concreto y realista.
+
+${compText||adminCompText?`7. COMPROMISOS FORMALIZADOS: Redacta un párrafo que integre los compromisos aprobados como cierre formal del proceso evaluativo.`:''}
+
+8. VALORACIÓN FINAL (1 párrafo): Juicio calibrado sobre la trayectoria del colaborador. ¿Está creciendo, estable, en riesgo? Recomendación clara para la dirección.
+
+Firma el documento: "Evaluación realizada por: ${session.admin} — Hestia Management Co."`;
+
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
+  }).then(r=>r.json()).then(data=>{
+    const text=data.content?.map(x=>x.text||'').join('')||'Error al generar.';
+    window._lastReport360=text;
+    const fecha=new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'});
+
+    // Build sections from text
+    const htmlBody=text
+      .replace(/^#{1,3}\s+(.+)$/gm,'<h3>$1</h3>')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\n\n+/g,'</p><p>')
+      .replace(/\n/g,'<br>');
+
+    // Build compromisos section for report
+    const approvedComps=osmComps.filter(c=>c.texto&&c.status==='approved');
+    const adminFilledComps=adminComps.filter(c=>c.texto);
+    let compHTML='';
+    if(approvedComps.length||adminFilledComps.length){
+      compHTML=`<div style="margin-top:20px;padding-top:16px;border-top:2px solid var(--border)">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Compromisos formalizados — ${nextMonthLabel(session.mo)}</div>`;
+      if(approvedComps.length){
+        compHTML+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:8px">El OSM se compromete a:</div>`;
+        approvedComps.forEach((c,i)=>{compHTML+=`<div style="display:flex;gap:10px;margin-bottom:8px;padding:10px 12px;background:var(--green-bg);border-radius:var(--radius-sm);border-left:3px solid var(--green)"><span style="font-size:12px;font-weight:700;color:var(--green);min-width:18px">${i+1}</span><div><div style="font-size:13px;font-weight:500">${c.texto}</div>${c.metrica?`<div style="font-size:11px;color:var(--text2);margin-top:2px">📏 ${c.metrica}</div>`:''}${c.fecha?`<div style="font-size:11px;color:var(--text2)">📅 ${moLabel(c.fecha)}</div>`:''}</div></div>`;});
+        compHTML+='</div>';
+      }
+      if(adminFilledComps.length){
+        compHTML+=`<div><div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:8px">La Responsable establece:</div>`;
+        adminFilledComps.forEach((c,i)=>{compHTML+=`<div style="display:flex;gap:10px;margin-bottom:8px;padding:10px 12px;background:var(--blue-bg);border-radius:var(--radius-sm);border-left:3px solid var(--blue)"><span style="font-size:12px;font-weight:700;color:var(--blue);min-width:18px">${i+1}</span><div><div style="font-size:13px;font-weight:500">${c.texto}</div>${c.metrica?`<div style="font-size:11px;color:var(--text2);margin-top:2px">📏 ${c.metrica}</div>`:''}${c.fecha?`<div style="font-size:11px;color:var(--text2)">📅 ${moLabel(c.fecha)}</div>`:''}</div></div>`;});
+        compHTML+='</div>';
+      }
+      compHTML+='</div>';
+    }
+
+    zone.innerHTML=`<div class="rep-card">
+      <div class="rep-hdr">
+        <span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte 360° — ${session.osm}</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="copyReport360()"><i class="ti ti-copy"></i> Copiar</button>
+          <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="printReport360()"><i class="ti ti-printer"></i> Imprimir / PDF</button>
+          <button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="genReport()"><i class="ti ti-refresh"></i> Regenerar</button>
+        </div>
+      </div>
+      <div id="printable-report" style="font-family:'DM Sans',sans-serif">
+        <!-- HEADER con logo -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;margin-bottom:20px;border-bottom:2px solid var(--border)">
+          <div>
+            <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Hestia Management Co.</div>
+            <div style="font-size:18px;font-weight:700;color:var(--text)">Evaluación 360°</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:2px">${session.osm} · ${moLabel(session.mo)}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:28px;font-weight:700;font-family:'DM Mono',monospace;color:${global>=4?'var(--green)':global>=3?'#D97706':'var(--red)'}">${global.toFixed(2)}</div>
+            <div style="font-size:11px;color:var(--text2)">Score 360° / 5.00</div>
+            <div style="font-size:11px;font-weight:600;color:${global>=4?'var(--green)':global>=3?'#D97706':'var(--red)'}">${iL(global)}</div>
+          </div>
+        </div>
+        <!-- Scores resumen -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+          <div style="padding:10px;background:var(--purple-bg);border-radius:var(--radius-sm);text-align:center">
+            <div style="font-size:10px;font-weight:600;color:#5B21B6;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">RH / Personas</div>
+            <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:#5B21B6">${rhOv?rhOv.toFixed(2):'—'}</div>
+            <div style="font-size:10px;color:var(--text2)">peso 30%</div>
+          </div>
+          <div style="padding:10px;background:var(--blue-bg);border-radius:var(--radius-sm);text-align:center">
+            <div style="font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Contabilidad</div>
+            <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--blue)">${contOv?contOv.toFixed(2):'—'}</div>
+            <div style="font-size:10px;color:var(--text2)">peso 30%</div>
+          </div>
+          <div style="padding:10px;background:var(--green-bg);border-radius:var(--radius-sm);text-align:center">
+            <div style="font-size:10px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Operaciones</div>
+            <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--green)">${adminOv?adminOv.toFixed(2):'—'}</div>
+            <div style="font-size:10px;color:var(--text2)">peso 40%</div>
+          </div>
+        </div>
+        <!-- Cuerpo del reporte -->
+        <div class="rep-body"><p>${htmlBody}</p></div>
+        ${compHTML}
+        <!-- Footer -->
+        <div style="margin-top:24px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:11px;color:var(--text3)">Hestia Management Co. · Sistema OSM Eval 360°</div>
+          <div style="font-size:11px;color:var(--text3)">${fecha}</div>
+        </div>
+      </div>
+    </div>`;
+  }).catch(e=>{
+    // Fallback to local report if API fails
+    zone.innerHTML=`<div class="rep-card"><div class="rep-body"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Para el reporte con IA, abre este archivo desde SharePoint. <a href="#" onclick="genReportLocal();return false" style="color:var(--green)">Generar versión local →</a></p></div></div>`;
+  });
+}
+
+function copyReport360(){
+  if(!window._lastReport360)return;
+  navigator.clipboard.writeText(window._lastReport360).then(()=>notify('Copiado al portapapeles'));
+}
+
+function printReport360(){
+  const el=document.getElementById('printable-report');
+  if(!el)return;
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1C1A17;padding:32px 40px;max-width:820px;margin:0 auto;line-height:1.7}
+      h3{font-size:11px;font-weight:700;color:#6A6860;text-transform:uppercase;letter-spacing:.06em;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid #E0DDD5}
+      p{margin-bottom:10px}strong{font-weight:600}
+      .hestia-logo{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8A7D6B}
+      @media print{body{padding:20px}}
+    </style></head><body>
+    ${el.innerHTML}
+    </body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),800);
+}
+
+function genReportLocal(){
+  // Fallback local report (same as before but with compromisos)
+  const zone=document.getElementById('report-zone');if(!zone)return;
+  const global=globalScore();if(global===null)return;
+  const fecha=new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'});
+  const iL=v=>{if(v===null||v===undefined)return'Sin datos';if(v<1.5)return'Deficiente';if(v<2.5)return'Necesita mejora';if(v<3.5)return'Cumple';if(v<4.5)return'Buen desempeño';return'Excelencia'};
+  const iA=v=>{if(!v)return'';if(v<1.5)return'deficiente';if(v<2.5)return'por debajo del estándar';if(v<3.5)return'dentro del estándar';if(v<4.5)return'por encima del promedio';return'sobresaliente'};
+  const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
+  const strong=allAreas.filter(a=>areaAvg(a.owner,a.key)!==null&&areaAvg(a.owner,a.key)>=4);
+  const weak=allAreas.filter(a=>areaAvg(a.owner,a.key)!==null&&areaAvg(a.owner,a.key)<3);
+  const rhOv=roleOverall('rh'),contOv=roleOverall('cont'),adminOv=roleOverall('admin');
+  let txt=`REPORTE 360° — HESTIA MANAGEMENT CO.
+${'─'.repeat(55)}
+
+`;
+  txt+=`Colaborador: ${session.osm} | Período: ${moLabel(session.mo)} | Condominios: ${session.condos||'—'}
+Responsable: ${session.admin} | Fecha: ${fecha}
+
+`;
+  txt+=`SCORE 360° CONSOLIDADO: ${global.toFixed(2)}/5 — ${iL(global)}
+`;
+  txt+=`• RH/Personas (30%): ${rhOv?rhOv.toFixed(2):'—'} · Contabilidad (30%): ${contOv?contOv.toFixed(2):'—'} · Operaciones (40%): ${adminOv?adminOv.toFixed(2):'—'}
+
+`;
+  if(strong.length)txt+=`Fortalezas: ${strong.map(a=>a.label+' '+areaAvg(a.owner,a.key).toFixed(1)).join(', ')}
+`;
+  if(weak.length)txt+=`Requieren atención: ${weak.map(a=>a.label+' '+areaAvg(a.owner,a.key).toFixed(1)).join(', ')}
+`;
+  const approved=osmComps.filter(c=>c.texto&&c.status==='approved');
+  if(approved.length){txt+=`
+COMPROMISOS OSM:
+`;approved.forEach((c,i)=>{txt+=`${i+1}. ${c.texto}${c.metrica?' — '+c.metrica:''}\n`;});}
+  txt+=`
+Evaluación: ${session.admin} — Hestia Management Co.`;
+  window._lastReport360=txt;
+  const htmlBody=txt.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
+  zone.innerHTML=`<div class="rep-card"><div class="rep-hdr"><span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte local</span><button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="copyReport360()"><i class="ti ti-copy"></i> Copiar</button></div><div class="rep-body"><p>${htmlBody}</p></div></div>`;
+}
+
+function dlReport(){
+  if(!window._lastReport360)return;
+  const blob=new Blob([window._lastReport360],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download=(session?.osm||'OSM')+'_360_'+(session?.mo||'')+'.txt';a.click();URL.revokeObjectURL(url);
+}
+
+
+// ── COMPROMISOS ────────────────────────────────────────────────────
+let osmComps = []; // {texto, fecha, metrica, status:'pending'|'approved'|'rejected'}
+let adminComps = []; // {texto, fecha, metrica}
+
+function openCompromisos(){
+  if(!session)return;
+  document.getElementById('comp-title').textContent = session.osm + ' — Compromisos';
+  document.getElementById('comp-sub').textContent = 'Próximo mes: ' + nextMonthLabel(session.mo);
+  if(osmComps.length===0) osmComps=[{texto:'',fecha:'',metrica:'',status:'pending'}];
+  if(adminComps.length===0) adminComps=[{texto:'',fecha:'',metrica:''}];
+  renderCompList();
+  goS('compromisos');
+}
+
+function nextMonthLabel(mo){
+  if(!mo)return'próximo mes';
+  const d=new Date(mo+'-02');d.setMonth(d.getMonth()+1);
+  return d.toLocaleDateString('es',{month:'long',year:'numeric'});
+}
+
+function addOsmComp(){
+  osmComps.push({texto:'',fecha:'',metrica:'',status:'pending'});
+  renderCompList();
+}
+function addAdminComp(){
+  adminComps.push({texto:'',fecha:'',metrica:''});
+  renderCompList();
+}
+function removeOsmComp(i){osmComps.splice(i,1);if(osmComps.length===0)osmComps=[{texto:'',fecha:'',metrica:'',status:'pending'}];renderCompList()}
+function removeAdminComp(i){adminComps.splice(i,1);if(adminComps.length===0)adminComps=[{texto:'',fecha:'',metrica:''}];renderCompList()}
+function setCompStatus(i,status){osmComps[i].status=status;renderCompList()}
+
+function renderCompList(){
+  const ol=document.getElementById('osm-comp-list');
+  const al=document.getElementById('admin-comp-list');
+  if(ol) ol.innerHTML=osmComps.map((c,i)=>`
+    <div class="comp-row">
+      <span class="comp-num">${i+1}</span>
+      <div class="comp-inputs">
+        <input type="text" placeholder="¿Qué me comprometo a mejorar?" value="${(c.texto||'').replace(/"/g,'&quot;')}" oninput="osmComps[${i}].texto=this.value"/>
+        <div class="comp-meta">
+          <input type="text" placeholder="¿Cómo se medirá?" value="${(c.metrica||'').replace(/"/g,'&quot;')}" oninput="osmComps[${i}].metrica=this.value"/>
+          <input type="month" value="${c.fecha||''}" oninput="osmComps[${i}].fecha=this.value"/>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+          <span style="font-size:11px;color:var(--text2)">Estado:</span>
+          <button onclick="setCompStatus(${i},'approved')" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid;cursor:pointer;background:${c.status==='approved'?'var(--green-bg)':'var(--surface2)'};color:${c.status==='approved'?'var(--green)':'var(--text2)'};border-color:${c.status==='approved'?'var(--green-light)':'var(--border)'}">✓ Aprobado</button>
+          <button onclick="setCompStatus(${i},'rejected')" style="font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid;cursor:pointer;background:${c.status==='rejected'?'var(--red-bg)':'var(--surface2)'};color:${c.status==='rejected'?'var(--red)':'var(--text2)'};border-color:${c.status==='rejected'?'#ECA0A0':'var(--border)'}">✗ Rechazado</button>
+          ${osmComps.length>1?`<button onclick="removeOsmComp(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;margin-left:auto"><i class="ti ti-trash-x"></i></button>`:''}
+        </div>
+      </div>
+    </div>`).join('');
+
+  if(al) al.innerHTML=adminComps.map((c,i)=>`
+    <div class="comp-row">
+      <span class="comp-num">${i+1}</span>
+      <div class="comp-inputs">
+        <input type="text" placeholder="Compromiso o acción requerida" value="${(c.texto||'').replace(/"/g,'&quot;')}" oninput="adminComps[${i}].texto=this.value"/>
+        <div class="comp-meta">
+          <input type="text" placeholder="¿Cómo se medirá?" value="${(c.metrica||'').replace(/"/g,'&quot;')}" oninput="adminComps[${i}].metrica=this.value"/>
+          <input type="month" value="${c.fecha||''}" oninput="adminComps[${i}].fecha=this.value"/>
+        </div>
+        ${adminComps.length>1?`<button onclick="removeAdminComp(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;align-self:center"><i class="ti ti-trash-x"></i></button>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function saveCompromisos(){
+  saveToStorage();
+  // show preview
+  const card=document.getElementById('comp-preview-card');
+  const prev=document.getElementById('comp-preview');
+  if(!card||!prev)return;
+  const approved=osmComps.filter(c=>c.texto&&c.status==='approved');
+  const pending=osmComps.filter(c=>c.texto&&c.status==='pending');
+  const adminFilled=adminComps.filter(c=>c.texto);
+  let html='';
+  if(approved.length){
+    html+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">✓ Compromisos aprobados del OSM</div>`;
+    approved.forEach((c,i)=>{html+=`<div style="display:flex;gap:10px;margin-bottom:8px;padding:10px;background:var(--green-bg);border-radius:var(--radius-sm);border:1px solid var(--green-light)"><span style="font-size:12px;font-weight:700;color:var(--green);min-width:20px">${i+1}</span><div><div style="font-size:13px;font-weight:500">${c.texto}</div>${c.metrica?`<div style="font-size:11px;color:var(--text2);margin-top:3px">Métrica: ${c.metrica}</div>`:''}${c.fecha?`<div style="font-size:11px;color:var(--text2)">Fecha: ${moLabel(c.fecha)}</div>`:''}</div></div>`;});
+    html+='</div>';
+  }
+  if(pending.length){
+    html+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">⏳ Compromisos pendientes de aprobación</div>`;
+    pending.forEach(c=>{html+=`<div style="padding:8px 10px;background:var(--amber-bg);border-radius:var(--radius-sm);border:1px solid var(--amber-light);font-size:13px;margin-bottom:6px">${c.texto}</div>`;});
+    html+='</div>';
+  }
+  if(adminFilled.length){
+    html+=`<div><div style="font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📋 Compromisos definidos por la Responsable</div>`;
+    adminFilled.forEach((c,i)=>{html+=`<div style="display:flex;gap:10px;margin-bottom:8px;padding:10px;background:var(--blue-bg);border-radius:var(--radius-sm);border:1px solid #BFDBFE"><span style="font-size:12px;font-weight:700;color:var(--blue);min-width:20px">${i+1}</span><div><div style="font-size:13px;font-weight:500">${c.texto}</div>${c.metrica?`<div style="font-size:11px;color:var(--text2);margin-top:3px">Métrica: ${c.metrica}</div>`:''}${c.fecha?`<div style="font-size:11px;color:var(--text2)">Fecha: ${moLabel(c.fecha)}</div>`:''}</div></div>`;});
+    html+='</div>';
+  }
+  if(!html)html='<p style="font-size:13px;color:var(--text2)">Agrega y aprueba compromisos para verlos aquí.</p>';
+  prev.innerHTML=html;
+  card.style.display='block';
+  notify('Compromisos guardados');
+}
+
+
+
+// ── LEER COMPROMISOS DEL OSM ───────────────────────────────────────
+function approveCompromisos(){
+  const cd=window._osmCompromisos;if(!cd)return;
+  // Load them into the osmComps array
+  osmComps=cd.comps.map(c=>({texto:c.texto,metrica:c.metrica,fecha:c.fecha,status:'pending'}));
+  notify('Compromisos del OSM cargados — revísalos en la sección Compromisos');
+  openCompromisos();
+}
+
+// ── INIT ───────────────────────────────────────────────────────────
+document.getElementById('s-month').value=new Date().toISOString().slice(0,7);
+const loaded=loadFromStorage();
+if(loaded&&session){
+  // Show session info on home
+  const area=document.getElementById('session-join-area');
+  area.innerHTML=`<div class="card" style="background:var(--green-bg);border-color:var(--green-light);margin-bottom:16px">
+    <div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:4px"><i class="ti ti-circle-check"></i> Sesión activa: ${session.osm} · ${moLabel(session.mo)}</div>
+    <div style="font-size:12px;color:var(--text2)">Código: <strong style="font-family:'DM Mono',monospace">${session.id}</strong> · <a href="#" onclick="session=null;evalData={rh:{scores:{},comments:{},openAnswers:{},submitted:false},cont:{scores:{},comments:{},openAnswers:{},submitted:false},admin:{scores:{},comments:{},submitted:false}};localStorage.clear();location.reload();return false" style="color:var(--red)">Nueva sesión</a></div>
+  </div>`;
+}
+</script>
+</body>
+</html>

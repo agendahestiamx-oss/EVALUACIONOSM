@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Compromisos del mes — Hestia OSM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
+<style>
+:root{
+  --bg:#F5F4F0;--surface:#FFFFFF;--surface2:#EFEDE7;--border:#E0DDD5;--border2:#C8C4B8;
+  --text:#1C1A17;--text2:#6A6860;--text3:#A8A59E;
+  --green:#1A7A5E;--green-bg:#E6F4EF;--green-light:#B8E0D2;
+  --amber:#8A5700;--amber-bg:#FEF3D6;--amber-light:#FDE68A;
+  --red:#8B1E1E;--red-bg:#FDE8E8;
+  --blue:#1A3F8A;--blue-bg:#E8EFF8;
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 3px 12px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+input,select,textarea,button{font-family:'DM Sans',sans-serif;font-size:14px}
+input,select,textarea{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text);width:100%;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(26,122,94,.1)}
+.app{max-width:640px;margin:0 auto;padding:24px 20px}
+
+.header{text-align:center;padding:2rem 0 1.5rem}
+.hestia-brand{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8A7D6B;margin-bottom:16px}
+.header h1{font-size:20px;font-weight:600;margin-bottom:6px}
+.header p{font-size:13px;color:var(--text2);line-height:1.6;max-width:440px;margin:0 auto}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.fl{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+
+.comp-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow)}
+.comp-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.comp-num{width:26px;height:26px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace}
+.comp-num-label{font-size:13px;font-weight:600;color:var(--text)}
+.comp-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.comp-body textarea{font-size:13px;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);resize:vertical;min-height:72px;width:100%;line-height:1.6}
+.comp-body textarea:focus{outline:none;border-color:var(--green)}
+.comp-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.rm-comp{background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;padding:3px;border-radius:4px;transition:color .15s;margin-left:auto}
+.rm-comp:hover{color:var(--red)}
+.add-comp-btn{width:100%;padding:10px;font-size:13px;border:1px dashed var(--border2);border-radius:var(--radius-sm);background:none;color:var(--text2);cursor:pointer;transition:all .15s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:6px}
+.add-comp-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--border)}
+
+.refl-area{width:100%;font-size:13px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);resize:vertical;min-height:80px;line-height:1.6}
+.refl-area:focus{outline:none;border-color:var(--green)}
+
+.btn{padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--text);color:#fff;width:100%;justify-content:center;padding:13px}.btn-primary:hover{opacity:.85}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--text2)}.btn-ghost:hover{background:var(--surface2)}
+
+.screen{display:none}.screen.on{display:block}
+
+.info-banner{background:var(--green-bg);border:1px solid var(--green-light);border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;display:flex;gap:10px}
+.info-banner i{font-size:18px;color:var(--green);flex-shrink:0;margin-top:1px}
+.info-banner-text{font-size:13px;color:var(--text2);line-height:1.6}
+.info-banner-text strong{color:var(--text)}
+
+.reporte-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;box-shadow:var(--shadow)}
+.area-score-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.area-score-bar-wrap{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.area-score-bar{height:100%;border-radius:3px}
+.score-big{font-size:36px;font-weight:700;font-family:'DM Mono',monospace}
+
+.done-screen{text-align:center;padding:3rem 1rem}
+.done-icon{font-size:52px;margin-bottom:16px}
+
+.notif{position:fixed;top:20px;right:20px;background:var(--text);color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:var(--radius-sm);opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.18)}
+.notif.show{opacity:1}
+
+@media(max-width:500px){.fg,.comp-meta{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="notif" id="notif"></div>
+<div class="app">
+
+<!-- ACCESO -->
+<div id="scr-login" class="screen on">
+  <div class="header">
+    <div class="hestia-brand">Hestia Management Co.</div>
+    <h1>Compromisos del mes</h1>
+    <p>Después de revisar tu evaluación, define los compromisos que vas a trabajar el siguiente mes.</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-key"></i> Ingresa tu código de sesión</div>
+    <div style="margin-bottom:10px"><div class="fl">Código (te lo dio la Responsable de OSMs)</div>
+      <input type="text" id="login-code" placeholder="Ej. A3B7C2"
+        style="font-family:'DM Mono',monospace;font-size:20px;text-transform:uppercase;text-align:center;letter-spacing:.12em"
+        oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')loginOSM()"/>
+    </div>
+    <div style="margin-bottom:14px"><div class="fl">Tu nombre</div>
+      <input type="text" id="login-name" placeholder="Escribe tu nombre completo"/>
+    </div>
+    <button class="btn btn-primary" onclick="loginOSM()"><i class="ti ti-arrow-right"></i> Ver mi evaluación y definir compromisos</button>
+  </div>
+  <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:12px">
+    Si no tienes el código, pídelo a la Responsable de OSMs de Hestia.
+  </p>
+</div>
+
+<!-- REPORTE + COMPROMISOS -->
+<div id="scr-form" class="screen">
+  <div class="header" style="padding-top:0">
+    <div class="hestia-brand">Hestia Management Co.</div>
+    <h1 id="form-title"></h1>
+    <p id="form-sub" style="margin-top:4px"></p>
+  </div>
+
+  <!-- Resumen de evaluación -->
+  <div class="reporte-card" id="eval-summary">
+    <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px">Tu evaluación del mes</div>
+    <div id="scores-display"></div>
+  </div>
+
+  <!-- Reflexión del OSM -->
+  <div class="card">
+    <div class="card-title"><i class="ti ti-message-2"></i> Tu reflexión</div>
+    <div class="info-banner" style="margin-bottom:12px">
+      <i class="ti ti-bulb"></i>
+      <div class="info-banner-text">Antes de definir tus compromisos, tómate un momento para reflexionar sobre el mes. ¿Qué salió bien? ¿Qué fue difícil? ¿Qué aprendiste?</div>
+    </div>
+    <div class="fl">¿Cómo fue el mes para ti? ¿Qué destacarías?</div>
+    <textarea class="refl-area" id="reflexion-general" placeholder="Escribe libremente..."></textarea>
+    <div class="fl" style="margin-top:10px">¿Hubo algo que dificultó tu trabajo este mes?</div>
+    <textarea class="refl-area" id="reflexion-obstaculos" placeholder="Obstáculos, situaciones externas, falta de recursos..."></textarea>
+  </div>
+
+  <!-- Compromisos -->
+  <div class="card">
+    <div class="card-title"><i class="ti ti-checklist"></i> Tus compromisos para el siguiente mes</div>
+    <div class="info-banner" style="margin-bottom:14px">
+      <i class="ti ti-info-circle"></i>
+      <div class="info-banner-text">Define <strong>entre 2 y 5 compromisos concretos</strong> que vas a trabajar el próximo mes. Cada uno debe tener una acción específica y una forma de medirlo. La Responsable los revisará y aprobará.</div>
+    </div>
+    <div id="comp-list"></div>
+    <button class="add-comp-btn" id="add-btn" onclick="addComp()"><i class="ti ti-plus"></i> Agregar compromiso</button>
+  </div>
+
+  <!-- Mensaje para la Responsable -->
+  <div class="card">
+    <div class="card-title"><i class="ti ti-message-forward"></i> Mensaje para la Responsable</div>
+    <div class="fl">¿Hay algo que quieras comunicarle directamente? (opcional)</div>
+    <textarea class="refl-area" id="mensaje-resp" placeholder="Solicitudes de apoyo, comentarios sobre la evaluación, lo que necesites..."></textarea>
+  </div>
+
+  <button class="btn btn-primary" onclick="submitCompromisos()" style="margin-bottom:24px">
+    <i class="ti ti-send"></i> Enviar mis compromisos
+  </button>
+</div>
+
+<!-- DONE -->
+<div id="scr-done" class="screen">
+  <div class="done-screen">
+    <div class="done-icon">✅</div>
+    <h2 style="font-size:20px;font-weight:600;margin-bottom:8px">¡Compromisos enviados!</h2>
+    <p style="font-size:14px;color:var(--text2);max-width:380px;margin:0 auto 20px;line-height:1.7">
+      La Responsable de OSMs recibirá tus compromisos, los revisará y generará el reporte final del mes.
+    </p>
+    <div id="comp-summary" style="background:var(--green-bg);border:1px solid var(--green-light);border-radius:var(--radius);padding:16px;text-align:left;margin-bottom:20px"></div>
+    <p style="font-size:12px;color:var(--text3)">Puedes cerrar esta ventana.</p>
+  </div>
+</div>
+
+</div>
+<script>
+// ── STATE ──────────────────────────────────────────────────────────
+let session = null;
+let evalData = null;
+let osmName = '';
+let comps = [{texto:'',metrica:'',fecha:''}];
+const ROLE_COLORS = {rh:'#5B21B6',cont:'#1A3F8A',admin:'#1A7A5E'};
+const ROLE_NAMES = {rh:'RH / Personas',cont:'Contabilidad',admin:'Operaciones'};
+const ROLE_WEIGHTS = {rh:30,cont:30,admin:40};
+
+function moLabel(mo){return mo?new Date(mo+'-02').toLocaleDateString('es',{month:'long',year:'numeric'}):''}
+function nextMonthLabel(mo){
+  if(!mo)return'próximo mes';
+  const d=new Date(mo+'-02');d.setMonth(d.getMonth()+1);
+  return d.toLocaleDateString('es',{month:'long',year:'numeric'});
+}
+function interp(v){
+  if(v===null||v===undefined)return{label:'Sin datos',color:'#A8A59E'};
+  if(v<1.5)return{label:'Deficiente',color:'#DC2626'};
+  if(v<2.5)return{label:'Necesita mejora',color:'#D97706'};
+  if(v<3.5)return{label:'Cumple',color:'#16A34A'};
+  if(v<4.5)return{label:'Buen desempeño',color:'#2563EB'};
+  return{label:'Excelencia',color:'#1A7A5E'};
+}
+function notify(msg){
+  const el=document.getElementById('notif');
+  el.innerHTML=`<i class="ti ti-circle-check"></i> ${msg}`;
+  el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600);
+}
+function goS(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));document.getElementById('scr-'+s).classList.add('on')}
+
+// ── LOGIN ──────────────────────────────────────────────────────────
+function loginOSM(){
+  const code=document.getElementById('login-code').value.trim().toUpperCase();
+  const name=document.getElementById('login-name').value.trim();
+  if(!code){alert('Ingresa el código de sesión');return}
+  if(!name){alert('Ingresa tu nombre');return}
+
+  // Load from localStorage
+  try{
+    const s=localStorage.getItem('osm360_session');
+    const e=localStorage.getItem('osm360_eval');
+    if(s)session=JSON.parse(s);
+    if(e)evalData=JSON.parse(e);
+  }catch(ex){}
+
+  if(!session||session.id!==code){
+    alert('Código incorrecto. Pide el código actualizado a la Responsable de OSMs.');return;
+  }
+
+  osmName=name;
+  renderForm();
+  goS('form');
+}
+
+// ── SCORES ────────────────────────────────────────────────────────
+function roleOverall(role){
+  if(!evalData||!evalData[role])return null;
+  const AREAS_MAP={
+    rh:[
+      {key:'staff',crit:8},{key:'actitud',crit:6},{key:'homeowners_rh',crit:4}
+    ],
+    cont:[
+      {key:'contabilidad',crit:7},{key:'relacion_cont',crit:5},{key:'comunicacion_cont',crit:3}
+    ],
+    admin:[
+      {key:'operacion',crit:10},{key:'mantenimiento',crit:8},{key:'homeowners_admin',crit:5},{key:'comunicacion_admin',crit:6}
+    ]
+  };
+  const areas=AREAS_MAP[role]||[];
+  let allVals=[];
+  areas.forEach(a=>{
+    for(let i=0;i<a.crit;i++){
+      const v=evalData[role].scores[a.key+'|'+i];
+      if(v!==null&&v!==undefined)allVals.push(v);
+    }
+  });
+  return allVals.length?allVals.reduce((a,b)=>a+b,0)/allVals.length:null;
+}
+
+function globalScore(){
+  let sum=0,w=0;
+  ['rh','cont','admin'].forEach(role=>{
+    const ov=roleOverall(role);
+    if(ov!==null){sum+=ov*ROLE_WEIGHTS[role];w+=ROLE_WEIGHTS[role]}
+  });
+  return w?sum/w:null;
+}
+
+// ── RENDER FORM ────────────────────────────────────────────────────
+function renderForm(){
+  document.getElementById('form-title').textContent=session.osm;
+  document.getElementById('form-sub').textContent=moLabel(session.mo)+(session.condos?' · '+session.condos:'');
+
+  const global=globalScore();
+  const it=interp(global);
+  let scoresHtml='';
+
+  // Global score
+  scoresHtml+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+    <div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Score 360° consolidado</div>
+      <div class="score-big" style="color:${it.color}">${global!==null?global.toFixed(2):'—'}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:14px;font-weight:600;color:${it.color}">${it.label}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">/ 5.00 puntos</div>
+    </div>
+  </div>`;
+
+  // Scores por evaluadora
+  scoresHtml+=`<div style="margin-bottom:12px">`;
+  ['rh','cont','admin'].forEach(role=>{
+    const ov=roleOverall(role);
+    const ri=interp(ov);
+    const pct=ov!==null?Math.round(ov/5*100):0;
+    scoresHtml+=`<div class="area-score-row">
+      <span style="font-size:12px;min-width:110px;color:var(--text2)">${ROLE_NAMES[role]}</span>
+      <div class="area-score-bar-wrap"><div class="area-score-bar" style="width:${pct}%;background:${ri.color}"></div></div>
+      <span style="font-size:12px;font-weight:600;min-width:32px;text-align:right;font-family:'DM Mono',monospace;color:${ri.color}">${ov!==null?ov.toFixed(1):'—'}</span>
+    </div>`;
+  });
+  scoresHtml+=`</div>`;
+
+  // Contexto si hay
+  if(session.notas){
+    scoresHtml+=`<div style="background:var(--amber-bg);border:1px solid var(--amber-light);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--text2)">
+      <strong style="color:var(--text)">Contexto del mes:</strong> ${session.notas}
+    </div>`;
+  }
+
+  document.getElementById('scores-display').innerHTML=scoresHtml;
+  renderCompList();
+}
+
+// ── COMPROMISOS ────────────────────────────────────────────────────
+function addComp(){
+  if(comps.length>=5){notify('Máximo 5 compromisos');return}
+  comps.push({texto:'',metrica:'',fecha:''});
+  renderCompList();
+}
+function removeComp(i){
+  if(comps.length<=1)return;
+  comps.splice(i,1);
+  renderCompList();
+}
+function renderCompList(){
+  const el=document.getElementById('comp-list');if(!el)return;
+  el.innerHTML=comps.map((c,i)=>`
+    <div class="comp-block">
+      <div class="comp-hdr">
+        <div class="comp-num">${i+1}</div>
+        <span class="comp-num-label">Compromiso ${i+1}</span>
+        ${comps.length>1?`<button class="rm-comp" onclick="removeComp(${i})" title="Eliminar"><i class="ti ti-trash-x"></i></button>`:''}
+      </div>
+      <div class="comp-body">
+        <div>
+          <div class="fl">¿Qué te comprometes a hacer o mejorar?</div>
+          <textarea placeholder="Sé específico y concreto. Ej: 'Entregar el reporte de gastos antes del día 5 de cada mes'" oninput="comps[${i}].texto=this.value">${(c.texto||'').replace(/</g,'&lt;')}</textarea>
+        </div>
+        <div class="comp-meta">
+          <div>
+            <div class="fl">¿Cómo sabremos que lo cumpliste?</div>
+            <input type="text" placeholder="Métrica o evidencia" value="${(c.metrica||'').replace(/"/g,'&quot;')}" oninput="comps[${i}].metrica=this.value"/>
+          </div>
+          <div>
+            <div class="fl">Fecha límite</div>
+            <input type="month" value="${c.fecha||nextMonth()}" oninput="comps[${i}].fecha=this.value"/>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+
+  // Hide add button if max reached
+  const addBtn=document.getElementById('add-btn');
+  if(addBtn)addBtn.style.display=comps.length>=5?'none':'flex';
+}
+
+function nextMonth(){
+  const d=new Date();d.setMonth(d.getMonth()+1);
+  return d.toISOString().slice(0,7);
+}
+
+// ── SUBMIT ─────────────────────────────────────────────────────────
+function submitCompromisos(){
+  const filled=comps.filter(c=>c.texto.trim());
+  if(!filled.length){alert('Agrega al menos un compromiso antes de enviar.');return}
+
+  const reflexion=document.getElementById('reflexion-general').value.trim();
+  const obstaculos=document.getElementById('reflexion-obstaculos').value.trim();
+  const mensaje=document.getElementById('mensaje-resp').value.trim();
+
+  // Save to localStorage so the admin system can read it
+  const compData={
+    osmName,
+    reflexion,
+    obstaculos,
+    mensaje,
+    comps:filled,
+    timestamp:new Date().toISOString(),
+    sessionId:session.id
+  };
+  try{localStorage.setItem('osm360_compromisos',JSON.stringify(compData));}catch(ex){}
+
+  // Show done screen
+  let summaryHtml=`<div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:10px">${filled.length} compromiso${filled.length>1?'s':''} registrado${filled.length>1?'s':''}:</div>`;
+  filled.forEach((c,i)=>{
+    summaryHtml+=`<div style="display:flex;gap:8px;margin-bottom:8px"><span style="font-size:12px;font-weight:700;color:var(--green);min-width:16px">${i+1}</span>
+      <div><div style="font-size:13px;font-weight:500">${c.texto}</div>
+      ${c.metrica?`<div style="font-size:11px;color:var(--text2);margin-top:2px">📏 ${c.metrica}</div>`:''}
+      ${c.fecha?`<div style="font-size:11px;color:var(--text2)">📅 ${moLabel(c.fecha)}</div>`:''}</div></div>`;
+  });
+  document.getElementById('comp-summary').innerHTML=summaryHtml;
+  goS('done');
+}
+</script>
+</body>
+</html>
