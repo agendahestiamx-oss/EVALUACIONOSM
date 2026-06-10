@@ -172,6 +172,38 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);b
 <script>
 // ── STATE ──────────────────────────────────────────────────────────
 let session = null;
+const SP_API = 'https://hestiamx-my.sharepoint.com/personal/yaiza_hestiamx_com/_api/lists/getbytitle(%27OSM%20Eval%20Eventos%27)/items';
+
+async function notifyServer(tipo, datos){
+  try{
+    const ctxResp = await fetch(
+      'https://hestiamx-my.sharepoint.com/personal/yaiza_hestiamx_com/_api/contextinfo',
+      {method:'POST', headers:{'Accept':'application/json;odata=verbose'}}
+    );
+    if(!ctxResp.ok) return;
+    const ctx = await ctxResp.json();
+    const token = ctx.d.GetContextWebInformation.FormDigestValue;
+    await fetch(SP_API, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json;odata=verbose',
+        'Content-Type': 'application/json;odata=verbose',
+        'X-RequestDigest': token
+      },
+      body: JSON.stringify({
+        '__metadata': {'type': 'SP.Data.OSM_x0020_Eval_x0020_EventosListItem'},
+        'Title': tipo,
+        'tipo': tipo,
+        'osm': datos.osm || '',
+        'condominios': datos.condominios || '',
+        'codigo': datos.codigo || '',
+        'mensaje': datos.mensaje || ''
+      })
+    });
+  } catch(e) {
+    console.log('SharePoint notify error:', e.message);
+  }
+}
 let evalData = null;
 let osmName = '';
 let comps = [{texto:'',metrica:'',fecha:''}];
@@ -372,6 +404,8 @@ function submitCompromisos(){
     sessionId:session.id
   };
   try{localStorage.setItem('osm360_compromisos',JSON.stringify(compData));}catch(ex){}
+  // Notificar a la Responsable
+  notifyServer('compromisos_recibidos',{osm:osmName,condominios:session.condos||'',mensaje:reflexion.slice(0,200)});
 
   // Show done screen
   let summaryHtml=`<div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:10px">${filled.length} compromiso${filled.length>1?'s':''} registrado${filled.length>1?'s':''}:</div>`;

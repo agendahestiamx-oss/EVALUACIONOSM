@@ -452,10 +452,51 @@ const AREAS_ADMIN = [
 const ROLE_AREAS = {rh: AREAS_RH, cont: AREAS_CONT, admin: AREAS_ADMIN};
 const ROLE_COLORS = {rh:'#5B21B6', cont:'#1A3F8A', admin:'#1A7A5E'};
 const ROLE_NAMES = {rh:'Carmen — RH', cont:'Contabilidad', admin:'Responsable OSMs'};
-const ROLE_WEIGHTS = {rh:30, cont:30, admin:40}; // % del score final
+const ROLE_WEIGHTS = {rh:30, cont:30, admin:40};
+
+// ── NOTIFICACIONES VÍA SHAREPOINT LIST ────────────────────────────
+// Escribe eventos en la lista "OSM Eval Eventos" de SharePoint
+// Power Automate detecta los nuevos elementos y envía los correos
+const SP_API = 'https://hestiamx-my.sharepoint.com/personal/yaiza_hestiamx_com/_api/lists/getbytitle(%27OSM%20Eval%20Eventos%27)/items';
+
+async function notifyServer(tipo, datos){
+  try{
+    // Obtener el token de formulario de SharePoint (necesario para POST)
+    const ctxResp = await fetch(
+      'https://hestiamx-my.sharepoint.com/personal/yaiza_hestiamx_com/_api/contextinfo',
+      {method:'POST', headers:{'Accept':'application/json;odata=verbose'}}
+    );
+    if(!ctxResp.ok) return;
+    const ctx = await ctxResp.json();
+    const token = ctx.d.GetContextWebInformation.FormDigestValue;
+
+    await fetch(SP_API, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json;odata=verbose',
+        'Content-Type': 'application/json;odata=verbose',
+        'X-RequestDigest': token
+      },
+      body: JSON.stringify({
+        '__metadata': {'type': 'SP.Data.OSM_x0020_Eval_x0020_EventosListItem'},
+        'Title': tipo,
+        'tipo': tipo,
+        'osm': datos.osm || '',
+        'condominios': datos.condominios || '',
+        'codigo': datos.codigo || '',
+        'mensaje': datos.mensaje || ''
+      })
+    });
+    console.log('Evento registrado en SharePoint:', tipo);
+  } catch(e) {
+    console.log('No se pudo registrar en SharePoint:', e.message);
+  }
+} // % del score final
 
 // ── STATE ──────────────────────────────────────────────────────────
 let session = null; // {id, osm, mo, admin, condos, notas, created}
+let condoList = []; // parsed array of condo names
+let activeCondo360 = 0; // currently selected condo index in 360 eval
 let evalData = {rh:{scores:{},comments:{},openAnswers:{},submitted:false}, cont:{scores:{},comments:{},openAnswers:{},submitted:false}, admin:{scores:{},comments:{},submitted:false}};
 let currentRole = null;
 let openAreas = {};
@@ -510,10 +551,15 @@ function globalScore(){
 }
 function countFilled(role){
   const areas=ROLE_AREAS[role];let n=0;
-  areas.forEach(a=>a.criteria.forEach((_,i)=>{if(evalData[role].scores[a.key+'|'+i]!==null&&evalData[role].scores[a.key+'|'+i]!==undefined)n++}));
+  const numCondos=condoList.length||1;
+  for(let ci=0;ci<numCondos;ci++){
+    areas.forEach(a=>a.criteria.forEach((_,i)=>{
+      if(evalData[role].scores[ci+'|'+a.key+'|'+i]!==null&&evalData[role].scores[ci+'|'+a.key+'|'+i]!==undefined)n++;
+    }));
+  }
   return n;
 }
-function totalCrit(role){return ROLE_AREAS[role].reduce((s,a)=>s+a.criteria.length,0)}
+function totalCrit(role){return ROLE_AREAS[role].reduce((s,a)=>s+a.criteria.length,0)*(condoList.length||1)}
 
 // ── NAVIGATION ─────────────────────────────────────────────────────
 function goS(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));document.getElementById('scr-'+s).classList.add('on')}
@@ -528,6 +574,8 @@ function createSession(){
   if(!admin){notify('Ingresa tu nombre','err');return}
   const id=Math.random().toString(36).slice(2,8).toUpperCase();
   session={id,osm:nm,mo,admin,condos:document.getElementById('s-condos').value.trim(),notas:document.getElementById('s-notas').value.trim(),created:new Date().toISOString()};
+  condoList=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];
+  if(condoList.length===0)condoList=['Principal'];
   evalData={rh:{scores:{},comments:{},openAnswers:{},submitted:false},cont:{scores:{},comments:{},openAnswers:{},submitted:false},admin:{scores:{},comments:{},submitted:false}};
   saveToStorage();
   renderAdminScreen();
@@ -561,6 +609,8 @@ function joinSession(role){
   const code=document.getElementById('join-code').value.trim().toUpperCase();
   if(!session||session.id!==code){notify('Código incorrecto. Pide el código a la Responsable de OSMs.','err');return}
   currentRole=role;
+  condoList=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];
+  if(condoList.length===0)condoList=['Principal'];
   if(evalData[role].submitted){notify('Ya enviaste tu evaluación este mes. Gracias!','info');return}
   renderRoleScreen(role);goS(role);
 }
@@ -575,8 +625,16 @@ function renderRoleScreen(role){
   updateProgress(role);
   const bodyEl=document.getElementById(role+'-body');
   if(!bodyEl)return;
-  bodyEl.innerHTML=areas.map(area=>{
-    const avg=areaAvg(role,area.key);const isO=openAreas[area.key]!==false;
+  // Add condo tabs if multiple condos
+  let condoTabsHtml='';
+  if(condoList.length>1){
+    condoTabsHtml=`<div style="display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px">
+      ${condoList.map((c,i)=>`<button style="flex:1;padding:9px 8px;font-size:12px;font-weight:${i===activeCondo360?'600':'400'};color:${i===activeCondo360?'#fff':'var(--text2)'};background:${i===activeCondo360?'var(--text)':'none'};border:none;border-right:1px solid var(--border);cursor:pointer;text-align:center;transition:all .15s" onclick="switchCondo360(${i},'${role}')">${c}</button>`).join('')}
+    </div>`;
+  }
+  const condoLabel=condoList.length>1?`<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Evaluando: ${condoList[activeCondo360]}</div>`:'';
+  bodyEl.innerHTML=condoTabsHtml+condoLabel+areas.map(area=>{
+    const avg=areaAvg(role,area.key,activeCondo360);const isO=openAreas[area.key]!==false;
     const tagClass={'rh':'tag-rh','cont':'tag-cont','admin':'tag-admin','shared':'tag-shared'}[area.tag]||'tag-shared';
     const tagLabel={'rh':'RH','cont':'Contabilidad','admin':'Operaciones','shared':'Compartida'}[area.tag]||area.tag;
     return`<div class="area-block">
@@ -592,14 +650,14 @@ function renderRoleScreen(role){
           const sc=evalData[role].scores[area.key+'|'+idx];
           const com=evalData[role].comments[area.key+'|'+idx]||'';
           return`<div class="crit-row with-comment"><span class="crit-name">${cr}</span>
-            <div class="pills">${[1,2,3,4,5].map(v=>`<button class="pill p${v}${sc===v?' on':''}" onclick="setSc('${role}','${area.key}',${idx},${v},this)">${v}</button>`).join('')}</div>
-            <input class="com-input" type="text" placeholder="Comentario..." value="${com.replace(/"/g,'&quot;')}" oninput="saveCom('${role}','${area.key}',${idx},this.value)"/>
+            <div class="pills">${[1,2,3,4,5].map(v=>`<button class="pill p${v}${sc===v?' on':''}" onclick="setSc('${role}','${area.key}',${idx},${v},this,activeCondo360)">${v}</button>`).join('')}</div>
+            <input class="com-input" type="text" placeholder="Comentario..." value="${com.replace(/"/g,'"')}" oninput="saveCom('${role}','${area.key}',${idx},this.value,activeCondo360)"/>
           </div>`;
         }).join('')}
         ${area.openQuestions?`<div style="padding:12px 15px;border-top:1px solid var(--border);background:var(--surface2)">
           ${area.openQuestions.map(q=>`
             <span class="open-q-label">${q.label}</span>
-            <textarea class="open-q" placeholder="Escribe aquí..." oninput="saveOpenQ('${role}','${q.key}',this.value)">${(evalData[role].openAnswers[q.key]||'').replace(/</g,'&lt;')}</textarea>
+            <textarea class="open-q" placeholder="Escribe aquí..." oninput="saveOpenQ('${role}','${q.key}',this.value)">${(evalData[role].openAnswers[q.key]||'').replace(/</g,'<')}</textarea>
           `).join('')}
         </div>`:''}
         <div class="area-res">
@@ -644,7 +702,7 @@ function renderAdminScreen(){
   // Admin eval areas
   bodyEl.innerHTML+=`<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Tu evaluación — Operación completa</div>`;
   bodyEl.innerHTML+=AREAS_ADMIN.map(area=>{
-    const avg=areaAvg('admin',area.key);const isO=openAreas[area.key]!==false;
+    const avg=areaAvg('admin',area.key,activeCondo360);const isO=openAreas[area.key]!==false;
     return`<div class="area-block">
       <div class="area-hdr" onclick="toggleArea('${area.key}')">
         <div class="area-hdr-l"><i class="ti ${area.icon}" style="font-size:15px;color:var(--text2)"></i><span class="area-ttl">${area.label}</span></div>
@@ -653,8 +711,8 @@ function renderAdminScreen(){
       <div class="area-body${isO?' open':''}" id="ab-${area.key}">
         ${area.criteria.map((cr,idx)=>{const sc=evalData.admin.scores[area.key+'|'+idx];const com=evalData.admin.comments[area.key+'|'+idx]||'';
           return`<div class="crit-row with-comment"><span class="crit-name">${cr}</span>
-            <div class="pills">${[1,2,3,4,5].map(v=>`<button class="pill p${v}${sc===v?' on':''}" onclick="setSc('admin','${area.key}',${idx},${v},this)">${v}</button>`).join('')}</div>
-            <input class="com-input" type="text" placeholder="Comentario..." value="${com.replace(/"/g,'&quot;')}" oninput="saveCom('admin','${area.key}',${idx},this.value)"/>
+            <div class="pills">${[1,2,3,4,5].map(v=>`<button class="pill p${v}${sc===v?' on':''}" onclick="setSc('admin','${area.key}',${idx},${v},this,activeCondo360)">${v}</button>`).join('')}</div>
+            <input class="com-input" type="text" placeholder="Comentario..." value="${com.replace(/"/g,'"')}" oninput="saveCom('admin','${area.key}',${idx},this.value,activeCondo360)"/>
           </div>`;
         }).join('')}
         <div class="area-res"><span class="area-res-lbl">${area.label}</span><span id="ares-admin-${area.key}">${badge(avg)}</span></div>
@@ -668,19 +726,20 @@ function toggleArea(ak){
   if(b)b.classList.toggle('open',!openAreas[ak]);
   if(c)c.style.transform=`rotate(${openAreas[ak]?0:180}deg)`;
 }
-function setSc(role,ak,idx,val,btn){
-  const key=ak+'|'+idx;const prev=evalData[role].scores[key];
+function setSc(role,ak,idx,val,btn,ci){
+  const condoIdx=ci!==undefined?ci:activeCondo360;
+  const key=condoIdx+'|'+ak+'|'+idx;const prev=evalData[role].scores[key];
   evalData[role].scores[key]=prev===val?null:val;
   btn.parentElement.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
   if(prev!==val)btn.classList.add('on');
-  const avg=areaAvg(role,ak);
+  const avg=areaAvg(role,ak,condoIdx);
   const rb=document.getElementById('ares-'+role+'-'+ak)||document.getElementById('ares-admin-'+ak);
   if(rb)rb.innerHTML=badge(avg);
   const hdr=document.getElementById('ahdr-'+role+'-'+ak)||document.getElementById('ahdr-admin-'+ak);
   if(hdr){const chev=document.getElementById('chev-'+ak);hdr.innerHTML=`${badge(avg)}<i class="ti ti-chevron-down chev" style="transform:rotate(${openAreas[ak]?0:180}deg)" id="chev-${ak}"></i>`;}
   updateProgress(role);saveToStorage();
 }
-function saveCom(role,ak,idx,val){evalData[role].comments[ak+'|'+idx]=val;saveToStorage()}
+function saveCom(role,ak,idx,val,ci){const condoIdx=ci!==undefined?ci:activeCondo360;evalData[role].comments[condoIdx+'|'+ak+'|'+idx]=val;saveToStorage()}
 function saveOpenQ(role,key,val){evalData[role].openAnswers[key]=val;saveToStorage()}
 function updateProgress(role){
   const f=countFilled(role),t=totalCrit(role),p=Math.round(f/t*100);
@@ -789,237 +848,477 @@ function genReport(){
   const zone=document.getElementById('report-zone');
   if(!zone)return;
   const global=globalScore();
-  if(global===null){zone.innerHTML=`<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Completa al menos una sección para generar el reporte.</p></div>`;return}
+  if(global===null){
+    zone.innerHTML=`<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Completa al menos una sección para generar el reporte.</p></div>`;
+    return;
+  }
+  const txt=buildReporteNarrativo();
+  window._lastReport360=txt;
+  renderReporteHTML(zone,txt);
+}
 
-  zone.innerHTML=`<div class="rep-card">
-    <div class="rep-hdr"><span class="rep-ttl"><i class="ti ti-loader spin"></i> Generando reporte ejecutivo...</span></div>
-    <p style="font-size:13px;color:var(--text2);padding:8px 0">Redactando informe profesional — tarda unos segundos...</p>
-  </div>`;
-
+function buildReporteNarrativo(){
   const rhOv=roleOverall('rh'),contOv=roleOverall('cont'),adminOv=roleOverall('admin');
-  const iL=v=>{if(v===null||v===undefined)return'Sin datos';if(v<1.5)return'Deficiente';if(v<2.5)return'Necesita mejora';if(v<3.5)return'Cumple';if(v<4.5)return'Buen desempeño';return'Excelencia'};
+  const global=globalScore();
+  const fecha=new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'});
+  const nm=session.osm;
+  const mes=moLabel(session.mo);
+  const condos=session.condos||'el condominio';
+  const resp=session.admin||'la Responsable';
+
+  const iL=v=>{if(!v&&v!==0)return'sin datos';if(v<1.5)return'Deficiente';if(v<2.5)return'Necesita mejora';if(v<3.5)return'Cumple con lo esperado';if(v<4.5)return'Buen desempeño';return'Excelencia'};
+  const iA=v=>{if(!v&&v!==0)return'';if(v<1.5)return'deficiente';if(v<2.5)return'por debajo del estándar esperado';if(v<3.5)return'dentro del estándar esperado para el rol';if(v<4.5)return'por encima del promedio';return'sobresaliente'};
 
   const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
-  const strong=allAreas.filter(a=>areaAvg(a.owner,a.key)!==null&&areaAvg(a.owner,a.key)>=4).map(a=>a.label+' ('+areaAvg(a.owner,a.key).toFixed(1)+')');
-  const medium=allAreas.filter(a=>areaAvg(a.owner,a.key)!==null&&areaAvg(a.owner,a.key)>=3&&areaAvg(a.owner,a.key)<4).map(a=>a.label+' ('+areaAvg(a.owner,a.key).toFixed(1)+')');
-  const weak=allAreas.filter(a=>areaAvg(a.owner,a.key)!==null&&areaAvg(a.owner,a.key)<3).map(a=>a.label+' ('+areaAvg(a.owner,a.key).toFixed(1)+')');
+  const strong=allAreas.filter(a=>{const v=areaAvg(a.owner,a.key);return v!==null&&v>=4});
+  const medium=allAreas.filter(a=>{const v=areaAvg(a.owner,a.key);return v!==null&&v>=3&&v<4});
+  const weak=allAreas.filter(a=>{const v=areaAvg(a.owner,a.key);return v!==null&&v<3});
 
-  const openQsText=[
-    ...Object.entries(evalData.rh.openAnswers||{}),
-    ...Object.entries(evalData.cont.openAnswers||{})
-  ].filter(([k,v])=>v).map(([k,v])=>`${k.replace('q_','').replace(/_/g,' ')}: "${v}"`).join('\n');
+  // Collect open questions
+  const openRH={...evalData.rh.openAnswers};
+  const openCont={...evalData.cont.openAnswers};
 
-  // Include OSM compromisos from form if available
+  // OSM compromisos
   const osmFormComps=window._osmCompromisos?.comps||[];
-  const allOsmComps=[...osmComps.filter(c=>c.texto&&c.status==='approved'),...osmFormComps.filter(c=>c.texto&&!osmComps.find(x=>x.texto===c.texto))];
-  const compText=allOsmComps.map((c,i)=>`${i+1}. ${c.texto}${c.metrica?' — Métrica: '+c.metrica:''}${c.fecha?' — Fecha: '+moLabel(c.fecha):''}`).join('\n');
-  const osmReflexion=window._osmCompromisos?.reflexion?`\nReflexión del OSM: "${window._osmCompromisos.reflexion}"`:'' ;
-  const osmMensaje=window._osmCompromisos?.mensaje?`\nMensaje al equipo: "${window._osmCompromisos.mensaje}"`:'' ;
-  const adminCompText=adminComps.filter(c=>c.texto).map((c,i)=>`${i+1}. ${c.texto}${c.metrica?' — Métrica: '+c.metrica:''}${c.fecha?' — Fecha: '+moLabel(c.fecha):''}`).join('\n');
+  const approvedComps=[...osmComps.filter(c=>c.texto&&c.status==='approved'),...osmFormComps.filter(c=>c.texto&&!osmComps.find(x=>x.texto===c.texto))];
+  const adminFilled=adminComps.filter(c=>c.texto);
 
-  const prompt=`Eres consultor senior de Recursos Humanos en Hestia Management Co., empresa administradora de condominios residenciales de alto nivel en la Riviera Nayarit, México. Redacta un REPORTE EJECUTIVO 360° de evaluación mensual de desempeño.
+  let r='';
+  const L='═'.repeat(60);
+  const l='─'.repeat(60);
 
-DATOS DE LA EVALUACIÓN:
-Colaborador: ${session.osm}
-Período: ${moLabel(session.mo)}
-Condominios: ${session.condos||'—'}
-Responsable OSMs: ${session.admin}
-${session.notas?'Contexto del mes: '+session.notas:''}
+  // ENCABEZADO
+  r+=`HESTIA MANAGEMENT CO.
+`;
+  r+=`REPORTE DE EVALUACIÓN 360° — ON SITE MANAGER
+`;
+  r+=`${L}
 
-SCORES 360° (ponderados):
-- Score consolidado: ${global.toFixed(2)}/5 — ${iL(global)}
-- RH / Personas (30%): ${rhOv?rhOv.toFixed(2)+'/5 — '+iL(rhOv):'No evaluado'}
-- Contabilidad (30%): ${contOv?contOv.toFixed(2)+'/5 — '+iL(contOv):'No evaluado'}
-- Operaciones (40%): ${adminOv?adminOv.toFixed(2)+'/5 — '+iL(adminOv):'No evaluado'}
+`;
+  r+=`Colaborador evaluado:  ${nm}
+`;
+  r+=`Período:               ${mes}
+`;
+  r+=`Condominios a cargo:   ${condos}
+`;
+  r+=`Evaluación conducida por: ${resp}
+`;
+  r+=`Fecha de emisión:      ${fecha}
+`;
+  if(session.notas) r+=`Contexto del mes:      ${session.notas}
+`;
+  r+=`
+`;
 
-SCORES POR ÁREA:
-${allAreas.filter(a=>areaAvg(a.owner,a.key)!==null).map(a=>`- ${a.label}: ${areaAvg(a.owner,a.key).toFixed(2)}/5 — ${iL(areaAvg(a.owner,a.key))}`).join('\n')}
+  // SCORES RESUMEN
+  r+=`RESULTADOS CONSOLIDADOS
+${l}
+`;
+  r+=`Score 360° global:     ${global.toFixed(2)} / 5.00   (${iL(global).toUpperCase()})
+`;
+  if(rhOv!==null)   r+=`  · RH / Personas  (30%):  ${rhOv.toFixed(2)} / 5.00 — ${iL(rhOv)}
+`;
+  if(contOv!==null) r+=`  · Contabilidad   (30%):  ${contOv.toFixed(2)} / 5.00 — ${iL(contOv)}
+`;
+  if(adminOv!==null)r+=`  · Operaciones    (40%):  ${adminOv.toFixed(2)} / 5.00 — ${iL(adminOv)}
+`;
+  r+=`
+`;
 
-Fortalezas (≥4.0): ${strong.join(', ')||'ninguna'}
-En desarrollo (3.0–3.9): ${medium.join(', ')||'ninguna'}
-Requieren atención (<3.0): ${weak.join(', ')||'ninguna'}
+  // 1. RESUMEN EJECUTIVO
+  r+=`1. RESUMEN EJECUTIVO
+${l}
 
-${openQsText?'OBSERVACIONES CUALITATIVAS DE LAS EVALUADORAS:\n'+openQsText:''}
+`;
+  const nivel=iA(global);
+  const tendencia=strong.length>weak.length?'positiva, con más fortalezas que áreas de atención':'mixta, con oportunidades de mejora claramente identificadas';
+  r+=`La evaluación 360° de ${nm} correspondiente a ${mes} refleja un desempeño ${nivel}, con un score consolidado de ${global.toFixed(2)}/5.00. La perspectiva del mes es ${tendencia}.
 
-${compText?'COMPROMISOS DEL OSM (aprobados):\n'+compText:''}
-${adminCompText?'COMPROMISOS DEFINIDOS POR LA RESPONSABLE:\n'+adminCompText:''}
+`;
 
-INSTRUCCIONES DE REDACCIÓN:
-Estructura el reporte con estas secciones claramente separadas. Redacta en párrafos narrativos profesionales, NO listas de bullets. Español neutro latinoamericano, tono directo y constructivo. 600-800 palabras totales.
+  if(global>=4.5){
+    r+=`${nm} demuestra un nivel de excelencia que se evidencia de forma consistente en las tres perspectivas de evaluación — Recursos Humanos, Contabilidad y Operaciones. Este tipo de desempeño es una referencia para el equipo y merece reconocimiento formal.
 
-1. RESUMEN EJECUTIVO (1 párrafo): Síntesis del mes, score global, nivel general, tono del período. Nombra el condominio y al colaborador.
+`;
+  } else if(global>=4){
+    r+=`El mes muestra un colaborador sólido, con áreas bien consolidadas y con potencial claro de seguir creciendo. El reto para el siguiente período es llevar las áreas en desarrollo al mismo nivel que las fortalezas ya identificadas.
 
-2. PERSPECTIVA RH — PERSONAS Y LIDERAZGO (1-2 párrafos): Analiza staff, actitud y trato humano. Integra observaciones cualitativas de Carmen si las hay. Sé específico sobre el impacto en el equipo.
+`;
+  } else if(global>=3){
+    r+=`El desempeño cumple con los estándares operativos de Hestia, aunque con áreas específicas que requieren atención y un plan de mejora estructurado. Con el acompañamiento adecuado, hay margen real de mejora en el corto plazo.
 
-3. PERSPECTIVA CONTABILIDAD — GESTIÓN FINANCIERA (1-2 párrafos): Analiza puntualidad, calidad de reportes y relación con el área. Integra comentarios de Contabilidad. Señala cualquier riesgo financiero-operativo.
+`;
+  } else if(global>=2){
+    r+=`El mes presenta inconsistencias operativas que impactan la experiencia de homeowners, el equipo a cargo y el área administrativa. Se requiere un plan de acción claro con fechas y responsables definidos, y seguimiento cercano en las próximas semanas.
 
-4. PERSPECTIVA OPERACIONES — GESTIÓN DEL CONDOMINIO (1-2 párrafos): Analiza operación, mantenimiento y homeowners. Qué funciona bien y qué no en la gestión diaria.
+`;
+  } else {
+    r+=`Los resultados de esta evaluación están por debajo de los estándares mínimos esperados para el rol de On Site Manager. Se requiere intervención inmediata, revisión de las condiciones del contexto, y una decisión informada sobre continuidad y acompañamiento.
 
-5. SÍNTESIS Y PATRONES: 1 párrafo que identifique patrones transversales entre las tres perspectivas. ¿Hay consistencia entre lo que ven RH, Contabilidad y Operaciones?
+`;
+  }
 
-6. PLAN DE ACCIÓN: Para cada área con score <3.5, define en prosa: la acción, quién lidera, cuándo, y cómo se mide el avance. Concreto y realista.
+  // 2. PERSPECTIVA RH
+  if(rhOv!==null){
+    r+=`2. PERSPECTIVA RECURSOS HUMANOS — PERSONAS Y LIDERAZGO
+${l}
 
-${compText||adminCompText?`7. COMPROMISOS FORMALIZADOS: Redacta un párrafo que integre los compromisos aprobados como cierre formal del proceso evaluativo.`:''}
+`;
+    const staffV=areaAvg('rh','staff'), actV=areaAvg('rh','actitud'), hwRhV=areaAvg('rh','homeowners_rh');
 
-8. VALORACIÓN FINAL (1 párrafo): Juicio calibrado sobre la trayectoria del colaborador. ¿Está creciendo, estable, en riesgo? Recomendación clara para la dirección.
+    r+=`Desde la perspectiva de Recursos Humanos, ${nm} obtiene un score de ${rhOv.toFixed(2)}/5.00 (${iL(rhOv)}). `;
 
-Firma el documento: "Evaluación realizada por: ${session.admin} — Hestia Management Co."`;
-
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,messages:[{role:'user',content:prompt}]})
-  }).then(r=>r.json()).then(data=>{
-    const text=data.content?.map(x=>x.text||'').join('')||'Error al generar.';
-    window._lastReport360=text;
-    const fecha=new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'});
-
-    // Build sections from text
-    const htmlBody=text
-      .replace(/^#{1,3}\s+(.+)$/gm,'<h3>$1</h3>')
-      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-      .replace(/\n\n+/g,'</p><p>')
-      .replace(/\n/g,'<br>');
-
-    // Build compromisos section for report
-    const approvedComps=osmComps.filter(c=>c.texto&&c.status==='approved');
-    const adminFilledComps=adminComps.filter(c=>c.texto);
-    let compHTML='';
-    if(approvedComps.length||adminFilledComps.length){
-      compHTML=`<div style="margin-top:20px;padding-top:16px;border-top:2px solid var(--border)">
-        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Compromisos formalizados — ${nextMonthLabel(session.mo)}</div>`;
-      if(approvedComps.length){
-        compHTML+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:var(--green);margin-bottom:8px">El OSM se compromete a:</div>`;
-        approvedComps.forEach((c,i)=>{compHTML+=`<div style="display:flex;gap:10px;margin-bottom:8px;padding:10px 12px;background:var(--green-bg);border-radius:var(--radius-sm);border-left:3px solid var(--green)"><span style="font-size:12px;font-weight:700;color:var(--green);min-width:18px">${i+1}</span><div><div style="font-size:13px;font-weight:500">${c.texto}</div>${c.metrica?`<div style="font-size:11px;color:var(--text2);margin-top:2px">📏 ${c.metrica}</div>`:''}${c.fecha?`<div style="font-size:11px;color:var(--text2)">📅 ${moLabel(c.fecha)}</div>`:''}</div></div>`;});
-        compHTML+='</div>';
-      }
-      if(adminFilledComps.length){
-        compHTML+=`<div><div style="font-size:11px;font-weight:600;color:var(--blue);margin-bottom:8px">La Responsable establece:</div>`;
-        adminFilledComps.forEach((c,i)=>{compHTML+=`<div style="display:flex;gap:10px;margin-bottom:8px;padding:10px 12px;background:var(--blue-bg);border-radius:var(--radius-sm);border-left:3px solid var(--blue)"><span style="font-size:12px;font-weight:700;color:var(--blue);min-width:18px">${i+1}</span><div><div style="font-size:13px;font-weight:500">${c.texto}</div>${c.metrica?`<div style="font-size:11px;color:var(--text2);margin-top:2px">📏 ${c.metrica}</div>`:''}${c.fecha?`<div style="font-size:11px;color:var(--text2)">📅 ${moLabel(c.fecha)}</div>`:''}</div></div>`;});
-        compHTML+='</div>';
-      }
-      compHTML+='</div>';
+    if(staffV!==null){
+      if(staffV>=4) r+=`En el área de Staff y Liderazgo (${staffV.toFixed(1)}), el colaborador muestra una gestión de equipo sólida, con capacidad de organizar, motivar y resolver situaciones con el personal a cargo. `;
+      else if(staffV>=3) r+=`El área de Staff y Liderazgo (${staffV.toFixed(1)}) cumple el estándar base, aunque hay aspectos de la gestión del equipo que pueden fortalecerse con mayor intencionalidad. `;
+      else r+=`El área de Staff y Liderazgo (${staffV.toFixed(1)}) representa una oportunidad de mejora significativa que puede estar afectando la estabilidad y motivación del equipo a cargo. `;
     }
 
-    zone.innerHTML=`<div class="rep-card">
-      <div class="rep-hdr">
-        <span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte 360° — ${session.osm}</span>
-        <div style="display:flex;gap:6px">
-          <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="copyReport360()"><i class="ti ti-copy"></i> Copiar</button>
-          <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="printReport360()"><i class="ti ti-printer"></i> Imprimir / PDF</button>
-          <button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="genReport()"><i class="ti ti-refresh"></i> Regenerar</button>
-        </div>
-      </div>
-      <div id="printable-report" style="font-family:'DM Sans',sans-serif">
-        <!-- HEADER con logo -->
-        <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;margin-bottom:20px;border-bottom:2px solid var(--border)">
-          <div>
-            <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px">Hestia Management Co.</div>
-            <div style="font-size:18px;font-weight:700;color:var(--text)">Evaluación 360°</div>
-            <div style="font-size:13px;color:var(--text2);margin-top:2px">${session.osm} · ${moLabel(session.mo)}</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:28px;font-weight:700;font-family:'DM Mono',monospace;color:${global>=4?'var(--green)':global>=3?'#D97706':'var(--red)'}">${global.toFixed(2)}</div>
-            <div style="font-size:11px;color:var(--text2)">Score 360° / 5.00</div>
-            <div style="font-size:11px;font-weight:600;color:${global>=4?'var(--green)':global>=3?'#D97706':'var(--red)'}">${iL(global)}</div>
-          </div>
-        </div>
-        <!-- Scores resumen -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
-          <div style="padding:10px;background:var(--purple-bg);border-radius:var(--radius-sm);text-align:center">
-            <div style="font-size:10px;font-weight:600;color:#5B21B6;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">RH / Personas</div>
-            <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:#5B21B6">${rhOv?rhOv.toFixed(2):'—'}</div>
-            <div style="font-size:10px;color:var(--text2)">peso 30%</div>
-          </div>
-          <div style="padding:10px;background:var(--blue-bg);border-radius:var(--radius-sm);text-align:center">
-            <div style="font-size:10px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Contabilidad</div>
-            <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--blue)">${contOv?contOv.toFixed(2):'—'}</div>
-            <div style="font-size:10px;color:var(--text2)">peso 30%</div>
-          </div>
-          <div style="padding:10px;background:var(--green-bg);border-radius:var(--radius-sm);text-align:center">
-            <div style="font-size:10px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Operaciones</div>
-            <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--green)">${adminOv?adminOv.toFixed(2):'—'}</div>
-            <div style="font-size:10px;color:var(--text2)">peso 40%</div>
-          </div>
-        </div>
-        <!-- Cuerpo del reporte -->
-        <div class="rep-body"><p>${htmlBody}</p></div>
-        ${compHTML}
-        <!-- Footer -->
-        <div style="margin-top:24px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-          <div style="font-size:11px;color:var(--text3)">Hestia Management Co. · Sistema OSM Eval 360°</div>
-          <div style="font-size:11px;color:var(--text3)">${fecha}</div>
-        </div>
-      </div>
-    </div>`;
-  }).catch(e=>{
-    // Fallback to local report if API fails
-    zone.innerHTML=`<div class="rep-card"><div class="rep-body"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Para el reporte con IA, abre este archivo desde SharePoint. <a href="#" onclick="genReportLocal();return false" style="color:var(--green)">Generar versión local →</a></p></div></div>`;
-  });
+    if(actV!==null){
+      if(actV>=4) r+=`La actitud y desempeño personal (${actV.toFixed(1)}) destaca positivamente — se observa proactividad, responsabilidad y apertura al feedback. `;
+      else if(actV>=3) r+=`La actitud y desempeño personal (${actV.toFixed(1)}) es adecuada, con espacio para mayor proactividad e iniciativa. `;
+      else r+=`La actitud y desempeño personal (${actV.toFixed(1)}) requiere atención — aspectos como la proactividad, manejo del estrés o la apertura a la retroalimentación presentan áreas de desarrollo. `;
+    }
+
+    if(hwRhV!==null){
+      r+=`En cuanto al trato con homeowners desde la dimensión humana (${hwRhV.toFixed(1)}), `;
+      if(hwRhV>=4) r+=`se percibe un trato empático, profesional y consistente con los estándares de servicio de Hestia. `;
+      else if(hwRhV>=3) r+=`el trato es adecuado aunque hay situaciones específicas donde se puede mejorar el manejo de conflictos o la empatía. `;
+      else r+=`el trato con propietarios presenta inconsistencias que deben atenderse para proteger la reputación del condominio. `;
+    }
+    r+=`
+
+`;
+
+    // Open questions RH
+    if(openRH.q_fortaleza_personas) r+=`Carmen destaca como fortaleza: "${openRH.q_fortaleza_personas}"
+
+`;
+    if(openRH.q_conflictos_staff) r+=`Sobre situaciones con el staff: "${openRH.q_conflictos_staff}"
+
+`;
+    if(openRH.q_retencion_equipo) r+=`Sobre motivación y retención: "${openRH.q_retencion_equipo}"
+
+`;
+    if(openRH.q_mejora_rh) r+=`Área de desarrollo recomendada por RH: "${openRH.q_mejora_rh}"
+
+`;
+  }
+
+  // 3. PERSPECTIVA CONTABILIDAD
+  if(contOv!==null){
+    r+=`3. PERSPECTIVA CONTABILIDAD — GESTIÓN FINANCIERA
+${l}
+
+`;
+    const contV=areaAvg('cont','contabilidad'), relV=areaAvg('cont','relacion_cont'), comContV=areaAvg('cont','comunicacion_cont');
+
+    r+=`El área de Contabilidad evalúa a ${nm} con un score de ${contOv.toFixed(2)}/5.00 (${iL(contOv)}). `;
+
+    if(contV!==null){
+      if(contV>=4) r+=`Los reportes contables y cumplimiento de obligaciones (${contV.toFixed(1)}) reflejan puntualidad y calidad en las entregas — lo cual reduce la carga operativa del área y minimiza riesgos financieros para el condominio. `;
+      else if(contV>=3) r+=`El cumplimiento contable (${contV.toFixed(1)}) es aceptable aunque con algunas entregas que no siempre llegan en tiempo y forma. `;
+      else r+=`El cumplimiento contable (${contV.toFixed(1)}) presenta deficiencias que generan retrasos y riesgos en la operación financiera del condominio. `;
+    }
+
+    if(relV!==null){
+      if(relV>=4) r+=`La relación con el equipo contable (${relV.toFixed(1)}) es fluida — ${nm} solicita lo que necesita con claridad, responde a tiempo y organiza bien la documentación. `;
+      else if(relV>=3) r+=`La relación con Contabilidad (${relV.toFixed(1)}) es funcional, con oportunidades de mejorar la organización de documentos y la agilidad en las respuestas. `;
+      else r+=`La relación con el área contable (${relV.toFixed(1)}) genera fricciones que afectan los tiempos de cierre mensual y la calidad de la información financiera. `;
+    }
+    r+=`
+
+`;
+
+    if(openCont.q_entrega_tard) r+=`Sobre entregas tardías o incompletas: "${openCont.q_entrega_tard}"
+
+`;
+    if(openCont.q_docs_calidad) r+=`Sobre calidad de documentos: "${openCont.q_docs_calidad}"
+
+`;
+    if(openCont.q_actitud_error) r+=`Sobre actitud ante errores contables: "${openCont.q_actitud_error}"
+
+`;
+    if(openCont.q_mejora_proceso) r+=`Recomendación de mejora de proceso: "${openCont.q_mejora_proceso}"
+
+`;
+  }
+
+  // 4. PERSPECTIVA OPERACIONES
+  if(adminOv!==null){
+    r+=`4. PERSPECTIVA OPERACIONES — GESTIÓN DEL CONDOMINIO
+${l}
+
+`;
+    const opV=areaAvg('admin','operacion'), mantV=areaAvg('admin','mantenimiento');
+    const hwAdmV=areaAvg('admin','homeowners_admin'), comAdmV=areaAvg('admin','comunicacion_admin');
+
+    r+=`Desde la perspectiva de Operaciones, ${nm} obtiene un score de ${adminOv.toFixed(2)}/5.00 (${iL(adminOv)}). `;
+
+    if(opV!==null){
+      if(opV>=4) r+=`La gestión operativa de ${condos} (${opV.toFixed(1)}) muestra un colaborador que anticipa problemas, da seguimiento a pendientes y mantiene el inmueble funcionando de forma ordenada. `;
+      else if(opV>=3) r+=`La operación del condominio (${opV.toFixed(1)}) se mantiene dentro del estándar, aunque con oportunidades de ser más proactivo en la anticipación de incidencias. `;
+      else r+=`La operación del condominio (${opV.toFixed(1)}) presenta brechas que afectan la experiencia de los propietarios y la imagen de Hestia. `;
+    }
+
+    if(mantV!==null){
+      if(mantV>=4) r+=`El seguimiento de mantenimiento preventivo y correctivo (${mantV.toFixed(1)}) es riguroso y bien documentado. `;
+      else if(mantV>=3) r+=`El mantenimiento (${mantV.toFixed(1)}) cumple lo básico, aunque el seguimiento a proveedores y la documentación pueden ser más sistemáticos. `;
+      else r+=`El área de mantenimiento (${mantV.toFixed(1)}) requiere mayor estructura — hay pendientes que no se cierran a tiempo y proveedores sin supervisión adecuada. `;
+    }
+
+    if(hwAdmV!==null){
+      if(hwAdmV>=4) r+=`La atención a homeowners (${hwAdmV.toFixed(1)}) es uno de los puntos fuertes del período. `;
+      else if(hwAdmV>=3) r+=`La atención a propietarios (${hwAdmV.toFixed(1)}) es funcional con margen de mejora en tiempos de respuesta y seguimiento. `;
+      else r+=`La atención a homeowners (${hwAdmV.toFixed(1)}) es un área crítica que debe atenderse de forma prioritaria. `;
+    }
+    r+=`
+
+`;
+  }
+
+  // 5. PATRONES TRANSVERSALES
+  if(rhOv!==null&&contOv!==null&&adminOv!==null){
+    r+=`5. PATRONES TRANSVERSALES
+${l}
+
+`;
+    const scores=[rhOv,contOv,adminOv];
+    const maxDiff=Math.max(...scores)-Math.min(...scores);
+
+    if(maxDiff<0.5){
+      r+=`Las tres perspectivas de evaluación son consistentes entre sí, con una variación de menos de 0.5 puntos entre ellas. Esto indica que el nivel de desempeño de ${nm} es uniforme en todas las dimensiones del rol — lo que habla bien de su consistencia operativa.
+
+`;
+    } else if(rhOv===Math.max(...scores)||adminOv===Math.max(...scores)){
+      const fuerte=rhOv>contOv&&rhOv>adminOv?'la gestión de personas':adminOv>rhOv&&adminOv>contOv?'la operación del condominio':'las relaciones con el equipo';
+      const debil=contOv===Math.min(...scores)?'la gestión contable y administrativa':rhOv===Math.min(...scores)?'el liderazgo y trato humano':'la operación general';
+      r+=`Existe una brecha notable entre perspectivas (${maxDiff.toFixed(1)} puntos de diferencia). ${nm} muestra mayor fortaleza en ${fuerte}, mientras que ${debil} es el área que más jala el score hacia abajo. Esta consistencia en el patrón sugiere que el plan de acción debe focalizarse en esa dimensión específica.
+
+`;
+    } else {
+      r+=`Las perspectivas muestran un perfil diferenciado: ${nm} tiene fortalezas claras en algunas dimensiones del rol mientras que otras presentan oportunidades de desarrollo. El plan de acción debe abordar las áreas débiles sin descuidar el mantenimiento de las fortalezas.
+
+`;
+    }
+  }
+
+  // 6. PLAN DE ACCIÓN
+  if(weak.length||medium.length){
+    r+=`6. PLAN DE ACCIÓN
+${l}
+
+`;
+    const moNext=session.mo?new Date(session.mo+'-02').toLocaleDateString('es',{month:'long',year:'numeric'}):'el próximo mes';
+
+    if(weak.length){
+      r+=`Las siguientes áreas están por debajo del estándar y requieren atención prioritaria:
+
+`;
+      weak.forEach(a=>{
+        const v=areaAvg(a.owner,a.key);
+        r+=`▸ ${a.label} (${v.toFixed(1)}/5)
+`;
+        r+=`  Acción: Establecer objetivos específicos y medibles para esta área antes del día 10 del mes siguiente.
+`;
+        r+=`  Responsable: ${nm} con seguimiento de ${resp}.
+`;
+        r+=`  Fecha límite: fin de ${moNext}.
+`;
+        r+=`  Meta: alcanzar mínimo 3.5 en la siguiente evaluación.
+
+`;
+      });
+    }
+
+    if(medium.length){
+      r+=`Las siguientes áreas cumplen el estándar pero tienen potencial de mejora:
+
+`;
+      medium.forEach(a=>{
+        const v=areaAvg(a.owner,a.key);
+        r+=`▸ ${a.label} (${v.toFixed(1)}/5): Establecer un objetivo de mejora incremental para el siguiente trimestre.
+`;
+      });
+      r+=`
+`;
+    }
+  }
+
+  // 7. COMPROMISOS
+  if(approvedComps.length||adminFilled.length){
+    r+=`7. COMPROMISOS FORMALIZADOS — ${nextMonthLabel(session.mo).toUpperCase()}
+${l}
+
+`;
+
+    if(approvedComps.length){
+      r+=`${nm} se compromete a:
+
+`;
+      approvedComps.forEach((c,i)=>{
+        r+=`  ${i+1}. ${c.texto}
+`;
+        if(c.metrica) r+=`     Métrica: ${c.metrica}
+`;
+        if(c.fecha)   r+=`     Fecha límite: ${moLabel(c.fecha)}
+`;
+        r+=`
+`;
+      });
+    }
+
+    if(window._osmCompromisos?.reflexion){
+      r+=`Reflexión del OSM sobre el mes:
+"${window._osmCompromisos.reflexion}"
+
+`;
+    }
+
+    if(adminFilled.length){
+      r+=`La Responsable establece adicionalmente:
+
+`;
+      adminFilled.forEach((c,i)=>{
+        r+=`  ${i+1}. ${c.texto}
+`;
+        if(c.metrica) r+=`     Métrica: ${c.metrica}
+`;
+        if(c.fecha)   r+=`     Fecha límite: ${moLabel(c.fecha)}
+`;
+        r+=`
+`;
+      });
+    }
+
+    if(window._osmCompromisos?.mensaje){
+      r+=`Mensaje del OSM a la Responsable:
+"${window._osmCompromisos.mensaje}"
+
+`;
+    }
+  }
+
+  // 8. VALORACIÓN FINAL
+  r+=`8. VALORACIÓN FINAL
+${l}
+
+`;
+  if(global>=4.5){
+    r+=`${nm} demuestra en ${mes} un desempeño sobresaliente que lo posiciona como uno de los On Site Managers más sólidos del equipo Hestia. Su consistencia en todas las dimensiones del rol — personas, administración y operación — es una muestra de madurez profesional que debe reconocerse formalmente. Se recomienda considerar su perfil para roles de mentoría o mayor responsabilidad dentro de la organización.
+
+`;
+  } else if(global>=4){
+    r+=`${nm} cierra ${mes} con un desempeño sólido y consistente. La trayectoria es positiva y el potencial de crecimiento es claro. Se recomienda continuar el acompañamiento actual, establecer metas de desarrollo para el siguiente trimestre y reconocer las fortalezas identificadas en esta evaluación.
+
+`;
+  } else if(global>=3){
+    r+=`${nm} cumple con los estándares del rol en ${mes}. El colaborador tiene bases sólidas sobre las cuales construir. Con un plan de mejora bien estructurado y seguimiento constante, hay margen real de alcanzar un desempeño de buen nivel en los próximos dos o tres meses.
+
+`;
+  } else if(global>=2){
+    r+=`El desempeño de ${nm} en ${mes} presenta inconsistencias que requieren atención inmediata. Se recomienda una sesión de retroalimentación detallada, un plan de acción con metas concretas y seguimiento quincenal con ${resp}. Es fundamental entender si hay factores externos o de contexto que estén afectando el desempeño antes de tomar decisiones de largo plazo.
+
+`;
+  } else {
+    r+=`Los resultados de esta evaluación 360° indican que el desempeño de ${nm} está por debajo de los estándares mínimos del rol en múltiples dimensiones. Se requiere una reunión urgente entre ${nm}, ${resp} y el área de Recursos Humanos para evaluar la situación, identificar causas raíz y determinar el camino a seguir.
+
+`;
+  }
+
+  r+=`${L}
+`;
+  r+=`Evaluación conducida por: ${resp} — Hestia Management Co.
+`;
+  r+=`Fecha: ${fecha}
+`;
+  r+=`Sistema OSM Eval 360° · Hestia Management Co.`;
+
+  return r;
 }
 
-function copyReport360(){
-  if(!window._lastReport360)return;
-  navigator.clipboard.writeText(window._lastReport360).then(()=>notify('Copiado al portapapeles'));
-}
-
-function printReport360(){
-  const el=document.getElementById('printable-report');
-  if(!el)return;
-  const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-      *{box-sizing:border-box;margin:0;padding:0}
-      body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1C1A17;padding:32px 40px;max-width:820px;margin:0 auto;line-height:1.7}
-      h3{font-size:11px;font-weight:700;color:#6A6860;text-transform:uppercase;letter-spacing:.06em;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid #E0DDD5}
-      p{margin-bottom:10px}strong{font-weight:600}
-      .hestia-logo{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8A7D6B}
-      @media print{body{padding:20px}}
-    </style></head><body>
-    ${el.innerHTML}
-    </body></html>`);
-  win.document.close();
-  setTimeout(()=>win.print(),800);
-}
-
-function genReportLocal(){
-  // Fallback local report (same as before but with compromisos)
-  const zone=document.getElementById('report-zone');if(!zone)return;
-  const global=globalScore();if(global===null)return;
-  const fecha=new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'});
-  const iL=v=>{if(v===null||v===undefined)return'Sin datos';if(v<1.5)return'Deficiente';if(v<2.5)return'Necesita mejora';if(v<3.5)return'Cumple';if(v<4.5)return'Buen desempeño';return'Excelencia'};
-  const iA=v=>{if(!v)return'';if(v<1.5)return'deficiente';if(v<2.5)return'por debajo del estándar';if(v<3.5)return'dentro del estándar';if(v<4.5)return'por encima del promedio';return'sobresaliente'};
-  const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
-  const strong=allAreas.filter(a=>areaAvg(a.owner,a.key)!==null&&areaAvg(a.owner,a.key)>=4);
-  const weak=allAreas.filter(a=>areaAvg(a.owner,a.key)!==null&&areaAvg(a.owner,a.key)<3);
+function renderReporteHTML(zone, txt){
   const rhOv=roleOverall('rh'),contOv=roleOverall('cont'),adminOv=roleOverall('admin');
-  let txt=`REPORTE 360° — HESTIA MANAGEMENT CO.
-${'─'.repeat(55)}
+  const global=globalScore();
+  const iL=v=>{if(!v&&v!==0)return'Sin datos';if(v<1.5)return'Deficiente';if(v<2.5)return'Necesita mejora';if(v<3.5)return'Cumple';if(v<4.5)return'Buen desempeño';return'Excelencia'};
+  const scoreColor=v=>v===null?'var(--text3)':v<2.5?'var(--red)':v<3.5?'#D97706':v<4.5?'var(--green)':'var(--green)';
 
-`;
-  txt+=`Colaborador: ${session.osm} | Período: ${moLabel(session.mo)} | Condominios: ${session.condos||'—'}
-Responsable: ${session.admin} | Fecha: ${fecha}
+  // Convert plain text to HTML preserving sections
+  const lines=txt.split('\n');
 
-`;
-  txt+=`SCORE 360° CONSOLIDADO: ${global.toFixed(2)}/5 — ${iL(global)}
-`;
-  txt+=`• RH/Personas (30%): ${rhOv?rhOv.toFixed(2):'—'} · Contabilidad (30%): ${contOv?contOv.toFixed(2):'—'} · Operaciones (40%): ${adminOv?adminOv.toFixed(2):'—'}
+  let bodyHtml='';
+  let inPara=false;
+  lines.forEach(line=>{
+    const trim=line.trim();
+    if(!trim){if(inPara){bodyHtml+='</p>';inPara=false;}return}
+    if(trim.match(/^\d+\.\s+[A-ZÁÉÍÓÚ].*[A-ZÁÉÍÓÚ]$/)&&trim.length<80){
+      if(inPara){bodyHtml+='</p>';inPara=false;}
+      bodyHtml+=`<h3>${trim}</h3>`;
+    } else if(trim.startsWith('▸')){
+      if(inPara){bodyHtml+='</p>';inPara=false;}
+      bodyHtml+=`<div style="background:var(--surface2);border-left:3px solid var(--border2);padding:10px 14px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-bottom:10px;font-size:13px"><strong>${trim.slice(1).trim()}</strong></div>`;
 
-`;
-  if(strong.length)txt+=`Fortalezas: ${strong.map(a=>a.label+' '+areaAvg(a.owner,a.key).toFixed(1)).join(', ')}
-`;
-  if(weak.length)txt+=`Requieren atención: ${weak.map(a=>a.label+' '+areaAvg(a.owner,a.key).toFixed(1)).join(', ')}
-`;
-  const approved=osmComps.filter(c=>c.texto&&c.status==='approved');
-  if(approved.length){txt+=`
-COMPROMISOS OSM:
-`;approved.forEach((c,i)=>{txt+=`${i+1}. ${c.texto}${c.metrica?' — '+c.metrica:''}\n`;});}
-  txt+=`
-Evaluación: ${session.admin} — Hestia Management Co.`;
-  window._lastReport360=txt;
-  const htmlBody=txt.replace(/\n\n/g,'</p><p>').replace(/\n/g,'<br>');
-  zone.innerHTML=`<div class="rep-card"><div class="rep-hdr"><span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte local</span><button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="copyReport360()"><i class="ti ti-copy"></i> Copiar</button></div><div class="rep-body"><p>${htmlBody}</p></div></div>`;
+    } else if(trim.startsWith('·')||trim.startsWith('  ')){
+      if(inPara){bodyHtml+='</p>';inPara=false;}
+      bodyHtml+=`<div style="font-size:12px;color:var(--text2);padding-left:16px;margin-bottom:4px">${trim}</div>`;
+    } else {
+      if(!inPara){bodyHtml+='<p>';inPara=true;}
+      else bodyHtml+=' ';
+      bodyHtml+=trim;
+    }
+  });
+  if(inPara)bodyHtml+='</p>';
+
+  zone.innerHTML=`<div class="rep-card">
+    <div class="rep-hdr">
+      <span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte 360° — ${session.osm}</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="copyReport360()"><i class="ti ti-copy"></i> Copiar</button>
+        <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="printReport360()"><i class="ti ti-printer"></i> PDF</button>
+        <button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="genReport()"><i class="ti ti-refresh"></i> Regenerar</button>
+      </div>
+    </div>
+    <div id="printable-report">
+      <!-- Header Hestia -->
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:16px;margin-bottom:20px;border-bottom:2px solid var(--border)">
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#8A7D6B;margin-bottom:6px">Hestia Management Co.</div>
+          <div style="font-size:17px;font-weight:700">Evaluación 360° — On Site Manager</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:3px">${session.osm} · ${moLabel(session.mo)}${session.condos?' · '+session.condos:''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:34px;font-weight:700;font-family:'DM Mono',monospace;color:${scoreColor(global)};line-height:1">${global!==null?global.toFixed(2):'—'}</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:3px">Score 360° / 5.00</div>
+          <div style="font-size:12px;font-weight:600;color:${scoreColor(global)};margin-top:2px">${iL(global)}</div>
+        </div>
+      </div>
+      <!-- Score pills -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px">
+        <div style="padding:10px 12px;background:var(--purple-bg);border-radius:var(--radius-sm);border-left:3px solid #5B21B6">
+          <div style="font-size:10px;font-weight:700;color:#5B21B6;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">RH / Personas · 30%</div>
+          <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:#5B21B6">${rhOv?rhOv.toFixed(2):'—'}</div>
+          <div style="font-size:10px;color:var(--text2)">${iL(rhOv)}</div>
+        </div>
+        <div style="padding:10px 12px;background:var(--blue-bg);border-radius:var(--radius-sm);border-left:3px solid var(--blue)">
+          <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Contabilidad · 30%</div>
+          <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--blue)">${contOv?contOv.toFixed(2):'—'}</div>
+          <div style="font-size:10px;color:var(--text2)">${iL(contOv)}</div>
+        </div>
+        <div style="padding:10px 12px;background:var(--green-bg);border-radius:var(--radius-sm);border-left:3px solid var(--green)">
+          <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Operaciones · 40%</div>
+          <div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--green)">${adminOv?adminOv.toFixed(2):'—'}</div>
+          <div style="font-size:10px;color:var(--text2)">${iL(adminOv)}</div>
+        </div>
+      </div>
+      <!-- Cuerpo narrativo -->
+      <div class="rep-body">${bodyHtml}</div>
+      <!-- Footer -->
+      <div style="margin-top:24px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
+        <span>Hestia Management Co. · Sistema OSM Eval 360°</span>
+        <span>${new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'})}</span>
+      </div>
+    </div>
+  </div>`;
 }
 
 function dlReport(){
@@ -1069,9 +1368,9 @@ function renderCompList(){
     <div class="comp-row">
       <span class="comp-num">${i+1}</span>
       <div class="comp-inputs">
-        <input type="text" placeholder="¿Qué me comprometo a mejorar?" value="${(c.texto||'').replace(/"/g,'&quot;')}" oninput="osmComps[${i}].texto=this.value"/>
+        <input type="text" placeholder="¿Qué me comprometo a mejorar?" value="${(c.texto||'').replace(/"/g,'"')}" oninput="osmComps[${i}].texto=this.value"/>
         <div class="comp-meta">
-          <input type="text" placeholder="¿Cómo se medirá?" value="${(c.metrica||'').replace(/"/g,'&quot;')}" oninput="osmComps[${i}].metrica=this.value"/>
+          <input type="text" placeholder="¿Cómo se medirá?" value="${(c.metrica||'').replace(/"/g,'"')}" oninput="osmComps[${i}].metrica=this.value"/>
           <input type="month" value="${c.fecha||''}" oninput="osmComps[${i}].fecha=this.value"/>
         </div>
         <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
@@ -1087,9 +1386,9 @@ function renderCompList(){
     <div class="comp-row">
       <span class="comp-num">${i+1}</span>
       <div class="comp-inputs">
-        <input type="text" placeholder="Compromiso o acción requerida" value="${(c.texto||'').replace(/"/g,'&quot;')}" oninput="adminComps[${i}].texto=this.value"/>
+        <input type="text" placeholder="Compromiso o acción requerida" value="${(c.texto||'').replace(/"/g,'"')}" oninput="adminComps[${i}].texto=this.value"/>
         <div class="comp-meta">
-          <input type="text" placeholder="¿Cómo se medirá?" value="${(c.metrica||'').replace(/"/g,'&quot;')}" oninput="adminComps[${i}].metrica=this.value"/>
+          <input type="text" placeholder="¿Cómo se medirá?" value="${(c.metrica||'').replace(/"/g,'"')}" oninput="adminComps[${i}].metrica=this.value"/>
           <input type="month" value="${c.fecha||''}" oninput="adminComps[${i}].fecha=this.value"/>
         </div>
         ${adminComps.length>1?`<button onclick="removeAdminComp(${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;align-self:center"><i class="ti ti-trash-x"></i></button>`:''}
