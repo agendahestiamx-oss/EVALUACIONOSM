@@ -835,15 +835,16 @@ function renderDashboardInner(){
       <div class="status-pct">${adminOv!==null?adminOv.toFixed(2):'—'}</div>
       <div class="status-lbl"><span class="status-dot ${evalData.admin.submitted?'dot-done':countFilled('admin')>0?'dot-partial':'dot-empty'}"></span>${evalData.admin.submitted?'Completado':countFilled('admin')>0?'En progreso':'Sin iniciar'}</div>
     </div>
-  </div>
-  ${window._osmCompromisos?`<div style="background:var(--green-bg);border:1px solid var(--green-light);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px">
-    <i class="ti ti-checklist" style="font-size:20px;color:var(--green)"></i>
-    <div><div style="font-size:13px;font-weight:600;color:var(--green)">${window._osmCompromisos.osmName} envió sus compromisos</div>
-    <div style="font-size:11px;color:var(--text2);margin-top:2px">${window._osmCompromisos.comps.length} compromisos · ${new Date(window._osmCompromisos.timestamp).toLocaleDateString('es',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div></div>
-    <button class="btn btn-ghost" style="margin-left:auto;font-size:11px;padding:4px 10px" onclick="approveCompromisos()"><i class="ti ti-check"></i> Revisar y aprobar</button>
-  </div>`:''}
-  <div style="display:none">
   </div>`;
+  // Show compromisos notification if available
+  if(window._osmCompromisos){
+    html+=`<div style="background:var(--green-bg);border:1px solid var(--green-light);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px">
+      <i class="ti ti-checklist" style="font-size:20px;color:var(--green)"></i>
+      <div><div style="font-size:13px;font-weight:600;color:var(--green)">${window._osmCompromisos.osmName||'El OSM'} envió sus compromisos</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px">${(window._osmCompromisos.comps||[]).length} compromisos recibidos</div></div>
+      <button class="btn btn-ghost" style="margin-left:auto;font-size:11px;padding:4px 10px" onclick="approveCompromisos()"><i class="ti ti-check"></i> Revisar</button>
+    </div>`;
+  }
 
   // Score global
   html+=`<div class="metric-grid">
