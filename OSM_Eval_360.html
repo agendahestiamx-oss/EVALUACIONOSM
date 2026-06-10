@@ -502,10 +502,34 @@ let currentRole = null;
 let openAreas = {};
 let radarChart = null;
 
-// ── STORAGE ────────────────────────────────────────────────────────
+// ── SERVER CONFIG ──────────────────────────────────────────────────
+// URL del servidor en Render.com — se llena automáticamente al desplegar
+const SERVER = window.HESTIA_SERVER || 'https://hestia-notificaciones.onrender.com';
+
+// ── STORAGE (local + servidor) ─────────────────────────────────────
 function saveToStorage(){
   try{localStorage.setItem('osm360_session',JSON.stringify(session));localStorage.setItem('osm360_eval',JSON.stringify(evalData));}catch(e){}
+  if(SERVER && session){
+    fetch(SERVER+'/session',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sessionId:session.id,session,evalData})
+    }).catch(()=>{});
+  }
 }
+
+async function syncFromServer(sessionId){
+  if(!SERVER)return false;
+  try{
+    const r=await fetch(SERVER+'/session/'+sessionId);
+    if(!r.ok)return false;
+    const data=await r.json();
+    if(data.session)session=data.session;
+    if(data.evalData)evalData=data.evalData;
+    if(data.compromisos)window._osmCompromisos=data.compromisos;
+    condoList=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];
+    return true;
+  }catch(e){return false;}
+}
+
 function loadFromStorage(){
   try{
     const s=localStorage.getItem('osm360_session');const e=localStorage.getItem('osm360_eval');
@@ -611,8 +635,16 @@ function joinSession(role){
   currentRole=role;
   condoList=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];
   if(condoList.length===0)condoList=['Principal'];
-  if(evalData[role].submitted){notify('Ya enviaste tu evaluación este mes. Gracias!','info');return}
-  renderRoleScreen(role);goS(role);
+  // Intentar sincronizar datos del servidor
+  syncFromServer(code).then(synced=>{
+    if(synced)notify('Datos sincronizados','ok');
+    if(evalData[role].submitted){notify('Ya enviaste tu evaluación este mes. Gracias!','info');return}
+    renderRoleScreen(role);goS(role);
+  });
+  if(!SERVER){
+    if(evalData[role].submitted){notify('Ya enviaste tu evaluación este mes. Gracias!','info');return}
+    renderRoleScreen(role);goS(role);
+  }
 }
 
 // ── RENDER EVAL SCREENS ────────────────────────────────────────────
@@ -749,12 +781,28 @@ function updateProgress(role){
 }
 function submitRole(role){
   evalData[role].submitted=true;saveToStorage();
+  // Sync this role's data to server
+  if(SERVER && session){
+    fetch(SERVER+'/eval/'+session.id+'/'+role,{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(evalData[role])
+    }).catch(()=>{});
+  }
   if(role==='rh'||role==='cont'){goS('done');}
   else{notify('Evaluación guardada');renderDashboard();}
 }
 
 // ── DASHBOARD ──────────────────────────────────────────────────────
 function renderDashboard(){
+  if(!session)return;
+  // Sync latest data from server before rendering
+  if(SERVER && session){
+    syncFromServer(session.id).then(()=>renderDashboardInner());
+    return;
+  }
+  renderDashboardInner();
+}
+function renderDashboardInner(){
   if(!session)return;
   // Check if OSM submitted compromisos
   try{

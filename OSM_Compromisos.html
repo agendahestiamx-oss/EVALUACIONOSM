@@ -172,7 +172,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);b
 <script>
 // ── STATE ──────────────────────────────────────────────────────────
 let session = null;
-const SP_API = 'https://hestiamx-my.sharepoint.com/personal/yaiza_hestiamx_com/_api/lists/getbytitle(%27OSM%20Eval%20Eventos%27)/items';
+const SERVER = window.HESTIA_SERVER || 'https://hestia-notificaciones.onrender.com';
 
 async function notifyServer(tipo, datos){
   try{
@@ -252,8 +252,17 @@ function loginOSM(){
   }
 
   osmName=name;
-  renderForm();
-  goS('form');
+  // Try to sync from server
+  if(SERVER){
+    fetch(SERVER+'/session/'+code)
+      .then(r=>r.ok?r.json():null)
+      .then(data=>{
+        if(data&&data.session)session=data.session;
+        renderForm();goS('form');
+      }).catch(()=>{renderForm();goS('form');});
+  } else {
+    renderForm();goS('form');
+  }
 }
 
 // ── SCORES ────────────────────────────────────────────────────────
@@ -404,8 +413,13 @@ function submitCompromisos(){
     sessionId:session.id
   };
   try{localStorage.setItem('osm360_compromisos',JSON.stringify(compData));}catch(ex){}
-  // Notificar a la Responsable
-  notifyServer('compromisos_recibidos',{osm:osmName,condominios:session.condos||'',mensaje:reflexion.slice(0,200)});
+  // Send to server so admin can see it
+  if(SERVER && session){
+    fetch(SERVER+'/compromisos/'+session.id,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(compData)
+    }).then(()=>notify('Compromisos enviados al servidor')).catch(()=>{});
+  }
 
   // Show done screen
   let summaryHtml=`<div style="font-size:12px;font-weight:600;color:var(--green);margin-bottom:10px">${filled.length} compromiso${filled.length>1?'s':''} registrado${filled.length>1?'s':''}:</div>`;
