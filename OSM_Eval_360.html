@@ -3,296 +3,364 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OSM Eval 360°</title>
+<title>OSM Eval 360° — Hestia Management Co.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <style>
 :root{
-  --bg:#F5F4F0;--surface:#FFFFFF;--surface2:#EFEDE7;--border:#E0DDD5;--border2:#C8C4B8;
-  --text:#1C1A17;--text2:#6A6860;--text3:#A8A59E;
-  --green:#1A7A5E;--green-bg:#E6F4EF;--green-light:#B8E0D2;
-  --amber:#8A5700;--amber-bg:#FEF3D6;--amber-light:#FDE68A;
-  --red:#8B1E1E;--red-bg:#FDE8E8;
-  --blue:#1A3F8A;--blue-bg:#E8EFF8;
+  --bg:#F7F6F3;--surface:#FFFFFF;--surface2:#F0EFE9;--border:#E2E0D8;--border2:#D4D0C4;
+  --text:#1A1916;--text2:#6B6860;--text3:#A8A59E;
+  --green:#1A7A5E;--green-bg:#E8F5F0;--green-light:#C5E8DC;
+  --amber:#9A6200;--amber-bg:#FEF3D7;--amber-light:#FDE68A;
+  --red:#8B2020;--red-bg:#FDE8E8;
+  --blue:#1A4A8A;--blue-bg:#E8EFF8;
   --purple:#5B21B6;--purple-bg:#EDE9FE;
   --radius:10px;--radius-sm:6px;
-  --shadow:0 1px 2px rgba(0,0,0,.05),0 3px 12px rgba(0,0,0,.04);
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
 input,select,textarea,button{font-family:'DM Sans',sans-serif;font-size:14px}
 input,select,textarea{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;color:var(--text);width:100%;transition:border-color .15s}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(26,122,94,.1)}
-.app{max-width:860px;margin:0 auto;padding:24px 20px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green)}
+.app{max-width:920px;margin:0 auto;padding:24px 20px}
 
-/* ROLE COLORS */
-.role-rh{--rc:#5B21B6;--rc-bg:#EDE9FE;--rc-light:#DDD6FE}
-.role-cont{--rc:#1A3F8A;--rc-bg:#E8EFF8;--rc-light:#BFDBFE}
-.role-admin{--rc:#1A7A5E;--rc-bg:#E6F4EF;--rc-light:#B8E0D2}
-
-/* HOME */
-.home-hero{text-align:center;padding:2.5rem 0 2rem}
-.home-hero h1{font-size:22px;font-weight:600;margin-bottom:6px}
-.home-hero p{font-size:14px;color:var(--text2);max-width:480px;margin:0 auto}
-.role-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:2rem}
-.role-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
-.role-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.1)}
-.role-card.rh{border-top:3px solid #5B21B6}
-.role-card.cont{border-top:3px solid #1A3F8A}
-.role-card.admin{border-top:3px solid #1A7A5E}
-.role-ico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
-.role-ico.rh{background:#EDE9FE;color:#5B21B6}
-.role-ico.cont{background:#E8EFF8;color:#1A3F8A}
-.role-ico.admin{background:#E6F4EF;color:#1A7A5E}
-.role-name{font-size:15px;font-weight:600;margin-bottom:4px}
-.role-desc{font-size:12px;color:var(--text2);line-height:1.5}
-.role-areas{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
-.area-chip{font-size:10px;padding:2px 7px;border-radius:3px;font-weight:500}
-.chip-rh{background:#EDE9FE;color:#5B21B6}
-.chip-cont{background:#E8EFF8;color:#1A3F8A}
-.chip-admin{background:#E6F4EF;color:#1A7A5E}
-.chip-shared{background:var(--surface2);color:var(--text2)}
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{width:32px;height:32px;background:var(--text);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px}
+.nav-name{font-size:15px;font-weight:600;color:var(--text)}
+.nav-sub{font-size:12px;color:var(--text3);margin-top:1px}
+.nav-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
 /* SCREEN */
 .screen{display:none}.screen.on{display:block}
 
-/* TOPBAR */
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
-.topbar-left{display:flex;align-items:center;gap:10px}
-.role-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600}
-.badge-rh{background:#EDE9FE;color:#5B21B6}
-.badge-cont{background:#E8EFF8;color:#1A3F8A}
-.badge-admin{background:#E6F4EF;color:#1A7A5E}
-.topbar-title{font-size:15px;font-weight:600}
-.topbar-sub{font-size:12px;color:var(--text2);margin-top:1px}
-
-/* CARD */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
-.card-title{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
-.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-.fg.one{grid-template-columns:1fr}
-.fl{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:4px}
-
-/* AREA BLOCKS */
-.area-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow)}
-.area-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;background:var(--surface2);cursor:pointer;user-select:none}
-.area-hdr:hover{background:var(--border)}
-.area-hdr-l{display:flex;align-items:center;gap:8px}
-.area-ttl{font-size:13px;font-weight:600}
-.area-tag{font-size:10px;padding:2px 7px;border-radius:3px;font-weight:600}
-.tag-rh{background:#EDE9FE;color:#5B21B6}
-.tag-cont{background:#E8EFF8;color:#1A3F8A}
-.tag-admin{background:#E6F4EF;color:#1A7A5E}
-.tag-shared{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
-.chev{font-size:13px;color:var(--text3);transition:transform .2s}
-.area-body{display:none}.area-body.open{display:block}
-.crit-row{display:grid;grid-template-columns:1fr auto;align-items:start;gap:10px;padding:10px 15px;border-top:1px solid var(--border)}
-.crit-row.with-comment{grid-template-columns:1fr auto 180px}
-.crit-name{font-size:13px;color:var(--text);padding-top:2px}
-.pills{display:flex;gap:3px}
-.pill{width:29px;height:29px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;transition:all .1s;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace}
-.pill:hover{border-color:var(--border2);background:var(--border)}
-.pill.p1.on{background:#FDDEDE;color:#8B1E1E;border-color:#ECA0A0}
-.pill.p2.on{background:#FEF0C7;color:#8A5700;border-color:#FBCB5A}
-.pill.p3.on{background:#DCFCE7;color:#166534;border-color:#86EFAC}
-.pill.p4.on{background:#DBEAFE;color:#1E40AF;border-color:#93C5FD}
-.pill.p5.on{background:#1A7A5E;color:#fff;border-color:#1A7A5E}
-.com-input{font-size:12px;padding:5px 9px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);width:100%}
-.open-q{width:100%;font-size:13px;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);resize:vertical;min-height:60px}
-.open-q:focus{outline:none;border-color:var(--green)}
-.open-q-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;margin-top:10px;display:block}
-.area-res{display:flex;align-items:center;justify-content:space-between;padding:9px 15px;background:var(--surface2);border-top:1px solid var(--border)}
-.area-res-lbl{font-size:12px;font-weight:600;color:var(--text2)}
-.area-res-val{font-size:13px;font-weight:700;font-family:'DM Mono',monospace}
-
-/* BADGE */
-.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:4px;font-size:11px;font-weight:600}
-
-/* PROG */
-.prog-wrap{margin-bottom:18px}
-.prog-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
-.prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s}
-.prog-lbl{font-size:11px;color:var(--text3);margin-top:4px;text-align:right;font-family:'DM Mono',monospace}
-
 /* BUTTONS */
-.btn{padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn{padding:9px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
 .btn-primary{background:var(--text);color:#fff}.btn-primary:hover{opacity:.85}
-.btn-ghost{background:none;border:1px solid var(--border);color:var(--text2)}.btn-ghost:hover{background:var(--surface2);color:var(--text)}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--text2)}.btn-ghost:hover{background:var(--surface2)}
 .btn-green{background:var(--green);color:#fff}.btn-green:hover{opacity:.88}
 .btn-full{width:100%;justify-content:center;padding:12px}
 
-/* LEGEND */
-.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
-.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
-.ld{width:9px;height:9px;border-radius:2px}
+/* NOTIF */
+.notif{position:fixed;top:20px;right:20px;background:var(--text);color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:var(--radius-sm);opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;display:flex;align-items:center;gap:6px;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.notif.show{opacity:1}
 
-/* ADMIN DASHBOARD */
-.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.status-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);text-align:center}
-.status-ico{font-size:22px;margin-bottom:6px}
-.status-name{font-size:12px;font-weight:600;margin-bottom:4px}
-.status-pct{font-size:20px;font-weight:700;font-family:'DM Mono',monospace}
-.status-lbl{font-size:11px;color:var(--text2);margin-top:3px}
-.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
-.dot-done{background:#1A7A5E}.dot-partial{background:#D97706}.dot-empty{background:var(--border2)}
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:16px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.fg.one{grid-template-columns:1fr}
+.fl{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px}
 
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
-.mc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;box-shadow:var(--shadow)}
-.mc-lbl{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
-.mc-val{font-size:22px;font-weight:700;font-family:'DM Mono',monospace}
-.mc-sub{font-size:11px;margin-top:3px}
+/* ROLE CARDS on home */
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+.role-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow)}
+.role-card:hover{border-color:var(--border2);box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-1px)}
+.role-icon{font-size:28px;margin-bottom:12px}
+.role-name{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
+.role-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:10px}
+.role-tags{display:flex;flex-wrap:wrap;gap:4px}
+.rtag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em}
 
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
-.panel-ttl{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
-.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.bar-name{font-size:12px;min-width:95px;flex-shrink:0}
-.bar-track{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;transition:width .5s}
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-title{font-size:16px;font-weight:600;color:var(--text)}
+.topbar-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.role-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.badge-rh{background:var(--purple-bg);color:var(--purple)}
+.badge-cont{background:var(--blue-bg);color:var(--blue)}
+.badge-admin{background:var(--green-bg);color:var(--green)}
+
+/* JOIN SCREEN */
+.join-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;max-width:480px;margin:0 auto;box-shadow:var(--shadow)}
+.join-card h2{font-size:18px;font-weight:600;margin-bottom:6px}
+.join-card p{font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.code-input{font-family:'DM Mono',monospace;font-size:22px;text-transform:uppercase;text-align:center;letter-spacing:.14em;padding:12px}
+
+/* PROGRESS */
+.prog-wrap{margin-bottom:20px}
+.prog-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s}
+.prog-lbl{font-size:11px;color:var(--text3);margin-top:5px;text-align:right;font-family:'DM Mono',monospace}
+
+/* CONDO TABS */
+.condo-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:20px}
+.ctab{flex:1;padding:10px 8px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:none;border-right:1px solid var(--border);text-align:center;transition:all .15s;min-width:80px}
+.ctab:last-child{border-right:none}
+.ctab.on{background:var(--text);color:#fff}
+.ctab .cs{display:block;font-size:10px;margin-top:2px;opacity:.7;font-family:'DM Mono',monospace}
+
+/* AREA BLOCKS */
+.area-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow)}
+.area-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface2);cursor:pointer;user-select:none;transition:background .15s}
+.area-hdr:hover{background:var(--border)}
+.area-hdr-l{display:flex;align-items:center;gap:8px}
+.area-ico{font-size:16px;color:var(--text2)}
+.area-ttl{font-size:14px;font-weight:600;color:var(--text)}
+.area-hdr-r{display:flex;align-items:center;gap:8px}
+.chev{font-size:14px;color:var(--text3);transition:transform .2s}
+.area-body{display:none}.area-body.open{display:block}
+.crit-row{display:grid;grid-template-columns:1fr auto 180px;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid var(--border)}
+.crit-name{font-size:13px;color:var(--text)}
+.pills{display:flex;gap:4px}
+.pill{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text3);font-size:12px;font-weight:600;cursor:pointer;transition:all .1s;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace}
+.pill:hover{border-color:var(--border2);background:var(--border)}
+.pill.p1.on{background:#FDDEDE;color:#8B2020;border-color:#E88080}
+.pill.p2.on{background:#FEF0C7;color:#9A6200;border-color:#FBCB5A}
+.pill.p3.on{background:#DCFCE7;color:#166534;border-color:#86EFAC}
+.pill.p4.on{background:#CFFAFE;color:#155E75;border-color:#67E8F9}
+.pill.p5.on{background:#1A7A5E;color:#fff;border-color:#1A7A5E}
+.com-input{font-size:12px;padding:6px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);width:100%}
+.area-res{display:grid;grid-template-columns:1fr auto 180px;align-items:center;gap:10px;padding:10px 16px;background:var(--surface2);border-top:1px solid var(--border)}
+.area-res-lbl{font-size:12px;font-weight:600;color:var(--text2)}
+.area-res-val{font-size:14px;font-weight:600;text-align:center;font-family:'DM Mono',monospace}
+
+/* OPEN QUESTIONS */
+.oq-block{padding:14px 16px;border-top:1px solid var(--border);background:var(--surface)}
+.oq-lbl{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.oq-item{margin-bottom:10px}
+.oq-item:last-child{margin-bottom:0}
+.oq-q{font-size:12px;color:var(--text2);margin-bottom:4px}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
+
+/* DASH */
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.mc{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+.mc-lbl{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.mc-val{font-size:24px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
+.mc-sub{font-size:11px;margin-top:4px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow)}
+.panel-ttl{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.bar-name{font-size:12px;color:var(--text);min-width:100px;flex-shrink:0}
+.bar-track{flex:1;height:7px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .5s}
 .bar-val{font-size:12px;font-weight:600;min-width:28px;text-align:right;font-family:'DM Mono',monospace}
 
-.contrib-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
-.contrib-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.contrib-name{min-width:100px;flex-shrink:0;font-weight:500}
-.contrib-val{font-family:'DM Mono',monospace;font-weight:600}
+/* STATUS GRID */
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.status-card{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow)}
+.status-ico{font-size:20px;margin-bottom:6px}
+.status-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
+.status-pct{font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--text);margin-bottom:4px}
+.status-lbl{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-done{background:#1A7A5E}
+.dot-partial{background:#D97706}
+.dot-empty{background:#D1D0CB}
 
-.rep-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:18px;box-shadow:var(--shadow)}
-.rep-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
-.rep-ttl{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+/* REPORT */
+.rep-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:20px;box-shadow:var(--shadow)}
+.rep-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.rep-ttl{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px}
 .rep-body{font-size:13px;line-height:1.85;color:var(--text)}
-.rep-body h3{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.rep-body h3{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .rep-body h3:first-child{margin-top:0}
-.rep-body p{margin-bottom:9px}.rep-body p:last-child{margin-bottom:0}
+.rep-body p{margin-bottom:10px}.rep-body p:last-child{margin-bottom:0}
 .rep-body strong{font-weight:600}
 
-/* SESSION CODE */
-.session-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px;text-align:center}
-.session-code{font-size:32px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:.1em;color:var(--text);margin:8px 0}
-.session-label{font-size:12px;color:var(--text2)}
-.share-links{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.share-link{padding:10px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
-.share-link:hover{background:var(--surface2)}
-.share-link.rh{border-top:3px solid #5B21B6;color:#5B21B6}
-.share-link.cont{border-top:3px solid #1A3F8A;color:#1A3F8A}
-.share-link.admin{border-top:3px solid #1A7A5E;color:#1A7A5E}
-.share-link .sl-name{font-size:12px;font-weight:600;margin-bottom:2px}
-.share-link .sl-sub{font-size:10px;color:var(--text2);font-weight:400}
-
-.notif{position:fixed;top:20px;right:20px;background:var(--text);color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:var(--radius-sm);opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.18)}
-.notif.show{opacity:1}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spin{animation:spin 1s linear infinite;display:inline-block}
-@media(max-width:580px){.two-col,.fg,.status-grid,.share-links{grid-template-columns:1fr}}
-
 /* COMPROMISOS */
-.comp-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px}
-.comp-num{font-size:12px;color:var(--text3);min-width:20px;text-align:right;font-family:'DM Mono',monospace;padding-top:10px}
-.comp-inputs{flex:1;display:flex;flex-direction:column;gap:6px}
-.comp-inputs input{font-size:13px}
-.comp-inputs select{font-size:12px}
-.comp-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.comp-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:4px}
+.comp-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;box-shadow:var(--shadow)}
+.comp-hdr{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.comp-num{width:26px;height:26px;background:var(--green);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;font-family:'DM Mono',monospace}
+.comp-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.comp-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.comp-status{padding:3px 9px;border-radius:4px;font-size:11px;font-weight:600}
 .cs-pending{background:var(--amber-bg);color:var(--amber)}
 .cs-approved{background:var(--green-bg);color:var(--green)}
 .cs-rejected{background:var(--red-bg);color:var(--red)}
 
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2)}
+.ld{width:10px;height:10px;border-radius:3px}
+
+/* INFO BOX */
+.info-box{background:var(--amber-bg);border:1px solid var(--amber-light);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;font-size:13px;color:var(--text2);line-height:1.6}
+.info-box strong{color:var(--text)}
+
+/* CONDO ROW */
+.condo-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.condo-num{font-size:12px;color:var(--text3);min-width:20px;text-align:right;font-family:'DM Mono',monospace}
+.condo-row input{flex:1}
+.rmb{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px;border-radius:4px;line-height:1;transition:color .15s}
+.rmb:hover{color:var(--red)}
+.addb{width:100%;padding:9px;font-size:13px;border:1px dashed var(--border2);border-radius:var(--radius-sm);background:none;color:var(--text2);cursor:pointer;transition:all .15s;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px}
+.addb:hover{background:var(--surface2);color:var(--text)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite}
+
+@media(max-width:600px){
+  .role-grid{grid-template-columns:1fr}
+  .status-grid{grid-template-columns:1fr}
+  .two-col,.fg,.comp-meta{grid-template-columns:1fr}
+  .crit-row{grid-template-columns:1fr;gap:6px}
+}
 </style>
 </head>
 <body>
 <div class="notif" id="notif"></div>
 <div class="app">
 
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-brand">
+    <div class="nav-logo"><i class="ti ti-building-community"></i></div>
+    <div>
+      <div class="nav-name">OSM Eval 360°</div>
+      <div class="nav-sub" id="nav-sub">Hestia Management Co.</div>
+    </div>
+  </div>
+  <div class="nav-right" id="nav-right"></div>
+</div>
+
 <!-- HOME -->
 <div id="scr-home" class="screen on">
-  <div class="home-hero">
-    <div style="font-size:32px;margin-bottom:10px">🔄</div>
-    <h1>Evaluación 360° — On Site Managers</h1>
-    <p>Cada evaluadora completa su sección de forma independiente. Los resultados se consolidan automáticamente.</p>
+  <div style="text-align:center;padding:2rem 0 1.5rem">
+    <div style="font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Hestia Management Co.</div>
+    <h1 style="font-size:22px;font-weight:700;margin-bottom:8px">Evaluación 360° — On Site Managers</h1>
+    <p style="font-size:13px;color:var(--text2);max-width:480px;margin:0 auto">Cada evaluadora completa su sección de forma independiente. Los resultados se consolidan automáticamente.</p>
   </div>
 
-  <div id="session-join-area"></div>
-
-  <div class="role-cards">
-    <div class="role-card rh" onclick="selectRole('rh')">
-      <div class="role-ico rh"><i class="ti ti-heart-handshake"></i></div>
+  <div class="role-grid">
+    <div class="role-card" onclick="showJoin('rh')">
+      <div class="role-icon">💜</div>
       <div class="role-name">Carmen — RH</div>
       <div class="role-desc">Evalúa el trato humano, liderazgo de equipo y desempeño general del OSM</div>
-      <div class="role-areas">
-        <span class="area-chip chip-rh">Staff</span>
-        <span class="area-chip chip-rh">Actitud</span>
-        <span class="area-chip chip-shared">Comunicación</span>
-        <span class="area-chip chip-shared">Homeowners</span>
+      <div class="role-tags">
+        <span class="rtag" style="background:var(--purple-bg);color:var(--purple)">Staff</span>
+        <span class="rtag" style="background:var(--purple-bg);color:var(--purple)">Actitud</span>
+        <span class="rtag" style="background:var(--purple-bg);color:var(--purple)">Homeowners</span>
       </div>
     </div>
-    <div class="role-card cont" onclick="selectRole('cont')">
-      <div class="role-ico cont"><i class="ti ti-calculator"></i></div>
+    <div class="role-card" onclick="showJoin('cont')">
+      <div class="role-icon">💙</div>
       <div class="role-name">Contabilidad</div>
       <div class="role-desc">Evalúa puntualidad de entregas, calidad de reportes y relación con el área contable</div>
-      <div class="role-areas">
-        <span class="area-chip chip-cont">Contabilidad</span>
-        <span class="area-chip chip-cont">Relación con equipo</span>
-        <span class="area-chip chip-shared">Comunicación</span>
+      <div class="role-tags">
+        <span class="rtag" style="background:var(--blue-bg);color:var(--blue)">Contabilidad</span>
+        <span class="rtag" style="background:var(--blue-bg);color:var(--blue)">Comunicación</span>
       </div>
     </div>
-    <div class="role-card admin" onclick="selectRole('admin')">
-      <div class="role-ico admin"><i class="ti ti-crown"></i></div>
+    <div class="role-card" onclick="goS('setup')" style="border-top:3px solid var(--green)">
+      <div class="role-icon">💚</div>
       <div class="role-name">Responsable OSMs</div>
       <div class="role-desc">Evalúa operación completa, ve todos los resultados y genera el reporte consolidado</div>
-      <div class="role-areas">
-        <span class="area-chip chip-admin">Todas las áreas</span>
-        <span class="area-chip chip-admin">Dashboard 360°</span>
-        <span class="area-chip chip-admin">Reporte final</span>
+      <div class="role-tags">
+        <span class="rtag" style="background:var(--green-bg);color:var(--green)">Todas las áreas</span>
+        <span class="rtag" style="background:var(--green-bg);color:var(--green)">Dashboard 360°</span>
+        <span class="rtag" style="background:var(--green-bg);color:var(--green)">Reporte final</span>
       </div>
     </div>
   </div>
 
-  <div class="card" style="background:var(--amber-bg);border-color:var(--amber-light)">
-    <div style="font-size:12px;color:var(--amber);font-weight:600;margin-bottom:6px"><i class="ti ti-info-circle"></i> ¿Cómo funciona?</div>
-    <div style="font-size:12px;color:var(--text2);line-height:1.7">
-      1. La <strong>Responsable OSMs</strong> configura la evaluación y obtiene un código de sesión.<br>
-      2. Comparte el código con Carmen y Contabilidad — cada una entra con su rol.<br>
-      3. Cada quien llena su sección en ~5 minutos desde su computadora o cel.<br>
-      4. La Responsable ve el avance en tiempo real y genera el reporte final cuando todas terminaron.
+  <div class="info-box">
+    <strong>¿Cómo funciona?</strong><br>
+    1. La <strong>Responsable OSMs</strong> configura la evaluación y obtiene un código de sesión.<br>
+    2. Comparte el código con Carmen y Contabilidad — cada una entra con su rol.<br>
+    3. Cada quien llena su sección en ~5 minutos desde su computadora o cel.<br>
+    4. La Responsable ve el avance en tiempo real y genera el reporte final cuando todas terminaron.
+  </div>
+</div>
+
+<!-- JOIN (RH y Contabilidad) -->
+<div id="scr-join" class="screen">
+  <div style="max-width:480px;margin:0 auto;padding:2rem 0">
+    <div class="join-card">
+      <h2 id="join-title">Ingresar a mi evaluación</h2>
+      <p id="join-desc">Ingresa el código de sesión que te compartió la Responsable de OSMs.</p>
+      <div style="margin-bottom:14px">
+        <div class="fl">Código de sesión</div>
+        <input type="text" id="join-code" class="code-input" placeholder="Ej. A3B7C2"
+          oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')joinSession()"/>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost" onclick="goS('home')"><i class="ti ti-arrow-left"></i> Volver</button>
+        <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="joinSession()"><i class="ti ti-arrow-right"></i> Entrar</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- SETUP (Admin) -->
+<!-- SETUP (Responsable) -->
 <div id="scr-setup" class="screen">
   <div class="topbar">
     <div class="topbar-left">
       <span class="role-badge badge-admin"><i class="ti ti-crown"></i> Responsable OSMs</span>
-      <div><div class="topbar-title">Configurar evaluación</div></div>
+      <div><div class="topbar-title">Nueva evaluación</div></div>
     </div>
-    <button class="btn btn-ghost" onclick="goHome()"><i class="ti ti-arrow-left"></i> Inicio</button>
+    <button class="btn btn-ghost" onclick="goS('home')"><i class="ti ti-arrow-left"></i> Inicio</button>
   </div>
+
   <div class="card">
-    <div class="card-title">Datos del evaluado</div>
-    <div class="fg"><div><div class="fl">Nombre del OSM</div><input type="text" id="s-name" placeholder="Ej. Ana García"/></div><div><div class="fl">Mes de evaluación</div><input type="month" id="s-month"/></div></div>
-    <div class="fg"><div><div class="fl">Tu nombre (evaluadora)</div><input type="text" id="s-admin" placeholder="Tu nombre"/></div><div><div class="fl">Condominio(s)</div><input type="text" id="s-condos" placeholder="Ej. Ávida, Indah"/></div></div>
-    <div class="fg one"><div><div class="fl">Contexto del mes</div><textarea id="s-notas" rows="2" style="font-size:13px;width:100%;padding:8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);resize:vertical" placeholder="Incidencias, cambios de equipo, contexto especial..."></textarea></div></div>
+    <div class="card-title">Datos del OSM</div>
+    <div class="fg">
+      <div><div class="fl">Nombre del OSM</div><input type="text" id="s-name" placeholder="Ej. Ana García"/></div>
+      <div><div class="fl">Mes de evaluación</div><input type="month" id="s-month"/></div>
+    </div>
+    <div class="fg">
+      <div><div class="fl">Tu nombre (Responsable)</div><input type="text" id="s-admin" placeholder="Nombre del evaluador"/></div>
+    </div>
+    <div class="fg one">
+      <div><div class="fl">Notas del mes (opcional)</div>
+        <textarea id="s-notas" rows="2" style="font-size:13px;width:100%;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);resize:vertical" placeholder="Contexto especial, incidencias, cambios de equipo..."></textarea>
+      </div>
+    </div>
+    <div class="fg one">
+      <div><div class="fl">Observaciones del período <span style="font-weight:400;color:var(--text3)">(aparece en el reporte, sin mencionar fuentes)</span></div>
+        <textarea id="s-observaciones" rows="3" style="font-size:13px;width:100%;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);resize:vertical" placeholder="Lo que el equipo observó este mes: actitudes, situaciones, contexto relevante..."></textarea>
+      </div>
+    </div>
+    <div class="fg one">
+      <div><div class="fl">Compromiso del mes <span style="font-weight:400;color:var(--text3)">(qué se compromete a lograr en el próximo mes)</span></div>
+        <textarea id="s-compromiso" rows="2" style="font-size:13px;width:100%;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);resize:vertical" placeholder="Para junio, el compromiso es..."></textarea>
+      </div>
+    </div>
+    <div class="fg one">
+      <div><div class="fl">Frase de cierre <span style="font-weight:400;color:var(--text3)">(aparece al final del reporte en itálica)</span></div>
+        <input type="text" id="s-frase" placeholder='Ej: "La excelencia no hace ruido — simplemente se nota."'/>
+      </div>
+    </div>
   </div>
-  <button class="btn btn-primary btn-full" onclick="createSession()"><i class="ti ti-sparkles"></i> Crear sesión de evaluación</button>
+
+  <div class="card">
+    <div class="card-title">Condominios asignados</div>
+    <div id="condo-list"></div>
+    <button class="addb" onclick="addCondo()"><i class="ti ti-plus"></i> Agregar condominio</button>
+  </div>
+
+  <button class="btn btn-primary btn-full" onclick="createSession()"><i class="ti ti-arrow-right"></i> Crear sesión y obtener código</button>
 </div>
 
 <!-- EVAL RH -->
 <div id="scr-rh" class="screen">
   <div class="topbar">
     <div class="topbar-left">
-      <span class="role-badge badge-rh"><i class="ti ti-heart-handshake"></i> Carmen — RH</span>
+      <span class="role-badge badge-rh"><i class="ti ti-heart"></i> Carmen — RH</span>
       <div><div class="topbar-title" id="rh-title"></div><div class="topbar-sub" id="rh-sub"></div></div>
     </div>
-    <button class="btn btn-green" onclick="submitRole('rh')"><i class="ti ti-send"></i> Enviar evaluación</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="goS('home')"><i class="ti ti-arrow-left"></i></button>
+      <button class="btn btn-primary" onclick="submitRole('rh')"><i class="ti ti-send"></i> Enviar evaluación</button>
+    </div>
   </div>
   <div class="legend">
-    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #ECA0A0"></div>1 Deficiente</div>
-    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 Necesita mejora</div>
-    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 Cumple</div>
-    <div class="li"><div class="ld" style="background:#DBEAFE;border:1px solid #93C5FD"></div>4 Buen desempeño</div>
-    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 Excelencia</div>
+    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #E88080"></div>1 — Deficiente</div>
+    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 — Necesita mejora</div>
+    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 — Cumple</div>
+    <div class="li"><div class="ld" style="background:#CFFAFE;border:1px solid #67E8F9"></div>4 — Muy buen desempeño</div>
+    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 — Excelencia</div>
   </div>
-  <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="rh-prog"></div></div><div class="prog-lbl" id="rh-prog-lbl"></div></div>
+  <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-rh"></div></div><div class="prog-lbl" id="prog-rh-lbl"></div></div>
+  <div id="condo-tabs-rh"></div>
   <div id="rh-body"></div>
 </div>
 
@@ -303,16 +371,20 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);b
       <span class="role-badge badge-cont"><i class="ti ti-calculator"></i> Contabilidad</span>
       <div><div class="topbar-title" id="cont-title"></div><div class="topbar-sub" id="cont-sub"></div></div>
     </div>
-    <button class="btn btn-green" onclick="submitRole('cont')"><i class="ti ti-send"></i> Enviar evaluación</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="goS('home')"><i class="ti ti-arrow-left"></i></button>
+      <button class="btn btn-primary" onclick="submitRole('cont')"><i class="ti ti-send"></i> Enviar evaluación</button>
+    </div>
   </div>
   <div class="legend">
-    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #ECA0A0"></div>1 Deficiente</div>
-    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 Necesita mejora</div>
-    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 Cumple</div>
-    <div class="li"><div class="ld" style="background:#DBEAFE;border:1px solid #93C5FD"></div>4 Buen desempeño</div>
-    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 Excelencia</div>
+    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #E88080"></div>1 — Deficiente</div>
+    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 — Necesita mejora</div>
+    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 — Cumple</div>
+    <div class="li"><div class="ld" style="background:#CFFAFE;border:1px solid #67E8F9"></div>4 — Muy buen desempeño</div>
+    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 — Excelencia</div>
   </div>
-  <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="cont-prog"></div></div><div class="prog-lbl" id="cont-prog-lbl"></div></div>
+  <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-cont"></div></div><div class="prog-lbl" id="prog-cont-lbl"></div></div>
+  <div id="condo-tabs-cont"></div>
   <div id="cont-body"></div>
 </div>
 
@@ -323,19 +395,20 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);b
       <span class="role-badge badge-admin"><i class="ti ti-crown"></i> Responsable OSMs</span>
       <div><div class="topbar-title" id="admin-title"></div><div class="topbar-sub" id="admin-sub"></div></div>
     </div>
-    <div style="display:flex;gap:6px">
-      <button class="btn btn-ghost" onclick="goS('dash');renderDashboard()"><i class="ti ti-chart-bar"></i> Dashboard</button>
-      <button class="btn btn-green" onclick="submitRole('admin')"><i class="ti ti-send"></i> Guardar</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-ghost" onclick="goS('dash');renderDash()">Dashboard →</button>
+      <button class="btn btn-primary" onclick="submitRole('admin')"><i class="ti ti-send"></i> Guardar</button>
     </div>
   </div>
   <div class="legend">
-    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #ECA0A0"></div>1 Deficiente</div>
-    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 Necesita mejora</div>
-    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 Cumple</div>
-    <div class="li"><div class="ld" style="background:#DBEAFE;border:1px solid #93C5FD"></div>4 Buen desempeño</div>
-    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 Excelencia</div>
+    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #E88080"></div>1 — Deficiente</div>
+    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 — Necesita mejora</div>
+    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 — Cumple</div>
+    <div class="li"><div class="ld" style="background:#CFFAFE;border:1px solid #67E8F9"></div>4 — Muy buen desempeño</div>
+    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 — Excelencia</div>
   </div>
-  <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="admin-prog"></div></div><div class="prog-lbl" id="admin-prog-lbl"></div></div>
+  <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-admin"></div></div><div class="prog-lbl" id="prog-admin-lbl"></div></div>
+  <div id="condo-tabs-admin"></div>
   <div id="admin-body"></div>
 </div>
 
@@ -347,247 +420,245 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green);b
       <div><div class="topbar-title" id="dash-title"></div><div class="topbar-sub" id="dash-sub"></div></div>
     </div>
     <div style="display:flex;gap:6px">
-      <button class="btn btn-ghost" onclick="goS('admin')"><i class="ti ti-arrow-left"></i> Mi evaluación</button>
+      <button class="btn btn-ghost" onclick="goS('admin');renderAdminScreen()"><i class="ti ti-arrow-left"></i> Editar</button>
       <button class="btn btn-ghost" onclick="openCompromisos()"><i class="ti ti-checklist"></i> Compromisos</button>
-      <button class="btn btn-green" onclick="renderDashboard();genReport()"><i class="ti ti-file-text"></i> Reporte final</button>
+      <button class="btn btn-green" onclick="genReport()"><i class="ti ti-file-text"></i> Reporte final</button>
     </div>
   </div>
   <div id="dash-body"></div>
 </div>
 
-
 <!-- COMPROMISOS -->
 <div id="scr-compromisos" class="screen">
   <div class="topbar">
     <div class="topbar-left">
-      <span class="role-badge badge-admin"><i class="ti ti-checklist"></i> Compromisos del mes</span>
+      <span class="role-badge badge-admin"><i class="ti ti-checklist"></i> Compromisos</span>
       <div><div class="topbar-title" id="comp-title"></div><div class="topbar-sub" id="comp-sub"></div></div>
     </div>
     <div style="display:flex;gap:6px">
-      <button class="btn btn-ghost" onclick="goS('dash');renderDashboard()"><i class="ti ti-arrow-left"></i> Dashboard</button>
-      <button class="btn btn-green" onclick="saveCompromisos()"><i class="ti ti-device-floppy"></i> Guardar compromisos</button>
+      <button class="btn btn-ghost" onclick="goS('dash');renderDash()"><i class="ti ti-arrow-left"></i> Dashboard</button>
+      <button class="btn btn-green" onclick="saveCompromisos()"><i class="ti ti-device-floppy"></i> Guardar</button>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-    <!-- OSM propone -->
     <div class="card">
-      <div class="card-title" style="color:#1A3F8A;display:flex;align-items:center;gap:6px"><i class="ti ti-user"></i> El OSM propone</div>
-      <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">El OSM indica los compromisos que asume para el siguiente mes. La Responsable los revisa y aprueba.</p>
+      <div class="card-title" style="color:var(--green)"><i class="ti ti-user"></i> El OSM propone</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">Compromisos que asume el OSM para el siguiente mes. La Responsable los aprueba o rechaza.</p>
       <div id="osm-comp-list"></div>
       <button class="addb" onclick="addOsmComp()"><i class="ti ti-plus"></i> Agregar compromiso</button>
     </div>
-    <!-- Responsable aprueba -->
     <div class="card">
-      <div class="card-title" style="color:#1A7A5E;display:flex;align-items:center;gap:6px"><i class="ti ti-crown"></i> La Responsable define</div>
-      <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">Compromisos adicionales o ajustes definidos por la Responsable de OSMs.</p>
+      <div class="card-title" style="color:var(--blue)"><i class="ti ti-crown"></i> La Responsable define</div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">Compromisos adicionales o ajustes definidos por la Responsable.</p>
       <div id="admin-comp-list"></div>
       <button class="addb" onclick="addAdminComp()"><i class="ti ti-plus"></i> Agregar compromiso</button>
     </div>
-  </div>
-  <div class="card" id="comp-preview-card" style="display:none">
-    <div class="card-title">Compromisos confirmados</div>
-    <div id="comp-preview"></div>
   </div>
 </div>
 
 <!-- SUBMITTED -->
 <div id="scr-done" class="screen">
-  <div style="text-align:center;padding:3rem 0">
-    <div style="font-size:48px;margin-bottom:16px">✅</div>
-    <h2 style="font-size:20px;font-weight:600;margin-bottom:8px">¡Evaluación enviada!</h2>
-    <p style="font-size:14px;color:var(--text2);max-width:360px;margin:0 auto 24px">Tu sección ya está guardada. La Responsable de OSMs verá tus respuestas en el dashboard consolidado.</p>
-    <p style="font-size:13px;color:var(--text3)">Puedes cerrar esta ventana.</p>
+  <div style="text-align:center;padding:4rem 1rem">
+    <div style="font-size:52px;margin-bottom:16px">✅</div>
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">¡Evaluación enviada!</h2>
+    <p id="done-msg" style="font-size:14px;color:var(--text2);max-width:420px;margin:0 auto 20px;line-height:1.7"></p>
+    <div style="background:var(--green-bg);border:1px solid var(--green-light);border-radius:var(--radius);padding:14px 20px;font-size:12px;color:var(--text2);max-width:380px;margin:0 auto">
+      Puedes cerrar esta ventana. La Responsable verá tus resultados en el dashboard.
+    </div>
   </div>
 </div>
 
-</div><!-- .app -->
-
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-// ── DEFINICIÓN DE ÁREAS Y ROLES ────────────────────────────────────
-
+// ── ÁREAS ─────────────────────────────────────────────────────────
 const AREAS_RH = [
-  {key:'staff', label:'Staff & Liderazgo', tag:'rh', icon:'ti-user-check', owner:'rh',
-   criteria:['Liderazgo con el equipo a cargo','Comunicación con colaboradores','Organización y distribución del trabajo','Seguimiento y supervisión del staff','Resolución de conflictos internos','Capacidad de delegar y confiar','Presencia y disponibilidad con el equipo','Motivación y clima laboral generado']},
-  {key:'actitud', label:'Actitud & Desempeño Personal', tag:'rh', icon:'ti-star', owner:'rh',
-   criteria:['Puntualidad y responsabilidad','Proactividad e iniciativa','Manejo del estrés y situaciones difíciles','Adaptabilidad ante cambios','Apertura a retroalimentación','Evolución y mejora mensual']},
-  {key:'homeowners_rh', label:'Trato con Homeowners', tag:'shared', icon:'ti-users', owner:'rh',
-   criteria:['Empatía y trato humano','Profesionalismo en comunicación','Manejo de situaciones difíciles con propietarios','Relación con consejo o comité'],
+  {key:'staff',label:'Staff & Liderazgo',icon:'ti-user-check',
+   criteria:['Liderazgo con el equipo a cargo','Comunicación con colaboradores','Organización y distribución del trabajo','Resolución de conflictos internos','Seguimiento al staff','Capacidad de delegar','Presencia y profesionalismo ante el equipo','Motivación y estabilidad operativa'],
    openQuestions:[
-     {key:'q_fortaleza_personas', label:'¿Qué fortaleza destaca este OSM en el trato con personas y equipo?'},
-     {key:'q_conflictos_staff', label:'¿Hubo conflictos o situaciones difíciles con el staff este mes? ¿Cómo se manejaron?'},
-     {key:'q_retencion_equipo', label:'¿Cómo calificarías su capacidad de motivar y retener al equipo?'},
-     {key:'q_mejora_rh', label:'¿Qué área de desarrollo humano recomendarías trabajar este mes?'}
-   ]
-  }
+     {key:'q_fortaleza_rh',label:'¿Qué fortaleza destaca este OSM en el trato con personas y equipo?'},
+     {key:'q_conflictos',label:'¿Hubo conflictos o situaciones difíciles con el staff este mes?'},
+     {key:'q_retencion',label:'¿Cómo calificarías su capacidad de motivar y retener al equipo?'},
+     {key:'q_mejora_rh',label:'¿Qué área de desarrollo humano recomendarías trabajar este mes?'}
+   ]},
+  {key:'actitud',label:'Actitud & Desempeño',icon:'ti-star',
+   criteria:['Puntualidad y responsabilidad','Proactividad e iniciativa','Manejo del estrés y situaciones difíciles','Adaptabilidad a cambios','Apertura a feedback','Disposición y actitud general']},
+  {key:'homeowners_rh',label:'Trato con Homeowners',icon:'ti-users',
+   criteria:['Empatía y trato humano','Profesionalismo en comunicación','Manejo de situaciones difíciles con propietarios','Seguimiento a necesidades del homeowner']}
 ];
 
 const AREAS_CONT = [
-  {key:'contabilidad', label:'Contabilidad & Reportes', tag:'cont', icon:'ti-report-money', owner:'cont',
-   criteria:['Reporte de gastos mensual — puntualidad','Reporte de ingresos mensual — puntualidad','Calidad y claridad de los reportes','Revisión y apego al presupuesto','Nómina — entrega a tiempo','Obligaciones patronales — cumplimiento','Impuestos — cumplimiento']},
-  {key:'relacion_cont', label:'Relación con el Equipo Contable', tag:'cont', icon:'ti-link', owner:'cont',
-   criteria:['Claridad al solicitar información o pagos','Tiempo de respuesta a solicitudes del área contable','Organización de documentos y comprobantes','Seguimiento a pendientes contables','Disposición para resolver inconsistencias'],
+  {key:'contabilidad',label:'Contabilidad & Reportes',icon:'ti-report-money',
+   criteria:['Entrega de reporte de gastos en tiempo','Entrega de reporte de ingresos en tiempo','Revisión y reconciliación de presupuesto','Nómina en tiempo y forma','Obligaciones patronales al corriente','Impuestos al corriente','Calidad y precisión de la información'],
    openQuestions:[
-     {key:'q_entrega_tard', label:'¿Hay algún reporte o entrega que consistentemente llega tarde o incompleta?'},
-     {key:'q_docs_calidad', label:'¿Los comprobantes y documentos llegan completos y organizados?'},
-     {key:'q_actitud_error', label:'¿Cómo es la actitud del OSM cuando hay un error o inconsistencia contable?'},
-     {key:'q_mejora_proceso', label:'¿Recomendarías algún cambio en el proceso de entrega de información?'}
-   ]
-  },
-  {key:'comunicacion_cont', label:'Comunicación con Contabilidad', tag:'shared', icon:'ti-message-circle', owner:'cont',
-   criteria:['Comunicación escrita clara y profesional','Seguimiento a correos y solicitudes','Organización de información enviada']}
+     {key:'q_entregas',label:'¿Hubo entregas tardías o incompletas este mes? ¿Cuáles?'},
+     {key:'q_calidad',label:'¿Cómo evalúas la calidad y organización de los documentos entregados?'},
+     {key:'q_actitud_cont',label:'¿Cómo reacciona el OSM ante observaciones o correcciones de Contabilidad?'},
+     {key:'q_mejora_cont',label:'¿Qué mejora de proceso recomendarías para optimizar la relación con este OSM?'}
+   ]},
+  {key:'relacion_cont',label:'Relación con Contabilidad',icon:'ti-link',
+   criteria:['Comunicación clara y oportuna','Respuesta a solicitudes de información','Organización de documentos y archivos','Disposición para resolver discrepancias','Seguimiento a observaciones previas']},
+  {key:'comunicacion_cont',label:'Comunicación',icon:'ti-message',
+   criteria:['Claridad en comunicación escrita','Tiempo de respuesta a correos y mensajes','Calidad del seguimiento administrativo']}
 ];
 
 const AREAS_ADMIN = [
-  {key:'operacion', label:'Operación', tag:'admin', icon:'ti-building', owner:'admin',
+  {key:'operacion',label:'Operación',icon:'ti-building',
    criteria:['Recorridos operativos','Seguimiento de pendientes','Anticipación de incidencias','Resolución de problemas','Supervisión general del inmueble','Organización operativa','Seguimiento de proyectos','Coordinación entre áreas','Gestión de emergencias','Cumplimiento operativo general']},
-  {key:'mantenimiento', label:'Mantenimiento', tag:'admin', icon:'ti-tool', owner:'admin',
+  {key:'mantenimiento',label:'Mantenimiento',icon:'ti-tool',
    criteria:['Seguimiento preventivo','Seguimiento correctivo','Planeación de mantenimientos','Supervisión de proveedores técnicos','Seguimiento de trabajos pendientes','Control de incidencias técnicas','Validación de trabajos realizados','Organización documental técnica']},
-  {key:'homeowners_admin', label:'Homeowners', tag:'admin', icon:'ti-users', owner:'admin',
-   criteria:['Atención al propietario','Tiempo de respuesta','Seguimiento a solicitudes','Resolución de conflictos','Experiencia general del homeowner']},
-  {key:'comunicacion_admin', label:'Comunicación & Reporting', tag:'admin', icon:'ti-message-circle', owner:'admin',
-   criteria:['Seguimiento de tickets CondoVive','Tiempo de respuesta','Actualización de SharePoint','Organización documental','Preparación de información para juntas','Trazabilidad y seguimiento']}
+  {key:'homeowners_admin',label:'Homeowners',icon:'ti-users',
+   criteria:['Atención al propietario','Tiempo de respuesta','Seguimiento a solicitudes','Resolución de conflictos','Relación con consejo/comité']},
+  {key:'comunicacion_admin',label:'Comunicación Operativa',icon:'ti-message-circle',
+   criteria:['Seguimiento de tickets CondoVive','Calidad de seguimiento','Comunicación escrita profesional','Actualización de SharePoint','Organización documental','Seguimiento administrativo']}
 ];
 
-const ROLE_AREAS = {rh: AREAS_RH, cont: AREAS_CONT, admin: AREAS_ADMIN};
-const ROLE_COLORS = {rh:'#5B21B6', cont:'#1A3F8A', admin:'#1A7A5E'};
-const ROLE_NAMES = {rh:'Carmen — RH', cont:'Contabilidad', admin:'Responsable OSMs'};
+const ROLE_AREAS = {rh:AREAS_RH, cont:AREAS_CONT, admin:AREAS_ADMIN};
 const ROLE_WEIGHTS = {rh:30, cont:30, admin:40};
-
-// ── NOTIFICACIONES VÍA SHAREPOINT LIST ────────────────────────────
-// Escribe eventos en la lista "OSM Eval Eventos" de SharePoint
-// Power Automate detecta los nuevos elementos y envía los correos
-const SP_API = 'https://hestiamx-my.sharepoint.com/personal/yaiza_hestiamx_com/_api/lists/getbytitle(%27OSM%20Eval%20Eventos%27)/items';
-
-async function notifyServer(tipo, datos){
-  try{
-    // Obtener el token de formulario de SharePoint (necesario para POST)
-    const ctxResp = await fetch(
-      'https://hestiamx-my.sharepoint.com/personal/yaiza_hestiamx_com/_api/contextinfo',
-      {method:'POST', headers:{'Accept':'application/json;odata=verbose'}}
-    );
-    if(!ctxResp.ok) return;
-    const ctx = await ctxResp.json();
-    const token = ctx.d.GetContextWebInformation.FormDigestValue;
-
-    await fetch(SP_API, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json;odata=verbose',
-        'Content-Type': 'application/json;odata=verbose',
-        'X-RequestDigest': token
-      },
-      body: JSON.stringify({
-        '__metadata': {'type': 'SP.Data.OSM_x0020_Eval_x0020_EventosListItem'},
-        'Title': tipo,
-        'tipo': tipo,
-        'osm': datos.osm || '',
-        'condominios': datos.condominios || '',
-        'codigo': datos.codigo || '',
-        'mensaje': datos.mensaje || ''
-      })
-    });
-    console.log('Evento registrado en SharePoint:', tipo);
-  } catch(e) {
-    console.log('No se pudo registrar en SharePoint:', e.message);
-  }
-} // % del score final
+const SERVER = 'https://hestia-notificaciones.onrender.com';
 
 // ── STATE ──────────────────────────────────────────────────────────
-let session = null; // {id, osm, mo, admin, condos, notas, created}
-let condoList = []; // parsed array of condo names
-let activeCondo360 = 0; // currently selected condo index in 360 eval
-let evalData = {rh:{scores:{},comments:{},openAnswers:{},submitted:false}, cont:{scores:{},comments:{},openAnswers:{},submitted:false}, admin:{scores:{},comments:{},submitted:false}};
-let currentRole = null;
+let session = null;
+let condoList = [];
+let activeCondo = {rh:0, cont:0, admin:0, dash:0};
 let openAreas = {};
-let radarChart = null;
+let currentRole = null;
+let osmComps = [{texto:'',metrica:'',fecha:'',status:'pending'}];
+let adminComps = [{texto:'',metrica:'',fecha:''}];
+let charts = {};
 
-// ── SERVER CONFIG ──────────────────────────────────────────────────
-// URL del servidor en Render.com — se llena automáticamente al desplegar
-const SERVER = window.HESTIA_SERVER || 'https://hestia-notificaciones.onrender.com';
-
-// ── STORAGE (local + servidor) ─────────────────────────────────────
-function saveToStorage(){
-  try{localStorage.setItem('osm360_session',JSON.stringify(session));localStorage.setItem('osm360_eval',JSON.stringify(evalData));}catch(e){}
-  if(SERVER && session){
-    fetch(SERVER+'/session',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({sessionId:session.id,session,evalData})
-    }).catch(()=>{});
-  }
-}
-
-async function syncFromServer(sessionId){
-  if(!SERVER)return false;
-  try{
-    const r=await fetch(SERVER+'/session/'+sessionId);
-    if(!r.ok)return false;
-    const data=await r.json();
-    if(data.session)session=data.session;
-    if(data.evalData)evalData=data.evalData;
-    if(data.compromisos)window._osmCompromisos=data.compromisos;
-    condoList=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];
-    return true;
-  }catch(e){return false;}
-}
-
-function loadFromStorage(){
-  try{
-    const s=localStorage.getItem('osm360_session');const e=localStorage.getItem('osm360_eval');
-    if(s)session=JSON.parse(s);if(e)evalData=JSON.parse(e);
-    return !!s;
-  }catch(e){return false}
-}
+let evalData = {
+  rh:  {scores:{}, comments:{}, openAnswers:{}, submitted:false},
+  cont:{scores:{}, comments:{}, openAnswers:{}, submitted:false},
+  admin:{scores:{}, comments:{}, submitted:false}
+};
 
 // ── UTILS ──────────────────────────────────────────────────────────
-function moLabel(mo){return mo?new Date(mo+'-02').toLocaleDateString('es',{month:'long',year:'numeric'}):''}
-function notify(msg,type='ok'){
-  const el=document.getElementById('notif');
-  const ic={ok:'ti-circle-check',err:'ti-circle-x',info:'ti-info-circle'}[type]||'ti-circle-check';
-  el.innerHTML=`<i class="ti ${ic}"></i> ${msg}`;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);
+function sk(role,ci,ak,idx){return role+'|'+ci+'|'+ak+'|'+idx}
+function ck(role,ci,ak,idx){return 'c|'+role+'|'+ci+'|'+ak+'|'+idx}
+function gs(role,ci,ak,idx){return evalData[role].scores[sk(role,ci,ak,idx)]??null}
+
+function areaAvg(role,ak,ci){
+  const areas=ROLE_AREAS[role];const area=areas.find(a=>a.key===ak);if(!area)return null;
+  const numC=condoList.length||1;
+  if(ci!==undefined){
+    const vals=area.criteria.map((_,i)=>gs(role,ci,ak,i)).filter(v=>v!==null);
+    return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+  }
+  // Average across all condos
+  let all=[];
+  for(let c=0;c<numC;c++){
+    area.criteria.forEach((_,i)=>{const v=gs(role,c,ak,i);if(v!==null)all.push(v)});
+  }
+  return all.length?all.reduce((a,b)=>a+b,0)/all.length:null;
 }
+
+function roleOverall(role){
+  const avgs=ROLE_AREAS[role].map(a=>areaAvg(role,a.key)).filter(v=>v!==null);
+  return avgs.length?avgs.reduce((a,b)=>a+b,0)/avgs.length:null;
+}
+
+function globalScore(){
+  let sum=0,w=0;
+  Object.keys(ROLE_WEIGHTS).forEach(role=>{
+    const ov=roleOverall(role);if(ov!==null){sum+=ov*ROLE_WEIGHTS[role];w+=ROLE_WEIGHTS[role]}
+  });
+  return w?sum/w:null;
+}
+
+function countFilled(role){
+  const numC=condoList.length||1;let n=0;
+  for(let c=0;c<numC;c++){
+    ROLE_AREAS[role].forEach(a=>a.criteria.forEach((_,i)=>{if(gs(role,c,a.key,i)!==null)n++}));
+  }
+  return n;
+}
+
+function totalCrit(role){return ROLE_AREAS[role].reduce((s,a)=>s+a.criteria.length,0)*(condoList.length||1)}
+
+function moLabel(mo){return mo?new Date(mo+'-02').toLocaleDateString('es',{month:'long',year:'numeric'}):''}
+
+function nextMonthLabel(mo){
+  if(!mo)return'próximo mes';
+  const d=new Date(mo+'-02');d.setMonth(d.getMonth()+1);
+  return d.toLocaleDateString('es',{month:'long',year:'numeric'});
+}
+
 function interp(v){
   if(v===null||v===undefined)return{label:'Sin datos',cls:'na',color:'#A8A59E'};
   if(v<1.5)return{label:'Deficiente',cls:'1',color:'#DC2626'};
   if(v<2.5)return{label:'Necesita mejora',cls:'2',color:'#D97706'};
   if(v<3.5)return{label:'Cumple',cls:'3',color:'#16A34A'};
-  if(v<4.5)return{label:'Buen desempeño',cls:'4',color:'#2563EB'};
+  if(v<4.5)return{label:'Buen desempeño',cls:'4',color:'#0891B2'};
   return{label:'Excelencia',cls:'5',color:'#1A7A5E'};
 }
+
 function badge(v){
   const i=interp(v);
-  const s={na:'background:#EFEDE7;color:#A8A59E',1:'background:#FDDEDE;color:#8B1E1E',2:'background:#FEF0C7;color:#8A5700',3:'background:#DCFCE7;color:#166534',4:'background:#DBEAFE;color:#1E40AF',5:'background:#E6F4EF;color:#1A7A5E'}[i.cls];
-  return`<span class="badge" style="${s}">${v!==null&&v!==undefined?v.toFixed(1)+' ':''}<span style="font-weight:500">${i.label}</span></span>`;
+  const bg={na:'var(--surface2)',1:'#FDDEDE',2:'#FEF0C7',3:'#DCFCE7',4:'#CFFAFE',5:'#E8F5F0'}[i.cls];
+  const cl={na:'var(--text3)',1:'#8B2020',2:'#9A6200',3:'#166534',4:'#155E75',5:'#1A7A5E'}[i.cls];
+  return `<span class="badge" style="background:${bg};color:${cl}">${v!==null?v.toFixed(1)+' ':''}${i.label}</span>`;
 }
-function areaAvg(role, areaKey){
-  const areas=ROLE_AREAS[role];const area=areas.find(a=>a.key===areaKey);if(!area)return null;
-  const vals=area.criteria.map((_,i)=>evalData[role].scores[areaKey+'|'+i]).filter(v=>v!==null&&v!==undefined);
-  return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:null;
+
+function notify(msg,type='ok'){
+  const el=document.getElementById('notif');
+  const ic=type==='ok'?'ti-circle-check':type==='err'?'ti-circle-x':'ti-info-circle';
+  el.innerHTML=`<i class="ti ${ic}"></i> ${msg}`;
+  el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2600);
 }
-function roleOverall(role){
-  const areas=ROLE_AREAS[role];
-  const avgs=areas.map(a=>areaAvg(role,a.key)).filter(v=>v!==null);
-  return avgs.length?avgs.reduce((a,b)=>a+b,0)/avgs.length:null;
-}
-function globalScore(){
-  let sum=0,w=0;
-  Object.keys(ROLE_WEIGHTS).forEach(role=>{const ov=roleOverall(role);if(ov!==null){sum+=ov*ROLE_WEIGHTS[role];w+=ROLE_WEIGHTS[role]}});
-  return w?sum/w:null;
-}
-function countFilled(role){
-  const areas=ROLE_AREAS[role];let n=0;
-  const numCondos=condoList.length||1;
-  for(let ci=0;ci<numCondos;ci++){
-    areas.forEach(a=>a.criteria.forEach((_,i)=>{
-      if(evalData[role].scores[ci+'|'+a.key+'|'+i]!==null&&evalData[role].scores[ci+'|'+a.key+'|'+i]!==undefined)n++;
-    }));
-  }
-  return n;
-}
-function totalCrit(role){return ROLE_AREAS[role].reduce((s,a)=>s+a.criteria.length,0)*(condoList.length||1)}
 
 // ── NAVIGATION ─────────────────────────────────────────────────────
-function goS(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));document.getElementById('scr-'+s).classList.add('on')}
-function goHome(){goS('home')}
+function goS(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));
+  document.getElementById('scr-'+s).classList.add('on');
+}
+
+// ── STORAGE ────────────────────────────────────────────────────────
+function saveToStorage(){
+  try{
+    localStorage.setItem('osm360_session',JSON.stringify(session));
+    localStorage.setItem('osm360_eval',JSON.stringify(evalData));
+  }catch(e){}
+  if(SERVER&&session){
+    fetch(SERVER+'/session',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({sessionId:session.id,session,evalData})}).catch(()=>{});
+  }
+}
+
+function loadFromStorage(){
+  try{
+    const s=localStorage.getItem('osm360_session');
+    const e=localStorage.getItem('osm360_eval');
+    if(s){session=JSON.parse(s);condoList=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];}
+    if(e)evalData=JSON.parse(e);
+    return !!s;
+  }catch(e){return false}
+}
+
+async function syncFromServer(sessionId){
+  if(!SERVER)return false;
+  try{
+    const r=await fetch(SERVER+'/session/'+sessionId);if(!r.ok)return false;
+    const data=await r.json();
+    if(data.session)session=data.session;
+    if(data.evalData)evalData=data.evalData;
+    condoList=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];
+    return true;
+  }catch(e){return false;}
+}
+
+// ── CONDO LIST ─────────────────────────────────────────────────────
+let condos=[];
+function addCondo(name=''){condos.push(name);renderCondoList()}
+function removeCondo(i){if(condos.length<=1)return;condos.splice(i,1);renderCondoList()}
+function renderCondoList(){
+  document.getElementById('condo-list').innerHTML=condos.map((c,i)=>`
+    <div class="condo-row">
+      <span class="condo-num">${i+1}</span>
+      <input type="text" placeholder="Nombre del condominio" value="${c.replace(/"/g,'&quot;')}" oninput="condos[${i}]=this.value"/>
+      ${condos.length>1?`<button class="rmb" onclick="removeCondo(${i})"><i class="ti ti-trash-x"></i></button>`:'<span style="width:26px"></span>'}
+    </div>`).join('');
+}
 
 // ── SESSION ────────────────────────────────────────────────────────
 function createSession(){
@@ -596,308 +667,606 @@ function createSession(){
   const admin=document.getElementById('s-admin').value.trim();
   if(!nm){notify('Ingresa el nombre del OSM','err');return}
   if(!admin){notify('Ingresa tu nombre','err');return}
+  const rc=condos.filter(c=>c.trim());
+  if(!rc.length){notify('Agrega al menos un condominio','err');return}
+  condos=rc;
+
   const id=Math.random().toString(36).slice(2,8).toUpperCase();
-  session={id,osm:nm,mo,admin,condos:document.getElementById('s-condos').value.trim(),notas:document.getElementById('s-notas').value.trim(),created:new Date().toISOString()};
-  condoList=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];
-  if(condoList.length===0)condoList=['Principal'];
+  session={id,osm:nm,mo,admin,condos:condos.join(', '),
+    notas:document.getElementById('s-notas').value.trim(),
+    observaciones:document.getElementById('s-observaciones').value.trim(),
+    compromisoMes:document.getElementById('s-compromiso').value.trim(),
+    fraseCierre:document.getElementById('s-frase').value.trim(),
+    created:new Date().toISOString()};
+  condoList=condos;
   evalData={rh:{scores:{},comments:{},openAnswers:{},submitted:false},cont:{scores:{},comments:{},openAnswers:{},submitted:false},admin:{scores:{},comments:{},submitted:false}};
   saveToStorage();
+
+  // Notify server
+  if(SERVER){
+    fetch(SERVER+'/notify/sesion',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({osm:nm,condos:session.condos,codigo:id,mes:moLabel(mo)})}).catch(()=>{});
+  }
+
   renderAdminScreen();
   goS('admin');
+  notify(`Sesión creada — código: ${id}`);
+  updateNav();
 }
 
-function selectRole(role){
+function showJoin(role){
   currentRole=role;
-  if(role==='admin'){
-    if(!session){goS('setup');return}
-    renderAdminScreen();goS('admin');
-  } else {
-    // show code entry
-    const area=document.getElementById('session-join-area');
-    area.innerHTML=`<div class="card" style="margin-bottom:16px">
-      <div class="card-title">${role==='rh'?'Carmen — RH':'Contabilidad'} — Ingresar con código</div>
-      <div class="fg">
-        <div><div class="fl">Código de sesión (te lo da la Responsable)</div>
-          <input type="text" id="join-code" placeholder="Ej. A3B7C2" style="font-family:'DM Mono',monospace;font-size:18px;text-transform:uppercase;text-align:center" oninput="this.value=this.value.toUpperCase()"/>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn btn-primary" onclick="joinSession('${role}')"><i class="ti ti-arrow-right"></i> Entrar</button>
-        <button class="btn btn-ghost" onclick="document.getElementById('session-join-area').innerHTML=''">Cancelar</button>
-      </div>
-    </div>`;
-  }
+  document.getElementById('join-title').textContent=role==='rh'?'Carmen — RH':'Contabilidad';
+  document.getElementById('join-desc').textContent=`Ingresa el código de sesión que te compartió la Responsable de OSMs para evaluar al On Site Manager este mes.`;
+  document.getElementById('join-code').value='';
+  goS('join');
 }
 
-function joinSession(role){
+function joinSession(){
   const code=document.getElementById('join-code').value.trim().toUpperCase();
-  if(!session||session.id!==code){notify('Código incorrecto. Pide el código a la Responsable de OSMs.','err');return}
-  currentRole=role;
-  condoList=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];
-  if(condoList.length===0)condoList=['Principal'];
-  // Intentar sincronizar datos del servidor
-  syncFromServer(code).then(synced=>{
-    if(synced)notify('Datos sincronizados','ok');
-    if(evalData[role].submitted){notify('Ya enviaste tu evaluación este mes. Gracias!','info');return}
-    renderRoleScreen(role);goS(role);
-  });
-  if(!SERVER){
-    if(evalData[role].submitted){notify('Ya enviaste tu evaluación este mes. Gracias!','info');return}
-    renderRoleScreen(role);goS(role);
+  if(!code){notify('Ingresa el código','err');return}
+
+  // Try localStorage first
+  loadFromStorage();
+  if(!session||session.id!==code){
+    // Try server
+    syncFromServer(code).then(synced=>{
+      if(synced){
+        renderRoleScreen(currentRole);goS(currentRole);updateNav();
+      } else {
+        notify('Código incorrecto. Pide el código actualizado a la Responsable.','err');
+      }
+    });
+    return;
   }
+  if(evalData[currentRole].submitted){
+    notify('Ya enviaste tu evaluación este mes. ¡Gracias!','info');return;
+  }
+  renderRoleScreen(currentRole);goS(currentRole);updateNav();
 }
 
-// ── RENDER EVAL SCREENS ────────────────────────────────────────────
+// ── NAV INFO ───────────────────────────────────────────────────────
+function updateNav(){
+  if(!session)return;
+  document.getElementById('nav-sub').textContent=session.osm+' · '+moLabel(session.mo);
+  const nr=document.getElementById('nav-right');
+  nr.innerHTML=`<span style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;background:var(--surface2);padding:4px 10px;border-radius:var(--radius-sm);color:var(--text2)">Código: ${session.id}</span>`;
+}
+
+// ── RENDER EVAL ────────────────────────────────────────────────────
 function renderRoleScreen(role){
-  const areas=ROLE_AREAS[role];
   const titleEl=document.getElementById(role+'-title');
   const subEl=document.getElementById(role+'-sub');
   if(titleEl)titleEl.textContent=session.osm;
   if(subEl)subEl.textContent=moLabel(session.mo)+(session.condos?' · '+session.condos:'');
   updateProgress(role);
-  const bodyEl=document.getElementById(role+'-body');
-  if(!bodyEl)return;
-  // Add condo tabs if multiple condos
-  let condoTabsHtml='';
-  if(condoList.length>1){
-    condoTabsHtml=`<div style="display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px">
-      ${condoList.map((c,i)=>`<button style="flex:1;padding:9px 8px;font-size:12px;font-weight:${i===activeCondo360?'600':'400'};color:${i===activeCondo360?'#fff':'var(--text2)'};background:${i===activeCondo360?'var(--text)':'none'};border:none;border-right:1px solid var(--border);cursor:pointer;text-align:center;transition:all .15s" onclick="switchCondo360(${i},'${role}')">${c}</button>`).join('')}
-    </div>`;
-  }
-  const condoLabel=condoList.length>1?`<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Evaluando: ${condoList[activeCondo360]}</div>`:'';
-  bodyEl.innerHTML=condoTabsHtml+condoLabel+areas.map(area=>{
-    const avg=areaAvg(role,area.key,activeCondo360);const isO=openAreas[area.key]!==false;
-    const tagClass={'rh':'tag-rh','cont':'tag-cont','admin':'tag-admin','shared':'tag-shared'}[area.tag]||'tag-shared';
-    const tagLabel={'rh':'RH','cont':'Contabilidad','admin':'Operaciones','shared':'Compartida'}[area.tag]||area.tag;
-    return`<div class="area-block">
-      <div class="area-hdr" onclick="toggleArea('${area.key}')">
-        <div class="area-hdr-l"><i class="ti ${area.icon}" style="font-size:15px;color:var(--text2)"></i>
-          <span class="area-ttl">${area.label}</span>
-          <span class="area-tag ${tagClass}">${tagLabel}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px" id="ahdr-${role}-${area.key}">${badge(avg)}<i class="ti ti-chevron-down chev" style="transform:rotate(${isO?180:0}deg)" id="chev-${area.key}"></i></div>
-      </div>
-      <div class="area-body${isO?' open':''}" id="ab-${area.key}">
-        ${area.criteria.map((cr,idx)=>{
-          const sc=evalData[role].scores[area.key+'|'+idx];
-          const com=evalData[role].comments[area.key+'|'+idx]||'';
-          return`<div class="crit-row with-comment"><span class="crit-name">${cr}</span>
-            <div class="pills">${[1,2,3,4,5].map(v=>`<button class="pill p${v}${sc===v?' on':''}" onclick="setSc('${role}','${area.key}',${idx},${v},this,activeCondo360)">${v}</button>`).join('')}</div>
-            <input class="com-input" type="text" placeholder="Comentario..." value="${com.replace(/"/g,'"')}" oninput="saveCom('${role}','${area.key}',${idx},this.value,activeCondo360)"/>
-          </div>`;
-        }).join('')}
-        ${area.openQuestions?`<div style="padding:12px 15px;border-top:1px solid var(--border);background:var(--surface2)">
-          ${area.openQuestions.map(q=>`
-            <span class="open-q-label">${q.label}</span>
-            <textarea class="open-q" placeholder="Escribe aquí..." oninput="saveOpenQ('${role}','${q.key}',this.value)">${(evalData[role].openAnswers[q.key]||'').replace(/</g,'<')}</textarea>
-          `).join('')}
-        </div>`:''}
-        <div class="area-res">
-          <span class="area-res-lbl">${area.label}</span>
-          <span id="ares-${role}-${area.key}">${badge(avg)}</span>
-        </div>
-      </div></div>`;
-  }).join('');
+  renderCondoTabs(role);
+  renderAreaBlocks(role);
 }
 
 function renderAdminScreen(){
-  if(!session)return;
-  document.getElementById('admin-title').textContent=session.osm;
-  document.getElementById('admin-sub').textContent=moLabel(session.mo)+(session.condos?' · '+session.condos:'');
-  updateProgress('admin');
-  const bodyEl=document.getElementById('admin-body');
+  renderRoleScreen('admin');
+}
+
+function renderCondoTabs(role){
+  const el=document.getElementById('condo-tabs-'+role);if(!el)return;
+  if(condoList.length<=1){el.innerHTML='';return}
+  el.innerHTML=`<div class="condo-tabs">${condoList.map((c,i)=>{
+    const ov=areaAvgForCondo(role,i);
+    return`<button class="ctab${i===activeCondo[role]?' on':''}" onclick="switchCondo('${role}',${i})">${c}<span class="cs">${ov!==null?ov.toFixed(1):'—'}</span></button>`;
+  }).join('')}</div>`;
+}
+
+function areaAvgForCondo(role,ci){
+  const avgs=ROLE_AREAS[role].map(a=>areaAvg(role,a.key,ci)).filter(v=>v!==null);
+  return avgs.length?avgs.reduce((a,b)=>a+b,0)/avgs.length:null;
+}
+
+function switchCondo(role,i){
+  activeCondo[role]=i;renderCondoTabs(role);renderAreaBlocks(role);
+}
+
+function updateProgress(role){
+  const f=countFilled(role),t=totalCrit(role),p=t?Math.round(f/t*100):0;
+  const fill=document.getElementById('prog-'+role);
+  const lbl=document.getElementById('prog-'+role+'-lbl');
+  if(fill)fill.style.width=p+'%';
+  if(lbl)lbl.textContent=f+' de '+t+' criterios ('+p+'%)';
+}
+
+function renderAreaBlocks(role){
+  const ci=activeCondo[role]||0;
+  const bodyEl=document.getElementById(role+'-body');
   if(!bodyEl)return;
-  // Status of other evaluators
-  const rhPct=Math.round(countFilled('rh')/totalCrit('rh')*100);
-  const contPct=Math.round(countFilled('cont')/totalCrit('cont')*100);
-  bodyEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
-    <div style="background:var(--purple-bg);border:1px solid #DDD6FE;border-radius:var(--radius);padding:12px;display:flex;align-items:center;gap:10px">
-      <div style="font-size:20px">💜</div>
-      <div><div style="font-size:12px;font-weight:600;color:#5B21B6">Carmen — RH</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">${evalData.rh.submitted?'✅ Completado':'🕐 '+(rhPct>0?rhPct+'% llenado':'Sin iniciar')}</div>
+
+  bodyEl.innerHTML=ROLE_AREAS[role].map(area=>{
+    const avg=areaAvg(role,area.key,ci);
+    const isOpen=openAreas[role+'|'+area.key]!==false;
+    let html=`<div class="area-block">
+      <div class="area-hdr" onclick="toggleArea('${role}','${area.key}')">
+        <div class="area-hdr-l"><i class="ti ${area.icon} area-ico"></i><span class="area-ttl">${area.label}</span></div>
+        <div class="area-hdr-r" id="ahdr-${role}-${area.key}">${badge(avg)}<i class="ti ti-chevron-down chev" style="transform:rotate(${isOpen?180:0}deg)" id="chev-${role}-${area.key}"></i></div>
       </div>
-    </div>
-    <div style="background:var(--blue-bg);border:1px solid #BFDBFE;border-radius:var(--radius);padding:12px;display:flex;align-items:center;gap:10px">
-      <div style="font-size:20px">💙</div>
-      <div><div style="font-size:12px;font-weight:600;color:#1A3F8A">Contabilidad</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:2px">${evalData.cont.submitted?'✅ Completado':'🕐 '+(contPct>0?contPct+'% llenado':'Sin iniciar')}</div>
-      </div>
-    </div>
-  </div>`;
-  // Session code
-  bodyEl.innerHTML+=`<div class="session-box" style="margin-bottom:16px">
-    <div class="session-label">Código para compartir con el equipo</div>
-    <div class="session-code">${session.id}</div>
-    <div style="font-size:12px;color:var(--text2)">Carmen y Contabilidad usan este código para ingresar al sistema</div>
-    <button class="btn btn-ghost" style="margin-top:10px;font-size:12px" onclick="navigator.clipboard.writeText('${session.id}').then(()=>notify('Código copiado'))"><i class="ti ti-copy"></i> Copiar código</button>
-  </div>`;
-  // Admin eval areas
-  bodyEl.innerHTML+=`<div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Tu evaluación — Operación completa</div>`;
-  bodyEl.innerHTML+=AREAS_ADMIN.map(area=>{
-    const avg=areaAvg('admin',area.key,activeCondo360);const isO=openAreas[area.key]!==false;
-    return`<div class="area-block">
-      <div class="area-hdr" onclick="toggleArea('${area.key}')">
-        <div class="area-hdr-l"><i class="ti ${area.icon}" style="font-size:15px;color:var(--text2)"></i><span class="area-ttl">${area.label}</span></div>
-        <div style="display:flex;align-items:center;gap:8px" id="ahdr-admin-${area.key}">${badge(avg)}<i class="ti ti-chevron-down chev" style="transform:rotate(${isO?180:0}deg)" id="chev-${area.key}"></i></div>
-      </div>
-      <div class="area-body${isO?' open':''}" id="ab-${area.key}">
-        ${area.criteria.map((cr,idx)=>{const sc=evalData.admin.scores[area.key+'|'+idx];const com=evalData.admin.comments[area.key+'|'+idx]||'';
-          return`<div class="crit-row with-comment"><span class="crit-name">${cr}</span>
-            <div class="pills">${[1,2,3,4,5].map(v=>`<button class="pill p${v}${sc===v?' on':''}" onclick="setSc('admin','${area.key}',${idx},${v},this,activeCondo360)">${v}</button>`).join('')}</div>
-            <input class="com-input" type="text" placeholder="Comentario..." value="${com.replace(/"/g,'"')}" oninput="saveCom('admin','${area.key}',${idx},this.value,activeCondo360)"/>
+      <div class="area-body${isOpen?' open':''}" id="ab-${role}-${area.key}">
+        ${area.criteria.map((cr,idx)=>{
+          const sc=gs(role,ci,area.key,idx);
+          const com=(evalData[role].comments[ck(role,ci,area.key,idx)]||'').replace(/"/g,'&quot;');
+          return`<div class="crit-row"><span class="crit-name">${cr}</span>
+            <div class="pills">${[1,2,3,4,5].map(v=>`<button class="pill p${v}${sc===v?' on':''}" onclick="setSc('${role}','${area.key}',${idx},${v},this,${ci})">${v}</button>`).join('')}</div>
+            <input class="com-input" type="text" placeholder="Comentario..." value="${com}" oninput="saveCom('${role}','${area.key}',${idx},this.value,${ci})"/>
           </div>`;
-        }).join('')}
-        <div class="area-res"><span class="area-res-lbl">${area.label}</span><span id="ares-admin-${area.key}">${badge(avg)}</span></div>
-      </div></div>`;
+        }).join('')}`;
+
+    // Open questions
+    if(area.openQuestions&&area.openQuestions.length){
+      html+=`<div class="oq-block"><div class="oq-lbl"><i class="ti ti-message-2"></i> Observaciones cualitativas</div>`;
+      area.openQuestions.forEach(oq=>{
+        const val=(evalData[role].openAnswers[oq.key]||'').replace(/"/g,'&quot;');
+        html+=`<div class="oq-item"><div class="oq-q">${oq.label}</div>
+          <textarea rows="2" style="font-size:12px;padding:7px 10px;width:100%;border-radius:var(--radius-sm);border:1px solid var(--border);resize:vertical" placeholder="Respuesta opcional..." oninput="saveOQ('${role}','${oq.key}',this.value)">${val}</textarea>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+
+    html+=`<div class="area-res">
+      <span class="area-res-lbl">${area.label}</span>
+      <span class="area-res-val" id="ares-${role}-${area.key}" style="color:${interp(avg).color}">${avg!==null?avg.toFixed(2):'—'}</span>
+      <span id="aresb-${role}-${area.key}">${badge(avg)}</span>
+    </div></div></div>`;
+    return html;
   }).join('');
 }
 
-function toggleArea(ak){
-  openAreas[ak]=openAreas[ak]===false;
-  const b=document.getElementById('ab-'+ak),c=document.getElementById('chev-'+ak);
-  if(b)b.classList.toggle('open',!openAreas[ak]);
-  if(c)c.style.transform=`rotate(${openAreas[ak]?0:180}deg)`;
-}
-function setSc(role,ak,idx,val,btn,ci){
-  const condoIdx=ci!==undefined?ci:activeCondo360;
-  const key=condoIdx+'|'+ak+'|'+idx;const prev=evalData[role].scores[key];
-  evalData[role].scores[key]=prev===val?null:val;
-  btn.parentElement.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
-  if(prev!==val)btn.classList.add('on');
-  const avg=areaAvg(role,ak,condoIdx);
-  const rb=document.getElementById('ares-'+role+'-'+ak)||document.getElementById('ares-admin-'+ak);
-  if(rb)rb.innerHTML=badge(avg);
-  const hdr=document.getElementById('ahdr-'+role+'-'+ak)||document.getElementById('ahdr-admin-'+ak);
-  if(hdr){const chev=document.getElementById('chev-'+ak);hdr.innerHTML=`${badge(avg)}<i class="ti ti-chevron-down chev" style="transform:rotate(${openAreas[ak]?0:180}deg)" id="chev-${ak}"></i>`;}
-  updateProgress(role);saveToStorage();
-}
-function saveCom(role,ak,idx,val,ci){const condoIdx=ci!==undefined?ci:activeCondo360;evalData[role].comments[condoIdx+'|'+ak+'|'+idx]=val;saveToStorage()}
-function saveOpenQ(role,key,val){evalData[role].openAnswers[key]=val;saveToStorage()}
-function updateProgress(role){
-  const f=countFilled(role),t=totalCrit(role),p=Math.round(f/t*100);
-  const pf=document.getElementById(role+'-prog');const pl=document.getElementById(role+'-prog-lbl');
-  if(pf)pf.style.width=p+'%';
-  if(pl)pl.textContent=f+' de '+t+' criterios ('+p+'%)';
-}
-function submitRole(role){
-  evalData[role].submitted=true;saveToStorage();
-  // Sync this role's data to server
-  if(SERVER && session){
-    fetch(SERVER+'/eval/'+session.id+'/'+role,{method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(evalData[role])
-    }).catch(()=>{});
-  }
-  if(role==='rh'||role==='cont'){goS('done');}
-  else{notify('Evaluación guardada');renderDashboard();}
+function toggleArea(role,ak){
+  const key=role+'|'+ak;
+  openAreas[key]=openAreas[key]===false;
+  const b=document.getElementById('ab-'+role+'-'+ak);
+  const c=document.getElementById('chev-'+role+'-'+ak);
+  if(b)b.classList.toggle('open',!openAreas[key]);
+  if(c)c.style.transform=`rotate(${openAreas[key]?0:180}deg)`;
 }
 
-// ── DASHBOARD ──────────────────────────────────────────────────────
-function renderDashboard(){
-  if(!session)return;
+function setSc(role,ak,idx,val,btn,ci){
+  const prev=gs(role,ci,ak,idx);
+  evalData[role].scores[sk(role,ci,ak,idx)]=prev===val?null:val;
+  btn.parentElement.querySelectorAll('.pill').forEach(b=>b.classList.remove('on'));
+  if(prev!==val)btn.classList.add('on');
+  const avg=areaAvg(role,ak,ci);
+  const re=document.getElementById('ares-'+role+'-'+ak);
+  const rb=document.getElementById('aresb-'+role+'-'+ak);
+  if(re){re.textContent=avg!==null?avg.toFixed(2):'—';re.style.color=interp(avg).color;}
+  if(rb)rb.innerHTML=badge(avg);
+  const hdr=document.getElementById('ahdr-'+role+'-'+ak);
+  if(hdr)hdr.innerHTML=`${badge(avg)}<i class="ti ti-chevron-down chev" style="transform:rotate(${openAreas[role+'|'+ak]===false?0:180}deg)" id="chev-${role}-${ak}"></i>`;
+  updateProgress(role);
+  renderCondoTabs(role);
+  saveToStorage();
+}
+
+function saveCom(role,ak,idx,val,ci){
+  evalData[role].comments[ck(role,ci,ak,idx)]=val;
+  saveToStorage();
+}
+
+function saveOQ(role,key,val){
+  evalData[role].openAnswers[key]=val;
+  saveToStorage();
+}
+
+function submitRole(role){
+  evalData[role].submitted=true;
+  saveToStorage();
   if(SERVER&&session){
-    syncFromServer(session.id).then(()=>{_renderDash();}).catch(()=>_renderDash());
+    fetch(SERVER+'/eval/'+session.id+'/'+role,{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(evalData[role])}).catch(()=>{});
+  }
+  if(role==='admin'){
+    goS('dash');renderDash();return;
+  }
+  const done=document.getElementById('done-msg');
+  if(done)done.textContent=`Gracias por evaluar a ${session.osm} (${moLabel(session.mo)}). Tu perspectiva es parte del reporte 360°.`;
+  goS('done');
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────
+function renderDash(){
+  if(!session)return;
+  // Sync from server
+  if(SERVER&&session){
+    syncFromServer(session.id).then(()=>_renderDash());
   } else {
     _renderDash();
   }
 }
 
 function _renderDash(){
-  if(!session)return;
-  // Check compromisos from localStorage
-  try{const cd=localStorage.getItem('osm360_compromisos');if(cd){const p=JSON.parse(cd);if(p.sessionId===session.id)window._osmCompromisos=p;}}catch(e){}
+  document.getElementById('dash-title').textContent=session.osm+' — 360°';
+  document.getElementById('dash-sub').textContent=moLabel(session.mo)+(session.condos?' · '+session.condos:'');
+  updateNav();
 
-  document.getElementById('d-ttl').textContent=session.osm||'Dashboard';
-  document.getElementById('d-sub').textContent=[moLabel(session.mo),session.admin?'Eval: '+session.admin:''].filter(Boolean).join(' · ');
-
-  // Condo tabs
-  const condos=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];
-  let tabs='';
-  if(condos.length>1){
-    tabs=`<div class="ctabs2">${condos.map((c,i)=>{const ov=roleOverall('admin');return`<button class="ctab2${i===activeDashCondo?' on':''}" onclick="swDC(${i})">${c}</button>`}).join('')}<button class="ctab2${activeDashCondo===-1?' on':''}" onclick="swDC(-1)">Comparativa</button></div>`;
-  }
-  document.getElementById('dash-condo-tabs').innerHTML=tabs;
-
-  Object.values(charts).forEach(c=>{try{c.destroy()}catch(e){}});charts={};
-
-  const rhOv=roleOverall('rh'),contOv=roleOverall('cont'),adminOv=roleOverall('admin');
   const global=globalScore();
+  const rhOv=roleOverall('rh'),contOv=roleOverall('cont'),adminOv=roleOverall('admin');
 
-  let html='';
-
-  // Compromisos notification
-  if(window._osmCompromisos){
-    html+=`<div style="background:var(--green-bg);border:1px solid var(--green-light);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:10px">
-      <i class="ti ti-checklist" style="font-size:20px;color:var(--green)"></i>
-      <div><div style="font-size:13px;font-weight:600;color:var(--green)">${window._osmCompromisos.osmName||'El OSM'} envió sus compromisos</div></div>
-      <button class="btn btn-ghost" style="margin-left:auto;font-size:11px;padding:4px 10px" onclick="approveCompromisos()"><i class="ti ti-check"></i> Revisar</button>
-    </div>`;
-  }
-
-  // Status evaluadoras
-  html+=`<div class="status-grid" style="margin-bottom:18px">
-    <div class="status-card"><div class="status-ico">💜</div><div class="status-name">Carmen — RH</div>
-      <div class="status-pct">${rhOv!==null?rhOv.toFixed(2):'—'}</div>
+  let html=`<div class="status-grid">
+    <div class="status-card" style="border-top:3px solid var(--purple)">
+      <div class="status-ico">💜</div><div class="status-name">Carmen — RH</div>
+      <div class="status-pct" style="color:${interp(rhOv).color}">${rhOv!==null?rhOv.toFixed(2):'—'}</div>
       <div class="status-lbl"><span class="status-dot ${evalData.rh.submitted?'dot-done':countFilled('rh')>0?'dot-partial':'dot-empty'}"></span>${evalData.rh.submitted?'Completado':countFilled('rh')>0?'En progreso':'Sin iniciar'}</div>
     </div>
-    <div class="status-card"><div class="status-ico">💙</div><div class="status-name">Contabilidad</div>
-      <div class="status-pct">${contOv!==null?contOv.toFixed(2):'—'}</div>
+    <div class="status-card" style="border-top:3px solid var(--blue)">
+      <div class="status-ico">💙</div><div class="status-name">Contabilidad</div>
+      <div class="status-pct" style="color:${interp(contOv).color}">${contOv!==null?contOv.toFixed(2):'—'}</div>
       <div class="status-lbl"><span class="status-dot ${evalData.cont.submitted?'dot-done':countFilled('cont')>0?'dot-partial':'dot-empty'}"></span>${evalData.cont.submitted?'Completado':countFilled('cont')>0?'En progreso':'Sin iniciar'}</div>
     </div>
-    <div class="status-card" style="border-top:3px solid #1A7A5E"><div class="status-ico">💚</div><div class="status-name">Responsable OSMs</div>
-      <div class="status-pct">${adminOv!==null?adminOv.toFixed(2):'—'}</div>
+    <div class="status-card" style="border-top:3px solid var(--green)">
+      <div class="status-ico">💚</div><div class="status-name">Responsable OSMs</div>
+      <div class="status-pct" style="color:${interp(adminOv).color}">${adminOv!==null?adminOv.toFixed(2):'—'}</div>
       <div class="status-lbl"><span class="status-dot ${evalData.admin.submitted?'dot-done':countFilled('admin')>0?'dot-partial':'dot-empty'}"></span>${evalData.admin.submitted?'Completado':countFilled('admin')>0?'En progreso':'Sin iniciar'}</div>
     </div>
   </div>`;
 
-  // Score global
   html+=`<div class="metric-grid">
-    <div class="mc" style="grid-column:span 2;border-top:3px solid ${interp(global).color}">
+    <div class="mc" style="border-top:3px solid ${interp(global).color}">
       <div class="mc-lbl">Score 360° consolidado</div>
-      <div class="mc-val" style="font-size:32px">${global!==null?global.toFixed(2):'—'}</div>
+      <div class="mc-val" style="color:${interp(global).color}">${global!==null?global.toFixed(2):'—'}</div>
       <div class="mc-sub">${badge(global)}</div>
     </div>
-    <div class="mc"><div class="mc-lbl">RH (${ROLE_WEIGHTS.rh}%)</div><div class="mc-val">${rhOv!==null?rhOv.toFixed(2):'—'}</div><div class="mc-sub">${badge(rhOv)}</div></div>
-    <div class="mc"><div class="mc-lbl">Contabilidad (${ROLE_WEIGHTS.cont}%)</div><div class="mc-val">${contOv!==null?contOv.toFixed(2):'—'}</div><div class="mc-sub">${badge(contOv)}</div></div>
-    <div class="mc"><div class="mc-lbl">Operaciones (${ROLE_WEIGHTS.admin}%)</div><div class="mc-val">${adminOv!==null?adminOv.toFixed(2):'—'}</div><div class="mc-sub">${badge(adminOv)}</div></div>
+    <div class="mc"><div class="mc-lbl">RH / Personas (30%)</div><div class="mc-val" style="color:${interp(rhOv).color}">${rhOv!==null?rhOv.toFixed(2):'—'}</div><div class="mc-sub">${badge(rhOv)}</div></div>
+    <div class="mc"><div class="mc-lbl">Contabilidad (30%)</div><div class="mc-val" style="color:${interp(contOv).color}">${contOv!==null?contOv.toFixed(2):'—'}</div><div class="mc-sub">${badge(contOv)}</div></div>
+    <div class="mc"><div class="mc-lbl">Operaciones (40%)</div><div class="mc-val" style="color:${interp(adminOv).color}">${adminOv!==null?adminOv.toFixed(2):'—'}</div><div class="mc-sub">${badge(adminOv)}</div></div>
   </div>`;
 
-  // Scores por área
   const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
-  html+=`<div class="two-col" style="margin-bottom:18px">
+  html+=`<div class="two-col">
     <div class="panel"><div class="panel-ttl">Scores por área</div>
-      ${allAreas.map(a=>{const v=areaAvg(a.owner,a.key);const p=v!==null?Math.round(v/5*100):0;const col=interp(v).color;
-        return`<div class="bar-row"><span class="bar-name" style="font-size:11px">${a.label}</span><div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${col}"></div></div><span class="bar-val">${v!==null?v.toFixed(1):'—'}</span></div>`;
+      ${allAreas.map(a=>{const v=areaAvg(a.owner||getRoleForArea(a.key),a.key);const p=v!==null?Math.round(v/5*100):0;const col=interp(v).color;
+        return`<div class="bar-row"><span class="bar-name">${a.label}</span><div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${col}"></div></div><span class="bar-val" style="color:${col}">${v!==null?v.toFixed(1):'—'}</span></div>`;
       }).join('')}
     </div>
     <div class="panel"><div class="panel-ttl">Perfil de desempeño</div>
-      <div style="position:relative;height:240px"><canvas id="radar-cv" role="img" aria-label="Radar de desempeño"></canvas></div>
+      <div style="position:relative;height:280px"><canvas id="radar-cv"></canvas></div>
     </div>
   </div>`;
 
   // Observaciones cualitativas
-  const openAnswers={...evalData.rh.openAnswers,...evalData.cont.openAnswers};
-  const hasOpen=Object.values(openAnswers).some(v=>v);
-  if(hasOpen){
-    html+=`<div class="panel" style="margin-bottom:18px"><div class="panel-ttl">Observaciones cualitativas</div>
-      ${Object.entries(openAnswers).map(([k,v])=>v?`<div style="margin-bottom:8px;font-size:13px"><span style="font-weight:500;color:var(--text2)">${k.replace('q_','').replace(/_/g,' ')}: </span>${v}</div>`:'').join('')}
+  const allOQ={...evalData.rh.openAnswers,...evalData.cont.openAnswers};
+  const hasOQ=Object.values(allOQ).some(v=>v);
+  if(hasOQ){
+    html+=`<div class="panel" style="margin-bottom:20px"><div class="panel-ttl">Observaciones cualitativas</div>
+      ${Object.entries(allOQ).filter(([k,v])=>v).map(([k,v])=>`<div style="margin-bottom:10px;font-size:13px"><strong style="color:var(--text2);font-size:11px;text-transform:uppercase;letter-spacing:.04em">${k.replace('q_','').replace(/_/g,' ')}</strong><br>${v}</div>`).join('')}
     </div>`;
   }
 
   html+=`<div id="report-zone"></div>`;
   document.getElementById('dash-body').innerHTML=html;
 
-  // Init radar chart
+  // Radar chart
   setTimeout(()=>{
     const el=document.getElementById('radar-cv');if(!el)return;
     if(charts.radar)try{charts.radar.destroy()}catch(e){}
-    charts.radar=new Chart(el,{type:'radar',data:{labels:allAreas.map(a=>a.label),
-      datasets:[{label:'Score',data:allAreas.map(a=>{const v=areaAvg(a.owner,a.key);return v!==null?parseFloat(v.toFixed(2)):0}),
-      borderColor:'#1A7A5E',backgroundColor:'rgba(26,122,94,0.1)',pointBackgroundColor:'#1A7A5E',pointRadius:3,borderWidth:2}]},
+    charts.radar=new Chart(el,{type:'radar',
+      data:{labels:allAreas.map(a=>a.label),
+        datasets:[{label:'Score',
+          data:allAreas.map(a=>{const v=areaAvg(getRoleForArea(a.key),a.key);return v!==null?parseFloat(v.toFixed(2)):0}),
+          borderColor:'#1A7A5E',backgroundColor:'rgba(26,122,94,0.1)',pointBackgroundColor:'#1A7A5E',pointRadius:3,borderWidth:2}]},
       options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{r:{min:0,max:5,ticks:{stepSize:1,font:{size:9},backdropColor:'transparent'},
-      grid:{color:'rgba(0,0,0,0.06)'},angleLines:{color:'rgba(0,0,0,0.06)'},
-      pointLabels:{font:{size:9}}}}}});
+        scales:{r:{min:0,max:5,ticks:{stepSize:1,font:{size:9},backdropColor:'transparent'},
+        grid:{color:'rgba(0,0,0,0.06)'},angleLines:{color:'rgba(0,0,0,0.06)'},
+        pointLabels:{font:{size:9}}}}}});
   },60);
 }
 
+function getRoleForArea(ak){
+  if(AREAS_RH.find(a=>a.key===ak))return 'rh';
+  if(AREAS_CONT.find(a=>a.key===ak))return 'cont';
+  return 'admin';
+}
+
+// ── COMPROMISOS ────────────────────────────────────────────────────
+function openCompromisos(){
+  if(!session)return;
+  document.getElementById('comp-title').textContent=session.osm+' — Compromisos';
+  document.getElementById('comp-sub').textContent='Próximo mes: '+nextMonthLabel(session.mo);
+  if(osmComps.length===0)osmComps=[{texto:'',metrica:'',fecha:'',status:'pending'}];
+  if(adminComps.length===0)adminComps=[{texto:'',metrica:'',fecha:''}];
+  renderCompLists();
+  goS('compromisos');
+}
+
+function addOsmComp(){osmComps.push({texto:'',metrica:'',fecha:'',status:'pending'});renderCompLists()}
+function addAdminComp(){adminComps.push({texto:'',metrica:'',fecha:''});renderCompLists()}
+function removeOsmComp(i){if(osmComps.length>1)osmComps.splice(i,1);renderCompLists()}
+function removeAdminComp(i){if(adminComps.length>1)adminComps.splice(i,1);renderCompLists()}
+function setCompStatus(i,st){osmComps[i].status=st;renderCompLists()}
+
+function renderCompLists(){
+  const ol=document.getElementById('osm-comp-list');
+  const al=document.getElementById('admin-comp-list');
+  if(ol)ol.innerHTML=osmComps.map((c,i)=>`
+    <div class="comp-block">
+      <div class="comp-hdr">
+        <div class="comp-num">${i+1}</div>
+        <span style="font-size:13px;font-weight:600;flex:1">Compromiso ${i+1}</span>
+        ${osmComps.length>1?`<button class="rmb" onclick="removeOsmComp(${i})"><i class="ti ti-trash-x"></i></button>`:''}
+      </div>
+      <div class="comp-body">
+        <input type="text" placeholder="¿Qué me comprometo a mejorar?" value="${(c.texto||'').replace(/"/g,'&quot;')}" oninput="osmComps[${i}].texto=this.value"/>
+        <div class="comp-meta">
+          <input type="text" placeholder="¿Cómo se medirá?" value="${(c.metrica||'').replace(/"/g,'&quot;')}" oninput="osmComps[${i}].metrica=this.value"/>
+          <input type="month" value="${c.fecha||''}" oninput="osmComps[${i}].fecha=this.value"/>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:11px;color:var(--text2)">Estado:</span>
+          <button onclick="setCompStatus(${i},'approved')" style="font-size:11px;padding:3px 9px;border-radius:4px;border:1px solid;cursor:pointer;background:${c.status==='approved'?'var(--green-bg)':'var(--surface2)'};color:${c.status==='approved'?'var(--green)':'var(--text2)'};border-color:${c.status==='approved'?'var(--green-light)':'var(--border)'}">✓ Aprobado</button>
+          <button onclick="setCompStatus(${i},'rejected')" style="font-size:11px;padding:3px 9px;border-radius:4px;border:1px solid;cursor:pointer;background:${c.status==='rejected'?'var(--red-bg)':'var(--surface2)'};color:${c.status==='rejected'?'var(--red)':'var(--text2)'};border-color:${c.status==='rejected'?'#ECA0A0':'var(--border)'}">✗ Rechazado</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  if(al)al.innerHTML=adminComps.map((c,i)=>`
+    <div class="comp-block">
+      <div class="comp-hdr">
+        <div class="comp-num" style="background:var(--blue)">${i+1}</div>
+        <span style="font-size:13px;font-weight:600;flex:1">Compromiso ${i+1}</span>
+        ${adminComps.length>1?`<button class="rmb" onclick="removeAdminComp(${i})"><i class="ti ti-trash-x"></i></button>`:''}
+      </div>
+      <div class="comp-body">
+        <input type="text" placeholder="Compromiso o acción requerida" value="${(c.texto||'').replace(/"/g,'&quot;')}" oninput="adminComps[${i}].texto=this.value"/>
+        <div class="comp-meta">
+          <input type="text" placeholder="¿Cómo se medirá?" value="${(c.metrica||'').replace(/"/g,'&quot;')}" oninput="adminComps[${i}].metrica=this.value"/>
+          <input type="month" value="${c.fecha||''}" oninput="adminComps[${i}].fecha=this.value"/>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function saveCompromisos(){
+  notify('Compromisos guardados');
+  goS('dash');renderDash();
+}
+
+// ── REPORTE ────────────────────────────────────────────────────────
+// ── NARRATIVE HELPERS ────────────────────────────────────────────
+function narrativeIntro(nm, condos, mes, ov){
+  const cstr = condoList.join(', ') || condos || '—';
+  if(ov>=4.5) return `Mayo ${mes} fue un mes para destacar. ${nm} alcanzó un score global de <strong>${ov.toFixed(2)}/5.00</strong>, posicionándose en el nivel de <strong>Excelencia</strong> — el máximo reconocido dentro del sistema de evaluación de Hestia Management Co. La operación en ${cstr} mantuvo los más altos estándares en todas las áreas evaluadas. Este resultado es el producto de presencia constante, atención al detalle y un liderazgo que se percibe en cada rincón del condominio.`;
+  if(ov>=3.5) return `El mes de evaluación documenta un <strong>buen desempeño</strong> con un score global de <strong>${ov.toFixed(2)}/5.00</strong>. La operación en ${cstr} mostró solidez y capacidad de sostener la gestión diaria con consistencia. Las fortalezas identificadas son una base sólida; las oportunidades de mejora son concretas y alcanzables.`;
+  if(ov>=2.5) return `El reporte del período indica un desempeño en <strong>nivel de cumplimiento</strong>, con un score global de <strong>${ov.toFixed(2)}/5.00</strong>. La operación en ${cstr} cubre los requisitos básicos del rol, aunque existen brechas identificadas que representan oportunidades concretas de crecimiento.`;
+  return `El reporte documenta un score global de <strong>${ov.toFixed(2)}/5.00</strong>. La operación en ${cstr} requiere <strong>mejora estructurada y seguimiento cercano</strong>. Este documento es el punto de partida para un plan de acción concreto.`;
+}
+
+function narrativeFortalezas(areaAvgs){
+  const ROLES = ['rh','cont','admin'];
+  const allAreas = [...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
+  const top = allAreas
+    .map(a=>({label:a.label, v:areaAvg(getRoleForArea(a.key), a.key)}))
+    .filter(x=>x.v!==null).sort((a,b)=>b.v-a.v);
+  const excel = top.filter(x=>x.v>=4.5).map(x=>x.label);
+  const good  = top.filter(x=>x.v>=3.5&&x.v<4.5).map(x=>x.label);
+  const parts = [];
+  if(excel.length) parts.push(`Las áreas de <strong>${excel.join(', ')}</strong> alcanzaron Excelencia, reflejando dominio sólido y consistente.`);
+  if(good.length)  parts.push(`<strong>${good.join(', ')}</strong> se mantienen en buen desempeño, con margen para seguir creciendo.`);
+  return parts.join(' ') || 'Evaluación completa en todos los criterios del período.';
+}
+
+function narrativeFocus(areaAvgs){
+  const allAreas = [...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
+  const TIPS = {
+    'staff':'agendar una reunión breve semanal con el equipo para alinear y resolver pendientes',
+    'actitud':'definir una meta personal de mejora operativa y compartirla con la Responsable',
+    'homeowners_rh':'aumentar la frecuencia de contacto proactivo con propietarios',
+    'contabilidad':'revisar y cerrar el reporte de gastos e incidencias de nómina antes del día 5',
+    'relacion_cont':'establecer protocolo de respuesta máximo 24 h para solicitudes de Contabilidad',
+    'comunicacion_cont':'mejorar la claridad y puntualidad de la comunicación escrita con el área contable',
+    'operacion':'reforzar recorridos diarios y seguimiento de tickets en CondoVive',
+    'mantenimiento':'cerrar correctivos del mes anterior y documentar plan preventivo',
+    'homeowners_admin':'aumentar visitas y comunicación proactiva con propietarios',
+    'comunicacion_admin':'establecer protocolo de respuesta a tickets y seguimiento administrativo',
+  };
+  const low = allAreas
+    .map(a=>({key:a.key, label:a.label, v:areaAvg(getRoleForArea(a.key),a.key)}))
+    .filter(x=>x.v!==null&&x.v<3.5).sort((a,b)=>a.v-b.v);
+  if(!low.length) return 'El reto del mes en curso es <strong>sostener este nivel</strong>. La constancia es el desafío más exigente y el más valioso. Se recomienda buscar una oportunidad de mejora o innovación en al menos un área operativa.';
+  const a1=low[0]; const t1=TIPS[a1.key]||'establecer métricas claras y revisarlas a mitad de mes';
+  let txt=`El foco principal para el mes en curso es <strong>${a1.label}</strong> (score: ${a1.v.toFixed(1)}/5.00). La acción concreta recomendada es ${t1}.`;
+  if(low.length>=2){const a2=low[1];const t2=TIPS[a2.key]||'revisar el proceso y establecer indicadores de seguimiento';txt+=` Como segundo frente, <strong>${a2.label}</strong> (${a2.v.toFixed(1)}/5.00) requiere: ${t2}.`;}
+  txt+=' El seguimiento de estos puntos será parte de la agenda de la reunión mensual.';
+  return txt;
+}
+
+function getRoleForArea(ak){
+  if(AREAS_RH.find(a=>a.key===ak)) return 'rh';
+  if(AREAS_CONT.find(a=>a.key===ak)) return 'cont';
+  return 'admin';
+}
+
+function genReport(){
+  const zone=document.getElementById('report-zone');
+  if(!zone)return;
+  const global=globalScore();
+  if(global===null){
+    zone.innerHTML=`<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Completa al menos una sección para generar el reporte.</p></div>`;
+    return;
+  }
+  renderReporteHTML(zone);
+}
+
+function renderReporteHTML(zone){
+  const nm   = session.osm;
+  const mes  = moLabel(session.mo);
+  const resp = session.admin||'—';
+  const cond = session.condos||condoList.join(', ')||'—';
+  const ov   = globalScore();
+  const rhOv = roleOverall('rh'), contOv=roleOverall('cont'), adminOv=roleOverall('admin');
+  const fecha= new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'});
+
+  function interp(v){
+    if(!v&&v!==0)return{lbl:'Sin datos',col:'#A8A59E'};
+    if(v>=4.5)return{lbl:'Excelencia',col:'#1A7A5E'};
+    if(v>=3.5)return{lbl:'Buen desempeño',col:'#0C7490'};
+    if(v>=2.5)return{lbl:'Cumple',col:'#92580A'};
+    return{lbl:'Necesita mejora',col:'#9B2020'};
+  }
+  function badge(v){
+    const i=interp(v);
+    const bg={Excelencia:'#D4EFE7','Buen desempeño':'#CFFAFE',Cumple:'#FEF0C7','Necesita mejora':'#FDE8E8','Sin datos':'#ECEAE3'}[i.lbl]||'#ECEAE3';
+    return `<span style="background:${bg};color:${i.col};padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700">${v!==null&&v!==undefined?v.toFixed(2)+' · ':''} ${i.lbl}</span>`;
+  }
+  function barHTML(label, v, max=5){
+    const col=interp(v).col;
+    const pct=v?Math.round(v/max*100):0;
+    return `<div style="display:grid;grid-template-columns:140px 1fr 38px;align-items:center;gap:8px;margin-bottom:7px">
+      <span style="font-size:9px;color:#46443F">${label}</span>
+      <div style="height:9px;background:#ECEAE3;border-radius:5px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:${col};border-radius:5px"></div>
+      </div>
+      <span style="font-size:10px;font-weight:700;color:${col};text-align:right">${v!==null&&v!==undefined?v.toFixed(1):'—'}</span>
+    </div>`;
+  }
+
+  // Areas
+  const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
+  const areaBars=allAreas.map(a=>{
+    const v=areaAvg(getRoleForArea(a.key),a.key);
+    return barHTML(a.label,v);
+  }).join('');
+
+  // Compromiso & frase from session
+  const compromiso = session.compromisoMes||'';
+  const frase      = session.fraseCierre||'';
+
+  // Observaciones from session
+  const obsText = session.observaciones||'';
+
+  const html=`
+  <div id="printable-report" style="background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;color:#1C1B19;line-height:1.65">
+
+    <!-- HEADER -->
+    <div style="background:#1C1B19;border-radius:10px;padding:22px 24px 20px;margin-bottom:20px;position:relative">
+      <div style="position:absolute;left:0;top:0;width:5px;height:100%;background:#8A7D6B;border-radius:10px 0 0 10px"></div>
+      <div style="font-size:7.5px;font-weight:700;letter-spacing:.12em;color:#C4B9A8;margin-left:8px;margin-bottom:10px">EVALUACIÓN MENSUAL · ON SITE MANAGER · HESTIA MANAGEMENT CO.</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-left:8px">
+        <div>
+          <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:5px">${nm}</div>
+          <div style="font-size:9px;color:#C4B9A8">${mes} · ${cond}</div>
+          <div style="font-size:9px;color:#C4B9A8;margin-top:2px">Evaluado por: ${resp}</div>
+        </div>
+        <div style="background:${interp(ov).col.replace('#','').length===6?interp(ov).col:'#1A7A5E'};background:${interp(ov).col};padding:14px 18px;border-radius:8px;text-align:center;min-width:90px;border-top:4px solid rgba(255,255,255,0.3)">
+          <div style="font-size:7px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:.1em;margin-bottom:4px">SCORE GLOBAL</div>
+          <div style="font-size:28px;font-weight:700;color:#fff">${ov!==null?ov.toFixed(2):'—'}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.85)">${interp(ov).lbl}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESUMEN -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;border-bottom:1px solid #D8D4CA;padding-bottom:3px;margin-bottom:8px">RESUMEN DEL MES</div>
+      <p style="margin:0;color:#46443F;text-align:justify">${narrativeIntro(nm,cond,mes,ov)}</p>
+    </div>
+
+    <!-- FORTALEZAS -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;border-bottom:1px solid #D8D4CA;padding-bottom:3px;margin-bottom:8px">FORTALEZAS DESTACADAS</div>
+      <p style="margin:0;color:#46443F;text-align:justify">${narrativeFortalezas()}</p>
+    </div>
+
+    <!-- SCORES 3-col -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">
+      ${[{l:'Responsable OSMs (40%)',v:adminOv},{l:'Contabilidad (30%)',v:contOv},{l:'RH / Personas (30%)',v:rhOv}].map(x=>`
+      <div style="background:${({Excelencia:'#D4EFE7','Buen desempeño':'#CFFAFE',Cumple:'#FEF0C7','Necesita mejora':'#FDE8E8','Sin datos':'#ECEAE3'}[interp(x.v).lbl]||'#ECEAE3')};border-radius:8px;padding:10px 12px;border-top:3px solid ${interp(x.v).col}">
+        <div style="font-size:7px;font-weight:700;color:${interp(x.v).col};text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${x.l}</div>
+        <div style="font-size:22px;font-weight:700;color:${interp(x.v).col}">${x.v!==null?x.v.toFixed(2):'—'}</div>
+        <div style="font-size:9px;color:${interp(x.v).col}">${interp(x.v).lbl}</div>
+      </div>`).join('')}
+    </div>
+
+    <!-- SCORES POR ÁREA -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;border-bottom:1px solid #D8D4CA;padding-bottom:3px;margin-bottom:10px">SCORES POR ÁREA</div>
+      ${areaBars}
+    </div>
+
+    <!-- OBSERVACIONES -->
+    ${obsText?`<div style="margin-bottom:18px">
+      <div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;border-bottom:1px solid #D8D4CA;padding-bottom:3px;margin-bottom:8px">OBSERVACIONES DEL PERÍODO</div>
+      <p style="margin:0;color:#46443F;text-align:justify">${obsText}</p>
+    </div>`:''}
+
+    <!-- ENFOQUE DEL MES -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;border-bottom:1px solid #D8D4CA;padding-bottom:3px;margin-bottom:8px">ENFOQUE PARA EL MES EN CURSO</div>
+      <p style="margin:0;color:#46443F;text-align:justify">${narrativeFocus()}</p>
+    </div>
+
+    <!-- COMPROMISO -->
+    ${compromiso?`<div style="background:#F0EBE3;border-radius:8px;padding:14px 16px;margin-bottom:18px;border-left:4px solid #8A7D6B;border-top:3px solid #8A7D6B">
+      <div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;margin-bottom:6px">COMPROMISO DEL MES</div>
+      <p style="margin:0;color:#1C1B19;font-size:13px;text-align:justify">${compromiso}</p>
+    </div>`:''}
+
+    <!-- FRASE DE CIERRE -->
+    ${frase?`<div style="text-align:center;padding:16px 20px;margin-bottom:12px">
+      <p style="margin:0;font-style:italic;font-size:12px;color:#8A7D6B">"${frase}"</p>
+    </div>`:''}
+
+    <!-- FOOTER -->
+    <div style="border-top:1px solid #D8D4CA;padding-top:8px;display:flex;justify-content:space-between;font-size:8px;color:#7A7670">
+      <span>Hestia Management Co. · Evaluación Mensual OSM · ${mes}</span>
+      <span>${nm} · Documento confidencial · ${fecha}</span>
+    </div>
+  </div>`;
+
+  zone.innerHTML=`<div class="rep-card">
+    <div class="rep-hdr">
+      <span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte — ${nm}</span>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="copyReport()"><i class="ti ti-copy"></i> Copiar</button>
+        <button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="printReport()"><i class="ti ti-printer"></i> Descargar PDF</button>
+      </div>
+    </div>
+    ${html}
+  </div>`;
+  window._reportHTML = html;
+}
+
+function copyReport(){
+  const el=document.getElementById('printable-report');
+  if(!el)return;
+  navigator.clipboard.writeText(el.innerText).then(()=>notify('Copiado al portapapeles'));
+}
+
+function printReport(){
+  const html=window._reportHTML;
+  if(!html)return;
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1C1B19;padding:32px 40px;max-width:820px;margin:0 auto;line-height:1.65}
+      @media print{
+        body{padding:20px 28px}
+        @page{margin:15mm 20mm;size:A4}
+      }
+      p{margin-bottom:10px} p:last-child{margin-bottom:0}
+      strong{font-weight:600}
+    </style>
+    </head><body>${html}</body></html>`);
+  win.document.close();
+  setTimeout(()=>{win.focus();win.print();},900);
+}
+
+
+// ── INIT ──────────────────────────────────────────────────────────
+document.getElementById('s-month').value=new Date().toISOString().slice(0,7);
+addCondo('');
+
+// Restore session if exists
+if(loadFromStorage()){
+  updateNav();
+}
+</script>
+</body>
+</html>
