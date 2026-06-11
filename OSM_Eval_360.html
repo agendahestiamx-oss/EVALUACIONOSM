@@ -850,163 +850,260 @@ async function renderDash(){
 
 // ══ REPORT ═══════════════════════════════════════════════════════
 
+// ══ REPORT ═══════════════════════════════════════════════════════
+function buildReportData(){
+  const allAreas = [...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
+  const global   = globalScore();
+  const rhOv     = roleOverall('rh');
+  const contOv   = roleOverall('cont');
+  const adminOv  = roleOverall('admin');
+  const nm       = session.osm;
+  const mes      = moLabel(session.mo);
+  const resp     = session.admin||'—';
+  const cond     = session.condos||'—';
+
+  // Collect all scores with labels and comments
+  const areaDetails = allAreas.map(area=>{
+    const role = getRoleForArea(area.key);
+    const avg  = areaAvg(role, area.key);
+    const n    = condoList.length||1;
+    const criteria = area.criteria.map((cr,idx)=>{
+      // Average across condos
+      let vals=[], coms=[];
+      for(let ci=0;ci<n;ci++){
+        const v = gs(role,ci,area.key,idx);
+        if(v!==null) vals.push(v);
+        const c = D[role].comments[`c|${role}|${ci}|${area.key}|${idx}`];
+        if(c) coms.push(ci>0?`${condoList[ci]}: ${c}`:c);
+      }
+      const avg = vals.length ? vals.reduce((a,b)=>a+b)/vals.length : null;
+      return { cr, avg, comments: coms };
+    }).filter(x=>x.avg!==null);
+
+    return {
+      label: area.label,
+      role,
+      avg,
+      criteria,
+      interp: avg!==null ? (avg>=4.5?'Excelencia':avg>=3.5?'Buen desempeño':avg>=2.5?'Cumple':avg>=1.5?'Necesita mejora':'Deficiente') : 'Sin datos'
+    };
+  });
+
+  return { nm, mes, resp, cond, global, rhOv, contOv, adminOv, areaDetails,
+           obs: session.obs||'', comp: session.comp||'', frase: session.frase||'',
+           condos: condoList };
+}
+
+function buildBaseHTML(d){
+  function ic(v){ if(v===null)return{col:'#A8A59E',bg:'#ECEAE3',lbl:'Sin datos'}; if(v>=4.5)return{col:'#1A7A5E',bg:'#D4EFE7',lbl:'Excelencia'}; if(v>=3.5)return{col:'#0C7490',bg:'#CFFAFE',lbl:'Buen desempeño'}; if(v>=2.5)return{col:'#92580A',bg:'#FEF0C7',lbl:'Cumple'}; if(v>=1.5)return{col:'#DC2626',bg:'#FDE8E8',lbl:'Necesita mejora'}; return{col:'#9B2020',bg:'#FDE8E8',lbl:'Deficiente'}; }
+  const fecha = new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'});
+  const {nm,mes,resp,cond,global,rhOv,contOv,adminOv,areaDetails,obs,comp,frase} = d;
+
+  return `
+    <!-- Header -->
+    <div style="background:#1C1B19;border-radius:10px;padding:22px 24px 20px;margin-bottom:20px;position:relative">
+      <div style="position:absolute;left:0;top:0;width:5px;height:100%;background:#8A7D6B;border-radius:10px 0 0 10px"></div>
+      <div style="font-size:7px;font-weight:700;letter-spacing:.12em;color:#C4B9A8;margin-left:8px;margin-bottom:10px">EVALUACIÓN MENSUAL · ON SITE MANAGER · HESTIA MANAGEMENT CO.</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-left:8px">
+        <div>
+          <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:5px">${nm}</div>
+          <div style="font-size:9px;color:#C4B9A8">${mes} · ${cond}</div>
+          <div style="font-size:9px;color:#C4B9A8;margin-top:2px">Evaluado por: ${resp}</div>
+        </div>
+        <div style="background:${ic(global).col};padding:14px 18px;border-radius:8px;text-align:center;min-width:90px;border-top:4px solid rgba(255,255,255,0.3)">
+          <div style="font-size:7px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:.1em;margin-bottom:4px">SCORE GLOBAL</div>
+          <div style="font-size:28px;font-weight:700;color:#fff">${global!==null?global.toFixed(2):'—'}</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.85)">${ic(global).lbl}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 scores -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+      ${[{l:'RH / Personas · 30%',v:rhOv},{l:'Contabilidad · 30%',v:contOv},{l:'Operaciones · 40%',v:adminOv}].map(x=>`
+      <div style="background:${ic(x.v).bg};border-radius:8px;padding:10px 12px;border-top:3px solid ${ic(x.v).col}">
+        <div style="font-size:7px;font-weight:700;color:${ic(x.v).col};text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${x.l}</div>
+        <div style="font-size:20px;font-weight:700;color:${ic(x.v).col}">${x.v!==null?x.v.toFixed(2):'—'}</div>
+        <div style="font-size:9px;color:${ic(x.v).col}">${ic(x.v).lbl}</div>
+      </div>`).join('')}
+    </div>
+
+    <!-- Scores por área -->
+    <div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;border-bottom:1px solid #D8D4CA;padding-bottom:3px;margin:0 0 10px;text-transform:uppercase">SCORES POR ÁREA</div>
+    ${areaDetails.map(a=>{const p=a.avg!==null?Math.round(a.avg/5*100):0;return`
+      <div style="display:grid;grid-template-columns:140px 1fr 36px;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="font-size:9px;color:#46443F">${a.label}</span>
+        <div style="height:9px;background:#ECEAE3;border-radius:5px;overflow:hidden"><div style="width:${p}%;height:100%;background:${ic(a.avg).col};border-radius:5px"></div></div>
+        <span style="font-size:10px;font-weight:700;color:${ic(a.avg).col};text-align:right">${a.avg!==null?a.avg.toFixed(1):'—'}</span>
+      </div>`}).join('')}
+
+    <!-- AI content placeholder -->
+    <div id="ai-content-zone" style="margin-top:18px"></div>
+
+    ${comp?`<div style="background:#F0EBE3;border-radius:8px;padding:14px 16px;margin:14px 0;border-left:4px solid #8A7D6B;border-top:3px solid #8A7D6B">
+      <div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase">Compromiso del mes</div>
+      <p style="margin:0;font-size:13px;color:#1C1B19;text-align:justify">${comp}</p>
+    </div>`:''}
+
+    ${frase?`<div style="text-align:center;padding:14px 20px"><p style="margin:0;font-style:italic;font-size:12px;color:#8A7D6B">"${frase}"</p></div>`:''}
+
+    <div style="border-top:1px solid #D8D4CA;padding-top:8px;display:flex;justify-content:space-between;font-size:8px;color:#7A7670;margin-top:12px">
+      <span>Hestia Management Co. · Evaluación Mensual OSM · ${mes}</span>
+      <span>${nm} · Documento confidencial · ${fecha}</span>
+    </div>`;
+}
+
 function genReport(){
   const zone = document.getElementById('report-zone');
   if(!zone) return;
-  const global = globalScore();
-  if(global===null){ zone.innerHTML=`<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Completa al menos una sección para generar el reporte.</p></div>`; return; }
-
-  const allAreas = [...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
-  const ov = global;
-  const nm = session.osm, mes = moLabel(session.mo), resp = session.admin||'—', cond = session.condos||'—';
-  const rhOv=roleOverall('rh'), contOv=roleOverall('cont'), adminOv=roleOverall('admin');
-
-  // Narrative helpers
-  function intro(){
-    if(ov>=4.5) return `${mes} fue un mes sobresaliente para <strong>${nm}</strong>. Con un score global de <strong>${ov.toFixed(2)}/5.00</strong>, el desempeño en ${cond} alcanzó el nivel de <strong>Excelencia</strong> — el máximo reconocido dentro del sistema de evaluación de Hestia. Este resultado refleja presencia constante, atención al detalle y un liderazgo que se percibe en cada rincón del condominio.`;
-    if(ov>=3.5) return `El presente reporte documenta un mes de <strong>buen desempeño</strong> para <strong>${nm}</strong>, con un score global de <strong>${ov.toFixed(2)}/5.00</strong>. La operación en ${cond} mostró solidez en las áreas principales, con oportunidades de mejora concretas y alcanzables para el mes en curso.`;
-    if(ov>=2.5) return `El presente reporte corresponde a <strong>${nm}</strong> y documenta un desempeño en <strong>nivel de cumplimiento</strong>, con un score global de <strong>${ov.toFixed(2)}/5.00</strong>. La operación en ${cond} cumple con los requisitos básicos del rol. Hay brechas identificadas que representan oportunidades directas de crecimiento.`;
-    return `El reporte de ${mes} documenta un score global de <strong>${ov.toFixed(2)}/5.00</strong> para <strong>${nm}</strong>. La operación en ${cond} requiere mejora estructurada. Este documento es el punto de partida para un plan de acción concreto.`;
+  if(globalScore()===null){
+    zone.innerHTML=`<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Completa al menos una sección para generar el reporte.</p></div>`;
+    return;
   }
+  const d = buildReportData();
+  const base = buildBaseHTML(d);
+  window._reportBase = base;
+  window._reportData = d;
 
-  function fortalezas(){
-    const best = allAreas.filter(a=>{const v=areaAvg(getRoleForArea(a.key),a.key);return v!==null&&v>=4.5;}).map(a=>a.label);
-    const good = allAreas.filter(a=>{const v=areaAvg(getRoleForArea(a.key),a.key);return v!==null&&v>=3.5&&v<4.5;}).map(a=>a.label);
-    const parts=[];
-    if(best.length) parts.push(`<strong>${best.join(', ')}</strong> alcanzaron Excelencia, reflejando dominio sólido y consistente.`);
-    if(good.length) parts.push(`<strong>${good.join(', ')}</strong> se mantienen en buen desempeño con margen de crecimiento.`);
-    return parts.join(' ') || 'Evaluación completa en todos los criterios del período.';
-  }
-
-  function enfoque(){
-    const TIPS={
-      staff:'agendar reunión breve semanal con el equipo',
-      actitud:'definir una meta personal de mejora y compartirla con la Responsable',
-      hw_rh:'aumentar contacto proactivo con propietarios',
-      contab:'cerrar reporte de gastos e incidencias de nómina antes del día 5',
-      rel_cont:'establecer protocolo de respuesta máximo 24 h',
-      op:'reforzar recorridos diarios y seguimiento en CondoVive',
-      mant:'cerrar correctivos del mes anterior y documentar preventivos',
-      hw_op:'aumentar visitas y comunicación proactiva con propietarios',
-      com:'mejorar seguimiento de tickets y comunicación escrita',
-    };
-    const low = allAreas.map(a=>({...a,v:areaAvg(getRoleForArea(a.key),a.key)})).filter(a=>a.v!==null&&a.v<3.5).sort((a,b)=>a.v-b.v);
-    if(!low.length) return `El reto del mes en curso es <strong>sostener este nivel</strong>. La constancia es el desafío más exigente y el más valioso. Se recomienda identificar una oportunidad de mejora o innovación en al menos un área operativa.`;
-    const a1=low[0]; let txt=`El foco principal para el mes en curso es <strong>${a1.label}</strong> (score: ${a1.v.toFixed(1)}/5.00). La acción concreta recomendada: ${TIPS[a1.key]||'establecer métricas claras y revisarlas a mitad de mes'}.`;
-    if(low.length>=2){const a2=low[1];txt+=` Como segundo frente, <strong>${a2.label}</strong> (${a2.v.toFixed(1)}/5.00) requiere: ${TIPS[a2.key]||'revisar el proceso y establecer indicadores'}.`;}
-    txt+=` El seguimiento se agendará en la reunión mensual con la Responsable.`;
-    return txt;
-  }
-
-  function cierre(){
-    const fn=nm.split(' ')[0];
-    if(ov>=4.5) return `Hestia Management Co. reconoce el compromiso de ${fn} con la excelencia operativa. Este tipo de resultados elevan el estándar de todo el equipo. ¡Gracias por ser parte de lo mejor de Hestia!`;
-    if(ov>=3.5) return `${fn}, el equipo de Hestia reconoce tu trabajo y el esfuerzo detrás de estos resultados. Estás en el camino correcto. Con foco en las áreas identificadas, el siguiente mes puede ser aún más sólido.`;
-    return `Este reporte llega con la intención de apoyar. Hestia Management Co. está comprometida a acompañar a ${fn} en este proceso. Las brechas identificadas son superables con foco y consistencia.`;
-  }
-
-  const fechaPDF = new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'});
-
-  const bodyHTML = `
-    <div id="printable-report" style="font-family:'DM Sans',sans-serif;font-size:13px;color:#1C1B19;line-height:1.65">
-
-      <!-- Header oscuro -->
-      <div style="background:#1C1B19;border-radius:10px;padding:22px 24px 20px;margin-bottom:20px;position:relative">
-        <div style="position:absolute;left:0;top:0;width:5px;height:100%;background:#8A7D6B;border-radius:10px 0 0 10px"></div>
-        <div style="font-size:7px;font-weight:700;letter-spacing:.12em;color:#C4B9A8;margin-left:8px;margin-bottom:10px">EVALUACIÓN MENSUAL · ON SITE MANAGER · HESTIA MANAGEMENT CO.</div>
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-left:8px">
-          <div>
-            <div style="font-size:26px;font-weight:700;color:#fff;margin-bottom:5px">${nm}</div>
-            <div style="font-size:9px;color:#C4B9A8">${mes} · ${cond}</div>
-            <div style="font-size:9px;color:#C4B9A8;margin-top:2px">Evaluado por: ${resp}</div>
-          </div>
-          <div style="background:${interp(ov).col};padding:14px 18px;border-radius:8px;text-align:center;min-width:90px;border-top:4px solid rgba(255,255,255,0.3)">
-            <div style="font-size:7px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:.1em;margin-bottom:4px">SCORE GLOBAL</div>
-            <div style="font-size:28px;font-weight:700;color:#fff">${ov.toFixed(2)}</div>
-            <div style="font-size:9px;color:rgba(255,255,255,0.85)">${interp(ov).lbl}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3 scores -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
-        ${[{l:'RH / Personas · 30%',v:rhOv},{l:'Contabilidad · 30%',v:contOv},{l:'Operaciones · 40%',v:adminOv}].map(x=>`
-        <div style="background:${interp(x.v).bg};border-radius:8px;padding:10px 12px;border-top:3px solid ${interp(x.v).col}">
-          <div style="font-size:7px;font-weight:700;color:${interp(x.v).col};text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${x.l}</div>
-          <div style="font-size:20px;font-weight:700;color:${interp(x.v).col}">${x.v!==null?x.v.toFixed(2):'—'}</div>
-          <div style="font-size:9px;color:${interp(x.v).col}">${interp(x.v).lbl}</div>
-        </div>`).join('')}
-      </div>
-
-      <!-- Resumen -->
-      <div class="rep-div">RESUMEN DEL MES</div>
-      <p class="rep-body" style="margin-bottom:10px;text-align:justify">${intro()}</p>
-
-      <!-- Fortalezas -->
-      <div class="rep-div">FORTALEZAS DESTACADAS</div>
-      <p class="rep-body" style="margin-bottom:10px;text-align:justify">${fortalezas()}</p>
-
-      <!-- Scores por área -->
-      <div class="rep-div">SCORES POR ÁREA</div>
-      ${allAreas.map(a=>{const v=areaAvg(getRoleForArea(a.key),a.key);const p=v!==null?Math.round(v/5*100):0;return`
-        <div style="display:grid;grid-template-columns:140px 1fr 36px;align-items:center;gap:8px;margin-bottom:7px">
-          <span style="font-size:9px;color:#46443F">${a.label}</span>
-          <div style="height:9px;background:#ECEAE3;border-radius:5px;overflow:hidden"><div style="width:${p}%;height:100%;background:${interp(v).col};border-radius:5px"></div></div>
-          <span style="font-size:10px;font-weight:700;color:${interp(v).col};text-align:right">${v!==null?v.toFixed(1):'—'}</span>
-        </div>`}).join('')}
-
-      <!-- Observaciones -->
-      ${session.obs?`<div class="rep-div">OBSERVACIONES DEL PERÍODO</div><p class="rep-body" style="margin-bottom:10px;text-align:justify">${session.obs}</p>`:''}
-
-      <!-- Enfoque -->
-      <div class="rep-div">ENFOQUE PARA EL MES EN CURSO</div>
-      <p class="rep-body" style="margin-bottom:10px;text-align:justify">${enfoque()}</p>
-
-      <!-- Compromiso -->
-      ${session.comp?`<div style="background:#F0EBE3;border-radius:8px;padding:14px 16px;margin:14px 0;border-left:4px solid #8A7D6B;border-top:3px solid #8A7D6B">
-        <div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase">Compromiso del mes</div>
-        <p style="margin:0;font-size:13px;color:#1C1B19;text-align:justify">${session.comp}</p>
-      </div>`:''}
-
-      <!-- Cierre -->
-      <div class="rep-div">NOTA DE CIERRE</div>
-      <p class="rep-body" style="margin-bottom:10px;text-align:justify">${cierre()}</p>
-
-      <!-- Frase -->
-      ${session.frase?`<div style="text-align:center;padding:14px 20px"><p style="margin:0;font-style:italic;font-size:12px;color:#8A7D6B">"${session.frase}"</p></div>`:''}
-
-      <!-- Footer -->
-      <div style="border-top:1px solid #D8D4CA;padding-top:8px;display:flex;justify-content:space-between;font-size:8px;color:#7A7670;margin-top:12px">
-        <span>Hestia Management Co. · Evaluación Mensual OSM · ${mes}</span>
-        <span>${nm} · Documento confidencial · ${fechaPDF}</span>
-      </div>
-    </div>`;
-
-  window._lastReportHTML = bodyHTML;
-
-  zone.innerHTML = `<div class="rep-card">
+  zone.innerHTML=`<div class="rep-card">
     <div class="rep-hdr">
-      <span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte — ${nm}</span>
+      <span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte — ${d.nm}</span>
       <div style="display:flex;gap:6px">
-        <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="doPrint()"><i class="ti ti-printer"></i> Descargar PDF</button>
-        <button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="genReport()"><i class="ti ti-refresh"></i> Actualizar</button>
+        <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="doPrint()"><i class="ti ti-printer"></i> PDF</button>
+        <button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="genAI()"><i class="ti ti-sparkles"></i> Generar análisis con IA</button>
       </div>
     </div>
-    ${bodyHTML}
+    <div id="printable-report">${base}</div>
   </div>`;
 }
 
+async function genAI(){
+  const aiZone = document.getElementById('ai-content-zone');
+  if(!aiZone) return;
+  const d = window._reportData;
+  if(!d) return;
+
+  aiZone.innerHTML=`<div style="background:#F0EBE3;border-radius:8px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:13px;color:#46443F">
+    <i class="ti ti-loader spin" style="font-size:20px;color:#8A7D6B"></i> Generando análisis con IA — puede tardar unos segundos...
+  </div>`;
+
+  // Build rich prompt with all data
+  const areaLines = d.areaDetails.map(a=>{
+    const critLines = a.criteria.map(c=>{
+      const sc = c.avg!==null?c.avg.toFixed(1):'—';
+      const com = c.comments.length ? ` | Comentarios: "${c.comments.join(' / ')}"` : '';
+      return `    • ${c.cr}: ${sc}/5${com}`;
+    }).join('\n');
+    return `  ${a.label} (${a.interp}, ${a.avg!==null?a.avg.toFixed(2):'—'}/5):\n${critLines}`;
+  }).join('\n');
+
+  const prompt = `Eres un consultor senior especializado en gestión de condominios residenciales y desarrollo de liderazgo en On Site Managers. Tu tarea es redactar el análisis narrativo de una evaluación mensual de desempeño.
+
+DATOS DE LA EVALUACIÓN:
+Colaborador: ${d.nm}
+Período: ${d.mes}
+Condominios: ${d.cond}
+Evaluado por: ${d.resp}
+Score global: ${d.global!==null?d.global.toFixed(2):'—'}/5.00 (RH 30%: ${d.rhOv!==null?d.rhOv.toFixed(2):'—'} | Contabilidad 30%: ${d.contOv!==null?d.contOv.toFixed(2):'—'} | Operaciones 40%: ${d.adminOv!==null?d.adminOv.toFixed(2):'—'})
+${d.obs?`Observaciones de la Responsable: ${d.obs}`:''}
+
+SCORES DETALLADOS POR ÁREA Y CRITERIO:
+${areaLines}
+
+Redacta el análisis en EXACTAMENTE estas 4 secciones, usando párrafos narrativos (no bullets). Cada sección debe ser específica a los datos —no genérica.
+
+## Lo que está funcionando bien
+Identifica 2-3 fortalezas reales basadas en los scores más altos y los comentarios. Describe el impacto operativo concreto de cada fortaleza. Sé específico: menciona las áreas con scores altos y qué significa para la operación del condominio.
+
+## Áreas de oportunidad
+Para cada área con score por debajo de 3.5, explica qué está pasando, por qué importa, y qué riesgo representa si no se atiende. Sé directo pero constructivo. No enumeres — narra.
+
+## Secuencia de trabajo para este mes
+Define 3-4 acciones concretas en orden de prioridad. Para cada una: qué hacer exactamente, cómo se mide el avance, y en qué semana del mes realizarla. Que sea una guía de trabajo real, no genérica.
+
+## Perspectiva de desarrollo
+2-3 oraciones finales calibradas: ¿Dónde está este OSM en su curva de desarrollo? ¿Hacia dónde va? ¿Qué necesita para dar el siguiente paso?
+
+TONO: Profesional, directo, cálido. Habla de ${d.nm.split(' ')[0]} en tercera persona. Español neutro latinoamericano. Longitud ideal: 400-550 palabras en total.`;
+
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:900,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    if(data.error){ throw new Error(data.error.message); }
+    const text = data.content?.map(x=>x.text||'').join('') || '';
+
+    // Parse sections
+    const sections = [
+      {key:'## Lo que está funcionando bien', color:'#1A7A5E', bg:'#D4EFE7', icon:'ti-star'},
+      {key:'## Áreas de oportunidad',          color:'#92580A', bg:'#FEF0C7', icon:'ti-target'},
+      {key:'## Secuencia de trabajo para este mes', color:'#1A4A8A', bg:'#E8EFF8', icon:'ti-list-check'},
+      {key:'## Perspectiva de desarrollo',     color:'#5B21B6', bg:'#EDE9FE', icon:'ti-trending-up'},
+    ];
+
+    let html = '';
+    let remaining = text;
+
+    sections.forEach((sec, i)=>{
+      const nextKey = sections[i+1]?.key;
+      const start = remaining.indexOf(sec.key);
+      if(start===-1) return;
+      const end = nextKey ? remaining.indexOf(nextKey) : remaining.length;
+      const content = remaining.slice(start+sec.key.length, end>-1?end:undefined).trim();
+      if(!content) return;
+
+      // Convert **bold** to <strong>
+      const formatted = content
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/\n\n+/g,'</p><p style="margin:0 0 8px;text-align:justify">')
+        .replace(/\n/g,' ');
+
+      html += `<div style="background:${sec.bg};border-radius:8px;padding:14px 16px;margin-bottom:10px;border-left:4px solid ${sec.color}">
+        <div style="font-size:7.5px;font-weight:700;color:${sec.color};letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+          <i class="ti ${sec.icon}"></i> ${sec.key.replace('## ','')}
+        </div>
+        <div style="font-size:13px;color:#1C1B19;line-height:1.7">
+          <p style="margin:0 0 8px;text-align:justify">${formatted}</p>
+        </div>
+      </div>`;
+    });
+
+    if(!html){
+      // Fallback: show raw text
+      html = `<div style="background:#F0EBE3;border-radius:8px;padding:14px 16px;font-size:13px;color:#1C1B19;line-height:1.7">${text.replace(/\n\n/g,'<br><br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')}</div>`;
+    }
+
+    aiZone.innerHTML = html;
+    window._aiText = text;
+    notify('Análisis generado ✓');
+  }catch(e){
+    aiZone.innerHTML=`<div style="background:#FDE8E8;border-radius:8px;padding:14px 16px;font-size:13px;color:#9B2020">
+      <i class="ti ti-alert-circle"></i> No se pudo generar el análisis. Verifica tu conexión e intenta de nuevo.<br>
+      <span style="font-size:11px;opacity:.7">${e.message||''}</span>
+    </div>`;
+  }
+}
+
 function doPrint(){
-  const html = window._lastReportHTML;
-  if(!html) return;
+  const el = document.getElementById('printable-report');
+  if(!el) return;
   const win = window.open('','_blank');
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1C1B19;padding:32px 40px;max-width:820px;margin:0 auto;line-height:1.65}p{margin-bottom:10px}p:last-child{margin-bottom:0}strong{font-weight:600}.rep-body{text-align:justify}.rep-div{font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;border-bottom:1px solid #D8D4CA;padding-bottom:3px;margin:14px 0 8px;text-transform:uppercase}@media print{body{padding:20px 28px}@page{margin:15mm 20mm;size:A4}}</style>
-    </head><body>${html}</body></html>`);
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
+    <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',sans-serif;font-size:13px;color:#1C1B19;padding:32px 40px;max-width:820px;margin:0 auto;line-height:1.65}p{margin-bottom:8px}strong{font-weight:600}@media print{body{padding:20px 28px}@page{margin:15mm 20mm;size:A4}}</style>
+    </head><body>${el.innerHTML}</body></html>`);
   win.document.close();
   setTimeout(()=>{win.focus();win.print();},900);
 }
+
 
 // ══ HISTORIAL ════════════════════════════════════════════════════
 async function openHist(){
