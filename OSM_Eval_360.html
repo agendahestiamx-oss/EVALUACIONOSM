@@ -638,13 +638,21 @@ function loadFromStorage(){
 async function syncFromServer(sessionId){
   if(!SERVER)return false;
   try{
-    const r=await fetch(SERVER+'/session/'+sessionId);if(!r.ok)return false;
+    const r=await fetch(SERVER+'/session/'+sessionId);
+    if(!r.ok)return false;
     const data=await r.json();
-    if(data.session)session=data.session;
-    if(data.evalData)evalData=data.evalData;
+    // Server may return {error:...} if not found
+    if(data.error||!data.session)return false;
+    session=data.session;
+    if(data.evalData){
+      // Merge: only overwrite roles that have data
+      ['rh','cont','admin'].forEach(role=>{
+        if(data.evalData[role])evalData[role]=data.evalData[role];
+      });
+    }
     condoList=session.condos?session.condos.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];
     return true;
-  }catch(e){return false;}
+  }catch(e){console.warn('syncFromServer error:',e);return false;}
 }
 
 // ── CONDO LIST ─────────────────────────────────────────────────────
@@ -706,23 +714,29 @@ function joinSession(){
   const code=document.getElementById('join-code').value.trim().toUpperCase();
   if(!code){notify('Ingresa el código','err');return}
 
-  // Try localStorage first
+  // Try localStorage first (same browser/device as Responsable)
   loadFromStorage();
-  if(!session||session.id!==code){
-    // Try server
-    syncFromServer(code).then(synced=>{
-      if(synced){
-        renderRoleScreen(currentRole);goS(currentRole);updateNav();
-      } else {
-        notify('Código incorrecto. Pide el código actualizado a la Responsable.','err');
-      }
-    });
+  if(session&&session.id===code){
+    if(evalData[currentRole]&&evalData[currentRole].submitted){
+      notify('Ya enviaste tu evaluación este mes. ¡Gracias!','info');return;
+    }
+    renderRoleScreen(currentRole);goS(currentRole);updateNav();
     return;
   }
-  if(evalData[currentRole].submitted){
-    notify('Ya enviaste tu evaluación este mes. ¡Gracias!','info');return;
-  }
-  renderRoleScreen(currentRole);goS(currentRole);updateNav();
+
+  // Try server (different device)
+  notify('Buscando sesión...','info');
+  syncFromServer(code).then(synced=>{
+    if(synced){
+      if(evalData[currentRole]&&evalData[currentRole].submitted){
+        notify('Ya enviaste tu evaluación este mes. ¡Gracias!','info');return;
+      }
+      renderRoleScreen(currentRole);goS(currentRole);updateNav();
+      notify('Sesión cargada ✓');
+    } else {
+      notify('Código no encontrado. Verifica que sea correcto y que la Responsable haya creado la sesión.','err');
+    }
+  });
 }
 
 // ── NAV INFO ───────────────────────────────────────────────────────
