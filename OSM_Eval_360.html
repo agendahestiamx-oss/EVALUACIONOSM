@@ -835,6 +835,12 @@ async function renderDash(){
   pullFromServer(session.id).then(synced=>{ if(synced) _renderDash(); }).catch(()=>{});
 }
 
+function getRoleForArea(ak){
+  if(AREAS_RH.find(a=>a.key===ak))   return 'rh';
+  if(AREAS_CONT.find(a=>a.key===ak)) return 'cont';
+  return 'admin';
+}
+
 function _renderDash(){
   const global = globalScore();
   const rhOv=roleOverall('rh'), contOv=roleOverall('cont'), adminOv=roleOverall('admin');
@@ -909,6 +915,7 @@ function _renderDash(){
 
 // ══ REPORT ═══════════════════════════════════════════════════════
 function buildReportData(){
+  function getRoleForArea(ak){ if(AREAS_RH.find(a=>a.key===ak)) return 'rh'; if(AREAS_CONT.find(a=>a.key===ak)) return 'cont'; return 'admin'; }
   const allAreas = [...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
   const global   = globalScore();
   const rhOv     = roleOverall('rh');
@@ -1019,38 +1026,49 @@ function buildBaseHTML(d){
 }
 
 function genReport(){
-  // Ensure dashboard is visible and has the report zone
-  goS('dash');
-  // Give _renderDash a tick to finish if needed
-  setTimeout(()=>{
-    let zone = document.getElementById('report-zone');
-    if(!zone){
-      // Dashboard not rendered yet — render it first
-      _renderDash();
-      zone = document.getElementById('report-zone');
-    }
-    if(!zone){ notify('Abre el dashboard primero','err'); return; }
-    if(globalScore()===null){
-      zone.innerHTML=`<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Completa al menos una sección para generar el reporte.</p></div>`;
-      return;
-    }
-    const d = buildReportData();
-    const base = buildBaseHTML(d);
-    window._reportBase = base;
-    window._reportData = d;
+  let zone = document.getElementById('report-zone');
+  if(!zone){ goS('dash'); _renderDash(); zone = document.getElementById('report-zone'); }
+  if(!zone){ notify('Error interno','err'); return; }
+
+  const g   = globalScore();
+  const rhK = Object.keys(D.rh.scores).length;
+  const cK  = Object.keys(D.cont.scores).length;
+  const aK  = Object.keys(D.admin.scores).length;
+
+  if(g === null){
     zone.innerHTML=`<div class="rep-card">
+      <p style="color:var(--red);font-size:13px;margin-bottom:10px"><i class="ti ti-alert-circle"></i> No hay scores registrados todavía.</p>
+      <div style="background:var(--surf2);border-radius:6px;padding:12px;font-size:11px;font-family:'DM Mono',monospace;color:var(--ink2);line-height:1.8">
+        RH: ${rhK} scores | Cont: ${cK} scores | Admin: ${aK} scores<br>
+        Global: ${g} | OSM: ${session?.osm||'ninguna'}<br>
+        condoList: [${condoList.join(', ')}]
+      </div>
+    </div>`;
+    zone.scrollIntoView({behavior:'smooth'});
+    return;
+  }
+
+  try{
+    const d    = buildReportData();
+    const base = buildBaseHTML(d);
+    window._reportData = d;
+    zone.innerHTML = `<div class="rep-card">
       <div class="rep-hdr">
         <span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte — ${d.nm}</span>
         <div style="display:flex;gap:6px">
           <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="doPrint()"><i class="ti ti-printer"></i> PDF</button>
-          <button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="genAI()"><i class="ti ti-sparkles"></i> Generar análisis con IA</button>
+          <button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="genAI()"><i class="ti ti-sparkles"></i> Análisis con IA</button>
         </div>
       </div>
       <div id="printable-report">${base}</div>
     </div>`;
-    zone.scrollIntoView({behavior:'smooth', block:'start'});
-  }, 100);
+    zone.scrollIntoView({behavior:'smooth'});
+    notify('Reporte generado ✓');
+  }catch(err){
+    zone.innerHTML=`<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Error: ${err.message}</p><pre style="font-size:10px;margin-top:8px;overflow:auto">${err.stack}</pre></div>`;
+  }
 }
+
 
 async function genAI(){
   const aiZone = document.getElementById('ai-content-zone');
