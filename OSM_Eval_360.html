@@ -517,9 +517,14 @@ function loadLocal(){
   try{
     const s = localStorage.getItem('h360_session');
     const d = localStorage.getItem('h360_D');
-    if(s){ session=JSON.parse(s); condoList=parseCList(session.condos); }
-    if(d){ D=JSON.parse(d); }
-    return !!s;
+    if(!s) return false;
+    const savedSession = JSON.parse(s);
+    // If there's an active session in memory, only restore D if IDs match
+    if(session && session.id !== savedSession.id) return false;
+    session = savedSession;
+    condoList = parseCList(session.condos);
+    if(d){ D = JSON.parse(d); }
+    return true;
   }catch(e){ return false; }
 }
 function parseCList(str){ return str ? str.split(',').map(c=>c.trim()).filter(Boolean) : ['Principal']; }
@@ -793,12 +798,10 @@ async function doSubmit(role){
 // ══ DASHBOARD ════════════════════════════════════════════════════
 async function renderDash(){
   if(!session){ notify('No hay sesión activa','err'); return; }
-  // Always load local first (fast, guaranteed), then merge server on top
-  loadLocal();
-  // Try to pull from server in background and re-render if it adds data
-  pullFromServer(session.id).then(synced=>{ if(synced) _renderDash(); }).catch(()=>{});
-  // Render immediately with what we have
+  // Render immediately from in-memory D (always up to date via setSc)
   _renderDash();
+  // Also try server in background to pick up other evaluators' data
+  pullFromServer(session.id).then(synced=>{ if(synced) _renderDash(); }).catch(()=>{});
 }
 
 function _renderDash(){
