@@ -400,15 +400,30 @@ const SERVER = 'https://hestia-notificaciones.onrender.com';
 // ══ AREAS ════════════════════════════════════════════════════════
 const AREAS_RH = [
   {key:'staff',label:'Staff & Liderazgo',icon:'ti-user-check',
-   criteria:['Liderazgo con el equipo','Comunicación con colaboradores','Organización y distribución del trabajo','Resolución de conflictos internos','Seguimiento al staff','Capacidad de delegar','Presencia y profesionalismo','Motivación y estabilidad operativa']},
+   criteria:['Liderazgo con el equipo','Comunicación con colaboradores','Organización y distribución del trabajo','Resolución de conflictos internos','Seguimiento al staff','Capacidad de delegar','Presencia y profesionalismo','Motivación y estabilidad operativa'],
+   openQuestions:[
+     {key:'oq_fortaleza',  label:'¿Qué fortaleza destaca este OSM en el trato con personas y equipo?'},
+     {key:'oq_conflictos', label:'¿Hubo conflictos o situaciones difíciles con el staff este mes?'},
+     {key:'oq_mejora_rh',  label:'¿Qué área de desarrollo humano recomendarías trabajar este mes?'}
+   ]},
   {key:'actitud',label:'Actitud & Desempeño',icon:'ti-star',
    criteria:['Puntualidad y responsabilidad','Proactividad e iniciativa','Manejo del estrés','Adaptabilidad a cambios','Apertura a feedback','Disposición general']},
   {key:'hw_rh',label:'Trato con Homeowners',icon:'ti-users',
-   criteria:['Empatía y trato humano','Profesionalismo en comunicación','Manejo de situaciones difíciles','Seguimiento a necesidades del homeowner']}
+   criteria:['Empatía y trato humano','Profesionalismo en comunicación','Manejo de situaciones difíciles','Seguimiento a necesidades del homeowner'],
+   openQuestions:[
+     {key:'oq_hw_positivo', label:'¿Hubo alguna situación positiva destacable con propietarios este mes?'},
+     {key:'oq_hw_dificil',  label:'¿Hubo alguna situación difícil con propietarios? ¿Cómo se manejó?'}
+   ]}
 ];
 const AREAS_CONT = [
   {key:'contab',label:'Contabilidad & Reportes',icon:'ti-report-money',
-   criteria:['Entrega de reporte de gastos en tiempo','Entrega de reporte de ingresos en tiempo','Revisión de presupuesto','Nómina en tiempo y forma','Obligaciones patronales al corriente','Impuestos al corriente','Calidad y precisión de la información']},
+   criteria:['Entrega de reporte de gastos en tiempo','Entrega de reporte de ingresos en tiempo','Revisión de presupuesto','Nómina en tiempo y forma','Obligaciones patronales al corriente','Impuestos al corriente','Calidad y precisión de la información'],
+   openQuestions:[
+     {key:'oq_entregas',    label:'¿Hubo entregas tardías o incompletas este mes? ¿Cuáles?'},
+     {key:'oq_calidad_cont',label:'¿Cómo evalúas la calidad y organización de los documentos entregados?'},
+     {key:'oq_actitud_cont',label:'¿Cómo reacciona el OSM ante observaciones o correcciones de Contabilidad?'},
+     {key:'oq_mejora_cont', label:'¿Qué mejora de proceso recomendarías para optimizar la relación con este OSM?'}
+   ]},
   {key:'rel_cont',label:'Relación con Contabilidad',icon:'ti-link',
    criteria:['Comunicación clara y oportuna','Respuesta a solicitudes','Organización de documentos','Disposición para resolver discrepancias','Seguimiento a observaciones previas']}
 ];
@@ -621,8 +636,8 @@ async function createSession(){
   };
   condoList = cl;
   D = {
-    rh:   {scores:{}, comments:{}, submitted:false},
-    cont: {scores:{}, comments:{}, submitted:false},
+    rh:   {scores:{}, comments:{}, openAnswers:{}, submitted:false},
+    cont: {scores:{}, comments:{}, openAnswers:{}, submitted:false},
     admin:{scores:{}, comments:{}, submitted:false}
   };
 
@@ -735,6 +750,16 @@ function renderAreaBlocks(role){
             <input class="com-in" type="text" placeholder="Comentario..." value="${com}" oninput="saveCom('${role}','${area.key}',${idx},this.value,${ci})"/>
           </div>`;
         }).join('')}
+        ${area.openQuestions ? `<div style="padding:12px 16px;border-top:1px solid var(--bord);background:var(--surf)">
+          <div style="font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Observaciones cualitativas</div>
+          ${area.openQuestions.map(oq=>{
+            const val = (D[role].openAnswers && D[role].openAnswers[oq.key]||'').replace(/"/g,'&quot;');
+            return `<div style="margin-bottom:10px">
+              <div style="font-size:12px;color:var(--ink2);margin-bottom:4px">${oq.label}</div>
+              <textarea rows="2" style="font-size:12px;padding:7px 10px;width:100%;border-radius:var(--rs);border:1px solid var(--bord);resize:vertical;background:var(--surf)" placeholder="Respuesta opcional..." oninput="saveOQ('${role}','${oq.key}',this.value)">${val}</textarea>
+            </div>`;
+          }).join('')}
+        </div>` : ''}
         <div class="ares">
           <span class="ares-lbl">${area.label}</span>
           <span class="ares-val" id="ares-${role}-${area.key}" style="color:${interp(avg).col}">${avg!==null?avg.toFixed(2):'—'}</span>
@@ -774,6 +799,12 @@ function setSc(role,ak,idx,val,btn,ci){
 
 function saveCom(role,ak,idx,val,ci){
   D[role].comments[`c|${role}|${ci}|${ak}|${idx}`]=val;
+}
+
+function saveOQ(role,key,val){
+  if(!D[role].openAnswers) D[role].openAnswers={};
+  D[role].openAnswers[key]=val;
+  saveLocal();
 }
 
 // ══ SUBMIT ═══════════════════════════════════════════════════════
@@ -915,9 +946,17 @@ function buildReportData(){
     };
   });
 
+  // Collect open answers from RH and Cont
+  const openAnswers = {};
+  ['rh','cont'].forEach(role=>{
+    if(D[role].openAnswers){
+      Object.entries(D[role].openAnswers).forEach(([k,v])=>{ if(v) openAnswers[k]=v; });
+    }
+  });
+
   return { nm, mes, resp, cond, global, rhOv, contOv, adminOv, areaDetails,
            obs: session.obs||'', comp: session.comp||'', frase: session.frase||'',
-           condos: condoList };
+           condos: condoList, openAnswers };
 }
 
 function buildBaseHTML(d){
@@ -980,27 +1019,37 @@ function buildBaseHTML(d){
 }
 
 function genReport(){
-  const zone = document.getElementById('report-zone');
-  if(!zone) return;
-  if(globalScore()===null){
-    zone.innerHTML=`<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Completa al menos una sección para generar el reporte.</p></div>`;
-    return;
-  }
-  const d = buildReportData();
-  const base = buildBaseHTML(d);
-  window._reportBase = base;
-  window._reportData = d;
-
-  zone.innerHTML=`<div class="rep-card">
-    <div class="rep-hdr">
-      <span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte — ${d.nm}</span>
-      <div style="display:flex;gap:6px">
-        <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="doPrint()"><i class="ti ti-printer"></i> PDF</button>
-        <button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="genAI()"><i class="ti ti-sparkles"></i> Generar análisis con IA</button>
+  // Ensure dashboard is visible and has the report zone
+  goS('dash');
+  // Give _renderDash a tick to finish if needed
+  setTimeout(()=>{
+    let zone = document.getElementById('report-zone');
+    if(!zone){
+      // Dashboard not rendered yet — render it first
+      _renderDash();
+      zone = document.getElementById('report-zone');
+    }
+    if(!zone){ notify('Abre el dashboard primero','err'); return; }
+    if(globalScore()===null){
+      zone.innerHTML=`<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Completa al menos una sección para generar el reporte.</p></div>`;
+      return;
+    }
+    const d = buildReportData();
+    const base = buildBaseHTML(d);
+    window._reportBase = base;
+    window._reportData = d;
+    zone.innerHTML=`<div class="rep-card">
+      <div class="rep-hdr">
+        <span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte — ${d.nm}</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="doPrint()"><i class="ti ti-printer"></i> PDF</button>
+          <button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="genAI()"><i class="ti ti-sparkles"></i> Generar análisis con IA</button>
+        </div>
       </div>
-    </div>
-    <div id="printable-report">${base}</div>
-  </div>`;
+      <div id="printable-report">${base}</div>
+    </div>`;
+    zone.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 100);
 }
 
 async function genAI(){
@@ -1023,6 +1072,9 @@ async function genAI(){
     return `  ${a.label} (${a.interp}, ${a.avg!==null?a.avg.toFixed(2):'—'}/5):\n${critLines}`;
   }).join('\n');
 
+  const oqLines = Object.entries(d.openAnswers||{}).filter(([k,v])=>v)
+    .map(([k,v])=>`  - ${k.replace('oq_','').replace(/_/g,' ')}: "${v}"`).join('\n');
+
   const prompt = `Eres un consultor senior especializado en gestión de condominios residenciales y desarrollo de liderazgo en On Site Managers. Tu tarea es redactar el análisis narrativo de una evaluación mensual de desempeño.
 
 DATOS DE LA EVALUACIÓN:
@@ -1032,6 +1084,7 @@ Condominios: ${d.cond}
 Evaluado por: ${d.resp}
 Score global: ${d.global!==null?d.global.toFixed(2):'—'}/5.00 (RH 30%: ${d.rhOv!==null?d.rhOv.toFixed(2):'—'} | Contabilidad 30%: ${d.contOv!==null?d.contOv.toFixed(2):'—'} | Operaciones 40%: ${d.adminOv!==null?d.adminOv.toFixed(2):'—'})
 ${d.obs?`Observaciones de la Responsable: ${d.obs}`:''}
+${oqLines?`Observaciones cualitativas del equipo:\n${oqLines}`:''}
 
 SCORES DETALLADOS POR ÁREA Y CRITERIO:
 ${areaLines}
