@@ -545,7 +545,24 @@ async function pullFromServer(code){
     condoList = parseCList(session.condos);
     if(data.evalData){
       ['rh','cont','admin'].forEach(role=>{
-        if(data.evalData[role]) D[role]=data.evalData[role];
+        const remote = data.evalData[role];
+        if(!remote) return; // server has nothing for this role — keep local
+        // Only overwrite if remote has actual scores (not empty)
+        const remoteHasScores = remote.scores && Object.keys(remote.scores).length > 0;
+        const localHasScores  = D[role].scores && Object.keys(D[role].scores).length > 0;
+        if(remoteHasScores){
+          // Merge: remote wins for keys it has, keep local for the rest
+          D[role] = {
+            ...remote,
+            scores:   {...(localHasScores ? D[role].scores : {}), ...remote.scores},
+            comments: {...(D[role].comments||{}), ...(remote.comments||{})},
+            submitted: remote.submitted || D[role].submitted
+          };
+        } else if(!localHasScores){
+          // Both empty — use remote structure
+          D[role] = remote;
+        }
+        // If remote empty but local has data: keep local
       });
     }
     saveLocal();
@@ -776,9 +793,15 @@ async function doSubmit(role){
 // ══ DASHBOARD ════════════════════════════════════════════════════
 async function renderDash(){
   if(!session){ notify('No hay sesión activa','err'); return; }
-  // Pull fresh data from server
-  await pullFromServer(session.id);
+  // Always load local first (fast, guaranteed), then merge server on top
+  loadLocal();
+  // Try to pull from server in background and re-render if it adds data
+  pullFromServer(session.id).then(synced=>{ if(synced) _renderDash(); }).catch(()=>{});
+  // Render immediately with what we have
+  _renderDash();
+}
 
+function _renderDash(){
   const global = globalScore();
   const rhOv=roleOverall('rh'), contOv=roleOverall('cont'), adminOv=roleOverall('admin');
 
