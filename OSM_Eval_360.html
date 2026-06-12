@@ -7,18 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <style>
-:root{
-  --bg:#F7F6F3;--surf:#fff;--surf2:#F0EFE9;--bord:#E2E0D8;--bord2:#D4D0C4;
-  --ink:#1A1916;--ink2:#6B6860;--ink3:#A8A59E;
-  --green:#1A7A5E;--green-bg:#E8F5F0;--green-l:#C5E8DC;
-  --amber:#9A6200;--amber-bg:#FEF3D7;
-  --red:#8B2020;--red-bg:#FDE8E8;
-  --blue:#1A4A8A;--blue-bg:#E8EFF8;
-  --plum:#5B21B6;--plum-bg:#EDE9FE;
-  --warm:#8A7D6B;--warm-bg:#F0EBE3;
-  --r:10px;--rs:6px;
-  --sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
-}
+:root{--bg:#F7F6F3;--surf:#fff;--surf2:#F0EFE9;--bord:#E2E0D8;--bord2:#D4D0C4;--ink:#1A1916;--ink2:#6B6860;--ink3:#A8A59E;--green:#1A7A5E;--green-bg:#E8F5F0;--green-l:#C5E8DC;--amber:#9A6200;--amber-bg:#FEF3D7;--red:#8B2020;--red-bg:#FDE8E8;--blue:#1A4A8A;--blue-bg:#E8EFF8;--plum:#5B21B6;--plum-bg:#EDE9FE;--warm:#8A7D6B;--warm-bg:#F0EBE3;--r:10px;--rs:6px;--sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;min-height:100vh}
 input,select,textarea,button{font-family:'DM Sans',sans-serif;font-size:14px}
@@ -47,429 +36,203 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green)}
 .topbar-title{font-size:16px;font-weight:600}
 .topbar-sub{font-size:12px;color:var(--ink2);margin-top:2px}
 .rb{font-size:11px;font-weight:700;padding:4px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
-.rb-rh{background:var(--plum-bg);color:var(--plum)}
-.rb-cont{background:var(--blue-bg);color:var(--blue)}
-.rb-admin{background:var(--green-bg);color:var(--green)}
+.rb-rh{background:var(--plum-bg);color:var(--plum)}.rb-cont{background:var(--blue-bg);color:var(--blue)}.rb-admin{background:var(--green-bg);color:var(--green)}
 .role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
 .role-card{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:20px;cursor:pointer;transition:all .2s;box-shadow:var(--sh)}
 .role-card:hover{border-color:var(--bord2);box-shadow:0 4px 20px rgba(0,0,0,.08);transform:translateY(-1px)}
 .join-wrap{max-width:480px;margin:0 auto;padding:2rem 0}
 .code-input{font-family:'DM Mono',monospace;font-size:22px;text-transform:uppercase;text-align:center;letter-spacing:.14em;padding:12px}
-.prog-wrap{margin-bottom:20px}
-.prog-track{height:4px;background:var(--bord);border-radius:2px;overflow:hidden}
-.prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s}
-.prog-lbl{font-size:11px;color:var(--ink3);margin-top:5px;text-align:right;font-family:'DM Mono',monospace}
-.ctabs{display:flex;border:1px solid var(--bord);border-radius:var(--r);overflow:hidden;margin-bottom:20px}
-.ctab{flex:1;padding:10px 8px;font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;border:none;background:none;border-right:1px solid var(--bord);text-align:center;transition:all .15s}
-.ctab:last-child{border-right:none}
-.ctab.on{background:var(--ink);color:#fff}
-.ctab .cs{display:block;font-size:10px;margin-top:2px;opacity:.7;font-family:'DM Mono',monospace}
-.ablock{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:var(--sh)}
-.ahdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surf2);cursor:pointer;user-select:none}
-.ahdr:hover{background:var(--bord)}
-.ahdr-l{display:flex;align-items:center;gap:8px}
-.ahdr-r{display:flex;align-items:center;gap:8px}
-.area-ico{font-size:16px;color:var(--ink2)}
-.area-ttl{font-size:14px;font-weight:600}
-.chev{font-size:14px;color:var(--ink3);transition:transform .2s}
-.abody{display:none}.abody.open{display:block}
-.crow{display:grid;grid-template-columns:1fr auto 180px;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid var(--bord)}
-.crit-name{font-size:13px}
-.pills{display:flex;gap:4px}
-.pill{width:30px;height:30px;border-radius:6px;border:1px solid var(--bord);background:var(--surf2);color:var(--ink3);font-size:12px;font-weight:600;cursor:pointer;transition:all .1s;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace}
-.pill:hover{border-color:var(--bord2);background:var(--bord)}
-.pill.p1.on{background:#FDDEDE;color:#8B2020;border-color:#E88080}
-.pill.p2.on{background:#FEF0C7;color:#9A6200;border-color:#FBCB5A}
-.pill.p3.on{background:#DCFCE7;color:#166534;border-color:#86EFAC}
-.pill.p4.on{background:#CFFAFE;color:#155E75;border-color:#67E8F9}
-.pill.p5.on{background:#1A7A5E;color:#fff;border-color:#1A7A5E}
-.com-in{font-size:12px;padding:6px 10px;border-radius:var(--rs);border:1px solid var(--bord);background:var(--surf);color:var(--ink);width:100%}
-.ares{display:grid;grid-template-columns:1fr auto 180px;align-items:center;gap:10px;padding:10px 16px;background:var(--surf2);border-top:1px solid var(--bord)}
-.ares-lbl{font-size:12px;font-weight:600;color:var(--ink2)}
-.ares-val{font-size:14px;font-weight:600;text-align:center;font-family:'DM Mono',monospace}
-.oq-wrap{padding:12px 16px;border-top:1px solid var(--bord);background:var(--surf)}
-.oq-title{font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
-.oq-item{margin-bottom:10px}
-.oq-q{font-size:12px;color:var(--ink2);margin-bottom:4px}
-.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
-.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink2)}
-.ld{width:10px;height:10px;border-radius:3px}
+.prog-wrap{margin-bottom:20px}.prog-track{height:4px;background:var(--bord);border-radius:2px;overflow:hidden}.prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s}.prog-lbl{font-size:11px;color:var(--ink3);margin-top:5px;text-align:right;font-family:'DM Mono',monospace}
+.ctabs{display:flex;border:1px solid var(--bord);border-radius:var(--r);overflow:hidden;margin-bottom:20px}.ctab{flex:1;padding:10px 8px;font-size:12px;font-weight:500;color:var(--ink2);cursor:pointer;border:none;background:none;border-right:1px solid var(--bord);text-align:center;transition:all .15s}.ctab:last-child{border-right:none}.ctab.on{background:var(--ink);color:#fff}.ctab .cs{display:block;font-size:10px;margin-top:2px;opacity:.7;font-family:'DM Mono',monospace}
+.ablock{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);overflow:hidden;margin-bottom:12px;box-shadow:var(--sh)}.ahdr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surf2);cursor:pointer;user-select:none}.ahdr:hover{background:var(--bord)}.ahdr-l{display:flex;align-items:center;gap:8px}.ahdr-r{display:flex;align-items:center;gap:8px}.area-ico{font-size:16px;color:var(--ink2)}.area-ttl{font-size:14px;font-weight:600}.chev{font-size:14px;color:var(--ink3);transition:transform .2s}.abody{display:none}.abody.open{display:block}
+.crow{display:grid;grid-template-columns:1fr auto 180px;align-items:center;gap:10px;padding:10px 16px;border-top:1px solid var(--bord)}.crit-name{font-size:13px}.pills{display:flex;gap:4px}.pill{width:30px;height:30px;border-radius:6px;border:1px solid var(--bord);background:var(--surf2);color:var(--ink3);font-size:12px;font-weight:600;cursor:pointer;transition:all .1s;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace}.pill:hover{border-color:var(--bord2);background:var(--bord)}.pill.p1.on{background:#FDDEDE;color:#8B2020;border-color:#E88080}.pill.p2.on{background:#FEF0C7;color:#9A6200;border-color:#FBCB5A}.pill.p3.on{background:#DCFCE7;color:#166534;border-color:#86EFAC}.pill.p4.on{background:#CFFAFE;color:#155E75;border-color:#67E8F9}.pill.p5.on{background:#1A7A5E;color:#fff;border-color:#1A7A5E}
+.com-in{font-size:12px;padding:6px 10px;border-radius:var(--rs);border:1px solid var(--bord);background:var(--surf);color:var(--ink);width:100%}.ares{display:grid;grid-template-columns:1fr auto 180px;align-items:center;gap:10px;padding:10px 16px;background:var(--surf2);border-top:1px solid var(--bord)}.ares-lbl{font-size:12px;font-weight:600;color:var(--ink2)}.ares-val{font-size:14px;font-weight:600;text-align:center;font-family:'DM Mono',monospace}
+.oq-wrap{padding:12px 16px;border-top:1px solid var(--bord);background:var(--surf)}.oq-title{font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}.oq-item{margin-bottom:10px}.oq-q{font-size:12px;color:var(--ink2);margin-bottom:4px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}.li{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink2)}.ld{width:10px;height:10px;border-radius:3px}
 .badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600}
-.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.stat-card{background:var(--surf);border:1px solid var(--bord);border-top:3px solid var(--bord);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}
-.stat-name{font-size:12px;font-weight:600;margin-bottom:4px}
-.stat-pct{font-size:22px;font-weight:700;font-family:'DM Mono',monospace;margin-bottom:4px}
-.stat-lbl{font-size:11px;color:var(--ink2);display:flex;align-items:center;gap:4px}
-.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.sdot-done{background:#1A7A5E}.sdot-part{background:#D97706}.sdot-empty{background:#D1D0CB}
-.mc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
-.mc{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh)}
-.mc-lbl{font-size:11px;font-weight:500;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
-.mc-val{font-size:24px;font-weight:600;font-family:'DM Mono',monospace}
-.mc-sub{font-size:11px;margin-top:4px}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
-.panel{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
-.panel-ttl{font-size:12px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
-.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
-.bar-name{font-size:12px;min-width:110px;flex-shrink:0}
-.bar-track{flex:1;height:7px;background:var(--surf2);border-radius:4px;overflow:hidden}
-.bar-fill{height:100%;border-radius:4px;transition:width .5s}
-.bar-val{font-size:12px;font-weight:600;min-width:28px;text-align:right;font-family:'DM Mono',monospace}
-.rep-card{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:20px;margin-bottom:20px;box-shadow:var(--sh)}
-.rep-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
-.rep-ttl{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
-.rdiv{font-size:7.5px;font-weight:700;color:var(--warm);letter-spacing:.1em;border-bottom:1px solid var(--bord);padding-bottom:3px;margin:14px 0 8px;text-transform:uppercase}
-.condo-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.condo-num{font-size:12px;color:var(--ink3);min-width:20px;text-align:right;font-family:'DM Mono',monospace}
-.condo-row input{flex:1}
-.rmb{background:none;border:none;cursor:pointer;color:var(--ink3);font-size:16px;padding:4px;border-radius:4px;line-height:1}
-.rmb:hover{color:var(--red)}
-.addb{width:100%;padding:9px;font-size:13px;border:1px dashed var(--bord2);border-radius:var(--rs);background:none;color:var(--ink2);cursor:pointer;transition:all .15s;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px}
-.addb:hover{background:var(--surf2)}
-.notif{position:fixed;top:20px;right:20px;background:var(--ink);color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:var(--rs);opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;display:flex;align-items:center;gap:6px;box-shadow:0 4px 20px rgba(0,0,0,.15)}
-.notif.show{opacity:1}
-.info-box{background:var(--amber-bg);border:1px solid #FDE68A;border-radius:var(--r);padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--ink2);line-height:1.6}
-.info-box strong{color:var(--ink)}
-.hist-table{width:100%;border-collapse:collapse}
-.hist-table th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;background:var(--surf2);border-bottom:1px solid var(--bord)}
-.hist-table td{padding:11px 14px;border-bottom:1px solid var(--bord);font-size:13px}
-.hist-table tr:last-child td{border-bottom:none}
-.hist-table tr:hover td{background:var(--surf2)}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spin{animation:spin 1s linear infinite}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}.stat-card{background:var(--surf);border:1px solid var(--bord);border-top:3px solid var(--bord);border-radius:var(--r);padding:14px;box-shadow:var(--sh)}.stat-name{font-size:12px;font-weight:600;margin-bottom:4px}.stat-pct{font-size:22px;font-weight:700;font-family:'DM Mono',monospace;margin-bottom:4px}.stat-lbl{font-size:11px;color:var(--ink2);display:flex;align-items:center;gap:4px}.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}.sdot-done{background:#1A7A5E}.sdot-part{background:#D97706}.sdot-empty{background:#D1D0CB}
+.mc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}.mc{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh)}.mc-lbl{font-size:11px;font-weight:500;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}.mc-val{font-size:24px;font-weight:600;font-family:'DM Mono',monospace}.mc-sub{font-size:11px;margin-top:4px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}.panel{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}.panel-ttl{font-size:12px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}.bar-name{font-size:12px;min-width:110px;flex-shrink:0}.bar-track{flex:1;height:7px;background:var(--surf2);border-radius:4px;overflow:hidden}.bar-fill{height:100%;border-radius:4px;transition:width .5s}.bar-val{font-size:12px;font-weight:600;min-width:28px;text-align:right;font-family:'DM Mono',monospace}
+.rep-card{background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);padding:20px;margin-bottom:20px;box-shadow:var(--sh)}.rep-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}.rep-ttl{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}.rdiv{font-size:7.5px;font-weight:700;color:var(--warm);letter-spacing:.1em;border-bottom:1px solid var(--bord);padding-bottom:3px;margin:14px 0 8px;text-transform:uppercase}
+.condo-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}.condo-num{font-size:12px;color:var(--ink3);min-width:20px;text-align:right;font-family:'DM Mono',monospace}.condo-row input{flex:1}.rmb{background:none;border:none;cursor:pointer;color:var(--ink3);font-size:16px;padding:4px;border-radius:4px;line-height:1}.rmb:hover{color:var(--red)}.addb{width:100%;padding:9px;font-size:13px;border:1px dashed var(--bord2);border-radius:var(--rs);background:none;color:var(--ink2);cursor:pointer;transition:all .15s;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px}.addb:hover{background:var(--surf2)}
+.notif{position:fixed;top:20px;right:20px;background:var(--ink);color:#fff;font-size:12px;font-weight:500;padding:10px 16px;border-radius:var(--rs);opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;display:flex;align-items:center;gap:6px;box-shadow:0 4px 20px rgba(0,0,0,.15)}.notif.show{opacity:1}
+.info-box{background:var(--amber-bg);border:1px solid #FDE68A;border-radius:var(--r);padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--ink2);line-height:1.6}.info-box strong{color:var(--ink)}
+.hist-table{width:100%;border-collapse:collapse}.hist-table th{padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.04em;background:var(--surf2);border-bottom:1px solid var(--bord)}.hist-table td{padding:11px 14px;border-bottom:1px solid var(--bord);font-size:13px}.hist-table tr:last-child td{border-bottom:none}.hist-table tr:hover td{background:var(--surf2)}
+@keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin 1s linear infinite}
 @media(max-width:600px){.role-grid,.stat-grid,.two-col,.fg{grid-template-columns:1fr}.crow{grid-template-columns:1fr;gap:6px}}
 </style>
 </head>
 <body>
 <div class="notif" id="notif"></div>
 <div class="app">
-
 <div class="nav">
-  <div class="nav-brand">
-    <div class="nav-logo"><i class="ti ti-building-community"></i></div>
-    <div><div class="nav-name">OSM Eval 360°</div><div class="nav-sub" id="nav-sub">Hestia Management Co.</div></div>
-  </div>
+  <div class="nav-brand"><div class="nav-logo"><i class="ti ti-building-community"></i></div><div><div class="nav-name">OSM Eval 360°</div><div class="nav-sub" id="nav-sub">Hestia Management Co.</div></div></div>
   <div id="nav-right" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"></div>
 </div>
-
 <!-- HOME -->
 <div id="scr-home" class="screen on">
   <div style="text-align:center;padding:2rem 0 1.5rem">
     <h1 style="font-size:22px;font-weight:700;margin-bottom:8px">Evaluación 360° — On Site Managers</h1>
-    <p style="font-size:13px;color:var(--ink2);max-width:480px;margin:0 auto">Cada evaluadora completa su sección de forma independiente usando el mismo link y el código de sesión.</p>
+    <p style="font-size:13px;color:var(--ink2);max-width:480px;margin:0 auto">Cada evaluadora completa su sección con el mismo link y el código de sesión.</p>
   </div>
   <div class="role-grid">
-    <div class="role-card" onclick="startJoin('rh')">
-      <div style="font-size:28px;margin-bottom:12px">💜</div>
-      <div style="font-size:15px;font-weight:600;margin-bottom:6px">Carmen — RH</div>
-      <div style="font-size:12px;color:var(--ink2)">Evalúa trato humano, liderazgo y clima con el equipo</div>
-    </div>
-    <div class="role-card" onclick="startJoin('cont')">
-      <div style="font-size:28px;margin-bottom:12px">💙</div>
-      <div style="font-size:15px;font-weight:600;margin-bottom:6px">Contabilidad</div>
-      <div style="font-size:12px;color:var(--ink2)">Evalúa entregas contables, reportes y comunicación</div>
-    </div>
-    <div class="role-card" style="border-top:3px solid var(--green)" onclick="goS('setup')">
-      <div style="font-size:28px;margin-bottom:12px">💚</div>
-      <div style="font-size:15px;font-weight:600;margin-bottom:6px">Responsable OSMs</div>
-      <div style="font-size:12px;color:var(--ink2)">Crea sesiones, evalúa operaciones y genera reportes</div>
-    </div>
+    <div class="role-card" onclick="startJoin('rh')"><div style="font-size:28px;margin-bottom:12px">💜</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">Carmen — RH</div><div style="font-size:12px;color:var(--ink2)">Evalúa trato humano, liderazgo y clima con el equipo</div></div>
+    <div class="role-card" onclick="startJoin('cont')"><div style="font-size:28px;margin-bottom:12px">💙</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">Contabilidad</div><div style="font-size:12px;color:var(--ink2)">Evalúa entregas contables, reportes y comunicación</div></div>
+    <div class="role-card" style="border-top:3px solid var(--green)" onclick="goS('setup')"><div style="font-size:28px;margin-bottom:12px">💚</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">Responsable OSMs</div><div style="font-size:12px;color:var(--ink2)">Crea sesiones, evalúa operaciones y genera reportes</div></div>
   </div>
-  <div class="info-box">
-    <strong>¿Cómo funciona?</strong><br>
-    1. La <strong>Responsable OSMs</strong> crea la sesión y obtiene un código de 6 letras.<br>
-    2. Comparte el código con Carmen y Contabilidad — cada una entra desde este mismo link.<br>
-    3. Cada quien llena su sección. La Responsable ve el avance en tiempo real en el dashboard.<br>
-    4. Cuando las tres terminan, se genera el reporte PDF con análisis de IA.
-  </div>
+  <div class="info-box"><strong>¿Cómo funciona?</strong><br>1. La <strong>Responsable OSMs</strong> crea la sesión y obtiene un código de 6 letras.<br>2. Comparte el código — RH y Contabilidad entran desde este mismo link.<br>3. Cada quien llena su sección. La Responsable ve el avance en el dashboard.<br>4. Se genera el reporte PDF listo para entregar.</div>
 </div>
-
 <!-- JOIN -->
 <div id="scr-join" class="screen">
-  <div class="join-wrap">
-    <div class="card">
-      <h2 style="font-size:18px;font-weight:600;margin-bottom:6px" id="join-title">Ingresar</h2>
-      <p style="font-size:13px;color:var(--ink2);margin-bottom:20px;line-height:1.6">Ingresa el código de sesión que te compartió la Responsable.</p>
-      <div style="margin-bottom:14px">
-        <div class="fl">Código de sesión</div>
-        <input type="text" id="join-code" class="code-input" placeholder="Ej. A3B7C2" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doJoin()"/>
-      </div>
-      <div id="join-status" style="font-size:12px;color:var(--ink2);min-height:20px;margin-bottom:12px"></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-ghost" onclick="goS('home')"><i class="ti ti-arrow-left"></i> Volver</button>
-        <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="doJoin()"><i class="ti ti-arrow-right"></i> Entrar</button>
-      </div>
-    </div>
-  </div>
+  <div class="join-wrap"><div class="card">
+    <h2 style="font-size:18px;font-weight:600;margin-bottom:6px" id="join-title">Ingresar</h2>
+    <p style="font-size:13px;color:var(--ink2);margin-bottom:20px;line-height:1.6">Ingresa el código de sesión que te compartió la Responsable.</p>
+    <div style="margin-bottom:14px"><div class="fl">Código de sesión</div><input type="text" id="join-code" class="code-input" placeholder="Ej. A3B7C2" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doJoin()"/></div>
+    <div id="join-status" style="font-size:12px;color:var(--ink2);min-height:20px;margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="goS('home')"><i class="ti ti-arrow-left"></i> Volver</button><button class="btn btn-primary" style="flex:1;justify-content:center" onclick="doJoin()"><i class="ti ti-arrow-right"></i> Entrar</button></div>
+  </div></div>
 </div>
-
 <!-- SETUP -->
 <div id="scr-setup" class="screen">
-  <div class="topbar">
-    <div class="topbar-l"><span class="rb rb-admin"><i class="ti ti-crown"></i> Responsable OSMs</span><div><div class="topbar-title">Nueva sesión</div></div></div>
-    <button class="btn btn-ghost" onclick="goS('home')"><i class="ti ti-arrow-left"></i> Inicio</button>
+  <div class="topbar"><div class="topbar-l"><span class="rb rb-admin"><i class="ti ti-crown"></i> Responsable OSMs</span><div><div class="topbar-title">Nueva sesión</div></div></div><button class="btn btn-ghost" onclick="goS('home')"><i class="ti ti-arrow-left"></i> Inicio</button></div>
+  <div class="card"><div class="card-title">Datos del OSM</div>
+    <div class="fg"><div><div class="fl">Nombre del OSM</div><input type="text" id="s-name" placeholder="Ej. Ana García"/></div><div><div class="fl">Mes de evaluación</div><input type="month" id="s-month"/></div></div>
+    <div class="fg"><div><div class="fl">Tu nombre (Responsable)</div><input type="text" id="s-admin" placeholder="Nombre"/></div></div>
   </div>
-  <div class="card">
-    <div class="card-title">Datos del OSM</div>
+  <div class="card"><div class="card-title">Condominios asignados</div><div id="condo-list"></div><button class="addb" onclick="addCondo()"><i class="ti ti-plus"></i> Agregar condominio</button></div>
+  <div class="card"><div class="card-title">Para el reporte <span style="font-weight:400;color:var(--ink3);text-transform:none;letter-spacing:0">(opcional)</span></div>
+    <div class="fg1"><div><div class="fl">Observaciones del período</div><textarea id="s-obs" rows="3" style="font-size:13px;width:100%;padding:8px 12px;border-radius:var(--rs);border:1px solid var(--bord);resize:vertical" placeholder="Lo que observaste este mes..."></textarea></div></div>
+    <div class="fg1"><div><div class="fl">Compromiso del mes siguiente</div><textarea id="s-comp" rows="2" style="font-size:13px;width:100%;padding:8px 12px;border-radius:var(--rs);border:1px solid var(--bord);resize:vertical" placeholder="Para el mes en curso, el compromiso es..."></textarea></div></div>
+    <div class="fg1"><div><div class="fl">Frase de cierre</div><input type="text" id="s-frase" placeholder="La excelencia no hace ruido — simplemente se nota."/></div></div>
+  </div>
+  <div class="card"><div class="card-title">Notificaciones por correo</div>
     <div class="fg">
-      <div><div class="fl">Nombre del OSM</div><input type="text" id="s-name" placeholder="Ej. Ana García"/></div>
-      <div><div class="fl">Mes de evaluación</div><input type="month" id="s-month"/></div>
+      <div><div class="fl">Correo RH</div><input type="email" id="s-email-rh" value="carmen@hestiamx.com"/></div>
+      <div><div class="fl">Correo Contabilidad</div><input type="email" id="s-email-cont" value="karem@hestiamx.com"/></div>
     </div>
-    <div class="fg">
-      <div><div class="fl">Tu nombre (Responsable)</div><input type="text" id="s-admin" placeholder="Nombre"/></div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">Condominios asignados</div>
-    <div id="condo-list"></div>
-    <button class="addb" onclick="addCondo()"><i class="ti ti-plus"></i> Agregar condominio</button>
-  </div>
-  <div class="card">
-    <div class="card-title">Para el reporte <span style="font-weight:400;color:var(--ink3);text-transform:none;letter-spacing:0">(opcional)</span></div>
-    <div class="fg1">
-      <div><div class="fl">Observaciones del período</div>
-        <textarea id="s-obs" rows="3" style="font-size:13px;width:100%;padding:8px 12px;border-radius:var(--rs);border:1px solid var(--bord);resize:vertical" placeholder="Lo que observaste este mes..."></textarea>
-      </div>
-    </div>
-    <div class="fg1">
-      <div><div class="fl">Compromiso del mes siguiente</div>
-        <textarea id="s-comp" rows="2" style="font-size:13px;width:100%;padding:8px 12px;border-radius:var(--rs);border:1px solid var(--bord);resize:vertical" placeholder="Para el mes en curso, el compromiso es..."></textarea>
-      </div>
-    </div>
-    <div class="fg1">
-      <div><div class="fl">Frase de cierre</div>
-        <input type="text" id="s-frase" placeholder='Ej. La excelencia no hace ruido — simplemente se nota.'/>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">Notificaciones por correo <span style="font-weight:400;color:var(--ink3);text-transform:none;letter-spacing:0">(opcional)</span></div>
-    <div class="fg">
-      <div><div class="fl">Correo RH</div><input type="email" id="s-email-rh" placeholder="carmen@hestiamx.com"/></div>
-      <div><div class="fl">Correo Contabilidad</div><input type="email" id="s-email-cont" placeholder="contabilidad@hestiamx.com"/></div>
-    </div>
-    <p style="font-size:12px;color:var(--ink3)">Se enviará el link y el código para que puedan completar su evaluación.</p>
+    <p style="font-size:12px;color:var(--ink3)">Se enviará el link y el código al crear la sesión.</p>
   </div>
   <button class="btn btn-primary btn-full" onclick="createSession()"><i class="ti ti-arrow-right"></i> Crear sesión y obtener código</button>
 </div>
-
 <!-- EVAL RH -->
 <div id="scr-rh" class="screen">
-  <div class="topbar">
-    <div class="topbar-l"><span class="rb rb-rh"><i class="ti ti-heart"></i> Carmen — RH</span><div><div class="topbar-title" id="rh-title"></div><div class="topbar-sub" id="rh-sub"></div></div></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-ghost" onclick="goS('home')">← Inicio</button>
-      <button class="btn btn-primary" onclick="doSubmit('rh')"><i class="ti ti-send"></i> Enviar</button>
-    </div>
-  </div>
-  <div class="legend">
-    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #E88080"></div>1 — Deficiente</div>
-    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 — Necesita mejora</div>
-    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 — Cumple</div>
-    <div class="li"><div class="ld" style="background:#CFFAFE;border:1px solid #67E8F9"></div>4 — Buen desempeño</div>
-    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 — Excelencia</div>
-  </div>
+  <div class="topbar"><div class="topbar-l"><span class="rb rb-rh"><i class="ti ti-heart"></i> Carmen — RH</span><div><div class="topbar-title" id="rh-title"></div><div class="topbar-sub" id="rh-sub"></div></div></div><div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="goS('home')">← Inicio</button><button class="btn btn-primary" onclick="doSubmit('rh')"><i class="ti ti-send"></i> Enviar</button></div></div>
+  <div class="legend"><div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #E88080"></div>1 — Deficiente</div><div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 — Necesita mejora</div><div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 — Cumple</div><div class="li"><div class="ld" style="background:#CFFAFE;border:1px solid #67E8F9"></div>4 — Buen desempeño</div><div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 — Excelencia</div></div>
   <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-rh"></div></div><div class="prog-lbl" id="prog-rh-lbl"></div></div>
   <div id="ctabs-rh"></div><div id="body-rh"></div>
 </div>
-
 <!-- EVAL CONT -->
 <div id="scr-cont" class="screen">
-  <div class="topbar">
-    <div class="topbar-l"><span class="rb rb-cont"><i class="ti ti-calculator"></i> Contabilidad</span><div><div class="topbar-title" id="cont-title"></div><div class="topbar-sub" id="cont-sub"></div></div></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-ghost" onclick="goS('home')">← Inicio</button>
-      <button class="btn btn-primary" onclick="doSubmit('cont')"><i class="ti ti-send"></i> Enviar</button>
-    </div>
-  </div>
-  <div class="legend">
-    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #E88080"></div>1 — Deficiente</div>
-    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 — Necesita mejora</div>
-    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 — Cumple</div>
-    <div class="li"><div class="ld" style="background:#CFFAFE;border:1px solid #67E8F9"></div>4 — Buen desempeño</div>
-    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 — Excelencia</div>
-  </div>
+  <div class="topbar"><div class="topbar-l"><span class="rb rb-cont"><i class="ti ti-calculator"></i> Contabilidad</span><div><div class="topbar-title" id="cont-title"></div><div class="topbar-sub" id="cont-sub"></div></div></div><div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="goS('home')">← Inicio</button><button class="btn btn-primary" onclick="doSubmit('cont')"><i class="ti ti-send"></i> Enviar</button></div></div>
+  <div class="legend"><div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #E88080"></div>1 — Deficiente</div><div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 — Necesita mejora</div><div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 — Cumple</div><div class="li"><div class="ld" style="background:#CFFAFE;border:1px solid #67E8F9"></div>4 — Buen desempeño</div><div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 — Excelencia</div></div>
   <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-cont"></div></div><div class="prog-lbl" id="prog-cont-lbl"></div></div>
   <div id="ctabs-cont"></div><div id="body-cont"></div>
 </div>
-
 <!-- EVAL ADMIN -->
 <div id="scr-admin" class="screen">
-  <div class="topbar">
-    <div class="topbar-l"><span class="rb rb-admin"><i class="ti ti-crown"></i> Responsable OSMs</span><div><div class="topbar-title" id="admin-title"></div><div class="topbar-sub" id="admin-sub"></div></div></div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-ghost" onclick="goS('dash');_renderDash()">Dashboard →</button>
-      <button class="btn btn-primary" onclick="doSubmit('admin')"><i class="ti ti-send"></i> Guardar</button>
-    </div>
-  </div>
-  <div class="legend">
-    <div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #E88080"></div>1 — Deficiente</div>
-    <div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 — Necesita mejora</div>
-    <div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 — Cumple</div>
-    <div class="li"><div class="ld" style="background:#CFFAFE;border:1px solid #67E8F9"></div>4 — Buen desempeño</div>
-    <div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 — Excelencia</div>
-  </div>
+  <div class="topbar"><div class="topbar-l"><span class="rb rb-admin"><i class="ti ti-crown"></i> Responsable OSMs</span><div><div class="topbar-title" id="admin-title"></div><div class="topbar-sub" id="admin-sub"></div></div></div><div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="goS('dash');_renderDash()">Dashboard →</button><button class="btn btn-primary" onclick="doSubmit('admin')"><i class="ti ti-send"></i> Guardar</button></div></div>
+  <div class="legend"><div class="li"><div class="ld" style="background:#FDDEDE;border:1px solid #E88080"></div>1 — Deficiente</div><div class="li"><div class="ld" style="background:#FEF0C7;border:1px solid #FBCB5A"></div>2 — Necesita mejora</div><div class="li"><div class="ld" style="background:#DCFCE7;border:1px solid #86EFAC"></div>3 — Cumple</div><div class="li"><div class="ld" style="background:#CFFAFE;border:1px solid #67E8F9"></div>4 — Buen desempeño</div><div class="li"><div class="ld" style="background:#1A7A5E;border:1px solid #1A7A5E"></div>5 — Excelencia</div></div>
   <div class="prog-wrap"><div class="prog-track"><div class="prog-fill" id="prog-admin"></div></div><div class="prog-lbl" id="prog-admin-lbl"></div></div>
   <div id="ctabs-admin"></div><div id="body-admin"></div>
 </div>
-
 <!-- DASHBOARD -->
 <div id="scr-dash" class="screen">
-  <div class="topbar">
-    <div class="topbar-l"><span class="rb rb-admin"><i class="ti ti-chart-bar"></i> Dashboard 360°</span><div><div class="topbar-title" id="dash-title"></div><div class="topbar-sub" id="dash-sub"></div></div></div>
-    <div style="display:flex;gap:6px">
-      <button class="btn btn-ghost" onclick="goS('admin');renderEval('admin')">← Editar</button>
-      <button class="btn btn-ghost" onclick="_renderDash()"><i class="ti ti-refresh"></i> Actualizar</button>
-      <button class="btn btn-green" onclick="genReport()"><i class="ti ti-file-text"></i> Reporte PDF</button>
-    </div>
-  </div>
+  <div class="topbar"><div class="topbar-l"><span class="rb rb-admin"><i class="ti ti-chart-bar"></i> Dashboard 360°</span><div><div class="topbar-title" id="dash-title"></div><div class="topbar-sub" id="dash-sub"></div></div></div><div style="display:flex;gap:6px"><button class="btn btn-ghost" onclick="goS('admin');renderEval('admin')">← Editar</button><button class="btn btn-ghost" onclick="_renderDash()"><i class="ti ti-refresh"></i> Actualizar</button><button class="btn btn-green" onclick="genReport()"><i class="ti ti-file-text"></i> Reporte PDF</button></div></div>
   <div id="dash-body"></div>
   <div id="report-zone"></div>
 </div>
-
 <!-- HISTORIAL -->
 <div id="scr-hist" class="screen">
-  <div class="topbar">
-    <div class="topbar-l"><span class="rb rb-admin"><i class="ti ti-history"></i> Historial</span><div><div class="topbar-title">Evaluaciones registradas</div></div></div>
-    <button class="btn btn-ghost" onclick="goS('home')">← Inicio</button>
-  </div>
+  <div class="topbar"><div class="topbar-l"><span class="rb rb-admin"><i class="ti ti-history"></i> Historial</span><div><div class="topbar-title">Evaluaciones registradas</div></div></div><button class="btn btn-ghost" onclick="goS('home')">← Inicio</button></div>
   <div id="hist-body"></div>
 </div>
-
 <!-- DONE -->
 <div id="scr-done" class="screen">
   <div style="text-align:center;padding:4rem 1rem">
     <div style="font-size:52px;margin-bottom:16px">✅</div>
     <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">¡Evaluación enviada!</h2>
     <p id="done-msg" style="font-size:14px;color:var(--ink2);max-width:420px;margin:0 auto 20px;line-height:1.7"></p>
-    <div style="background:var(--green-bg);border:1px solid var(--green-l);border-radius:var(--r);padding:14px 20px;font-size:12px;color:var(--ink2);max-width:380px;margin:0 auto">
-      Puedes cerrar esta ventana. La Responsable verá tus resultados en el dashboard.
-    </div>
+    <div style="background:var(--green-bg);border:1px solid var(--green-l);border-radius:var(--r);padding:14px 20px;font-size:12px;color:var(--ink2);max-width:380px;margin:0 auto">Puedes cerrar esta ventana. La Responsable verá tus resultados en el dashboard.</div>
   </div>
 </div>
-
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-const SERVER = 'https://hestia-notificaciones.onrender.com';
+const SERVER='https://hestia-notificaciones.onrender.com';
+const EMAIL_RH='carmen@hestiamx.com';
+const EMAIL_CONT='karem@hestiamx.com';
 
-// ── AREAS ─────────────────────────────────────────────────────────
-const AREAS_RH = [
-  {key:'staff', label:'Staff & Liderazgo', icon:'ti-user-check',
+const AREAS_RH=[
+  {key:'staff',label:'Staff & Liderazgo',icon:'ti-user-check',
    criteria:['Liderazgo con el equipo','Comunicación con colaboradores','Organización del trabajo','Resolución de conflictos','Seguimiento al staff','Capacidad de delegar','Presencia y profesionalismo','Motivación del equipo'],
-   oq:[{k:'oq_fortaleza',q:'¿Qué fortaleza destaca este OSM en el trato con personas y equipo?'},
-       {k:'oq_conflictos',q:'¿Hubo conflictos o situaciones difíciles con el staff este mes?'},
-       {k:'oq_mejora_rh',q:'¿Qué área de desarrollo humano recomendarías trabajar?'}]},
-  {key:'actitud', label:'Actitud & Desempeño', icon:'ti-star',
+   oq:[{k:'oq_fortaleza',q:'¿Qué fortaleza destaca este OSM en el trato con personas y equipo?'},{k:'oq_conflictos',q:'¿Hubo conflictos o situaciones difíciles con el staff este mes?'},{k:'oq_mejora_rh',q:'¿Qué área de desarrollo humano recomendarías trabajar?'}]},
+  {key:'actitud',label:'Actitud & Desempeño',icon:'ti-star',
    criteria:['Puntualidad y responsabilidad','Proactividad e iniciativa','Manejo del estrés','Adaptabilidad a cambios','Apertura a feedback','Disposición general']},
-  {key:'hw_rh', label:'Trato con Homeowners', icon:'ti-users',
+  {key:'hw_rh',label:'Trato con Homeowners',icon:'ti-users',
    criteria:['Empatía y trato humano','Profesionalismo en comunicación','Manejo de situaciones difíciles','Seguimiento a necesidades del homeowner'],
-   oq:[{k:'oq_hw_pos',q:'¿Hubo alguna situación positiva destacable con propietarios?'},
-       {k:'oq_hw_dif',q:'¿Hubo alguna situación difícil con propietarios? ¿Cómo se manejó?'}]}
+   oq:[{k:'oq_hw_pos',q:'¿Hubo alguna situación positiva destacable con propietarios?'},{k:'oq_hw_dif',q:'¿Hubo alguna situación difícil con propietarios? ¿Cómo se manejó?'}]}
 ];
-const AREAS_CONT = [
-  {key:'contab', label:'Contabilidad & Reportes', icon:'ti-report-money',
+const AREAS_CONT=[
+  {key:'contab',label:'Contabilidad & Reportes',icon:'ti-report-money',
    criteria:['Entrega de reporte de gastos en tiempo','Entrega de reporte de ingresos en tiempo','Revisión de presupuesto','Nómina en tiempo y forma','Obligaciones patronales al corriente','Impuestos al corriente','Calidad y precisión de la información'],
-   oq:[{k:'oq_entregas',q:'¿Hubo entregas tardías o incompletas este mes?'},
-       {k:'oq_calidad',q:'¿Cómo evalúas la calidad de los documentos entregados?'},
-       {k:'oq_actitud_cont',q:'¿Cómo reacciona el OSM ante observaciones de Contabilidad?'},
-       {k:'oq_mejora_cont',q:'¿Qué mejora de proceso recomendarías?'}]},
-  {key:'rel_cont', label:'Relación con Contabilidad', icon:'ti-link',
+   oq:[{k:'oq_entregas',q:'¿Hubo entregas tardías o incompletas este mes?'},{k:'oq_calidad',q:'¿Cómo evalúas la calidad de los documentos entregados?'},{k:'oq_actitud_cont',q:'¿Cómo reacciona el OSM ante observaciones de Contabilidad?'},{k:'oq_mejora_cont',q:'¿Qué mejora de proceso recomendarías?'}]},
+  {key:'rel_cont',label:'Relación con Contabilidad',icon:'ti-link',
    criteria:['Comunicación clara y oportuna','Respuesta a solicitudes','Organización de documentos','Disposición para resolver discrepancias','Seguimiento a observaciones previas']}
 ];
-const AREAS_ADMIN = [
-  {key:'op',   label:'Operación',            icon:'ti-building',
-   criteria:['Recorridos operativos','Seguimiento de pendientes','Anticipación de incidencias','Resolución de problemas','Supervisión general','Organización operativa','Seguimiento de proyectos','Coordinación entre áreas','Gestión de emergencias','Cumplimiento operativo']},
-  {key:'mant', label:'Mantenimiento',         icon:'ti-tool',
-   criteria:['Seguimiento preventivo','Seguimiento correctivo','Planeación de mantenimientos','Supervisión de proveedores','Seguimiento de trabajos','Control de incidencias','Validación de trabajos','Organización documental']},
-  {key:'hw_op',label:'Homeowners',            icon:'ti-users',
-   criteria:['Atención al propietario','Tiempo de respuesta','Seguimiento a solicitudes','Resolución de conflictos','Relación con consejo/comité']},
-  {key:'com',  label:'Comunicación Operativa',icon:'ti-message-circle',
-   criteria:['Seguimiento de tickets CondoVive','Calidad de seguimiento','Comunicación escrita profesional','Actualización de SharePoint','Organización documental','Seguimiento administrativo']}
+const AREAS_ADMIN=[
+  {key:'op',label:'Operación',icon:'ti-building',criteria:['Recorridos operativos','Seguimiento de pendientes','Anticipación de incidencias','Resolución de problemas','Supervisión general','Organización operativa','Seguimiento de proyectos','Coordinación entre áreas','Gestión de emergencias','Cumplimiento operativo']},
+  {key:'mant',label:'Mantenimiento',icon:'ti-tool',criteria:['Seguimiento preventivo','Seguimiento correctivo','Planeación de mantenimientos','Supervisión de proveedores','Seguimiento de trabajos','Control de incidencias','Validación de trabajos','Organización documental']},
+  {key:'hw_op',label:'Homeowners',icon:'ti-users',criteria:['Atención al propietario','Tiempo de respuesta','Seguimiento a solicitudes','Resolución de conflictos','Relación con consejo/comité']},
+  {key:'com',label:'Comunicación Operativa',icon:'ti-message-circle',criteria:['Seguimiento de tickets CondoVive','Calidad de seguimiento','Comunicación escrita profesional','Actualización de SharePoint','Organización documental','Seguimiento administrativo']}
 ];
-const ROLE_AREAS = {rh:AREAS_RH, cont:AREAS_CONT, admin:AREAS_ADMIN};
+const ROLE_AREAS={rh:AREAS_RH,cont:AREAS_CONT,admin:AREAS_ADMIN};
 
-// ── STATE ─────────────────────────────────────────────────────────
-let session=null, condoList=[], activeRole=null;
-let activeCondo={rh:0,cont:0,admin:0};
-let openAreas={}, condosInput=[''];
-let radarChart=null;
-let D={rh:{scores:{},comments:{},oqAnswers:{},submitted:false},
-       cont:{scores:{},comments:{},oqAnswers:{},submitted:false},
-       admin:{scores:{},comments:{},submitted:false}};
+let session=null,condoList=[],activeRole=null;
+let activeCondo={rh:0,cont:0,admin:0},openAreas={},condosInput=[''],radarChart=null;
+let D={rh:{scores:{},comments:{},oqAnswers:{},submitted:false},cont:{scores:{},comments:{},oqAnswers:{},submitted:false},admin:{scores:{},comments:{},submitted:false}};
 
-// ── UTILS ─────────────────────────────────────────────────────────
-const sk=(r,ci,ak,i)=>`${r}|${ci}|${ak}|${i}`;
+const sk=(r,ci,ak,i)=>r+'|'+ci+'|'+ak+'|'+i;
 const gs=(r,ci,ak,i)=>D[r].scores[sk(r,ci,ak,i)]??null;
 
-function getRoleForArea(ak){
-  if(AREAS_RH.find(a=>a.key===ak)) return 'rh';
-  if(AREAS_CONT.find(a=>a.key===ak)) return 'cont';
-  return 'admin';
-}
+function getRoleForArea(ak){if(AREAS_RH.find(a=>a.key===ak))return'rh';if(AREAS_CONT.find(a=>a.key===ak))return'cont';return'admin';}
 
 function areaAvg(role,ak,ci){
-  const area=ROLE_AREAS[role].find(a=>a.key===ak);
-  if(!area) return null;
+  const area=ROLE_AREAS[role].find(a=>a.key===ak);if(!area)return null;
   const n=condoList.length||1;
-  if(ci!==undefined){
-    const vals=area.criteria.map((_,i)=>gs(role,ci,ak,i)).filter(v=>v!==null);
-    return vals.length?vals.reduce((a,b)=>a+b)/vals.length:null;
-  }
-  let all=[];
-  for(let c=0;c<n;c++) area.criteria.forEach((_,i)=>{const v=gs(role,c,ak,i);if(v!==null)all.push(v);});
+  if(ci!==undefined){const vals=area.criteria.map((_,i)=>gs(role,ci,ak,i)).filter(v=>v!==null);return vals.length?vals.reduce((a,b)=>a+b)/vals.length:null;}
+  let all=[];for(let c=0;c<n;c++)area.criteria.forEach((_,i)=>{const v=gs(role,c,ak,i);if(v!==null)all.push(v);});
   return all.length?all.reduce((a,b)=>a+b)/all.length:null;
 }
-
-function roleOverall(role){
-  const avgs=ROLE_AREAS[role].map(a=>areaAvg(role,a.key)).filter(v=>v!==null);
-  return avgs.length?avgs.reduce((a,b)=>a+b)/avgs.length:null;
-}
-
-function globalScore(){
-  const w={rh:30,cont:30,admin:40};let sum=0,wt=0;
-  Object.keys(w).forEach(r=>{const v=roleOverall(r);if(v!==null){sum+=v*w[r];wt+=w[r];}});
-  return wt?sum/wt:null;
-}
-
-function countFilled(role){
-  const n=condoList.length||1;let c=0;
-  for(let ci=0;ci<n;ci++) ROLE_AREAS[role].forEach(a=>a.criteria.forEach((_,i)=>{if(gs(role,ci,a.key,i)!==null)c++;}));
-  return c;
-}
+function roleOverall(role){const avgs=ROLE_AREAS[role].map(a=>areaAvg(role,a.key)).filter(v=>v!==null);return avgs.length?avgs.reduce((a,b)=>a+b)/avgs.length:null;}
+function globalScore(){const w={rh:30,cont:30,admin:40};let sum=0,wt=0;Object.keys(w).forEach(r=>{const v=roleOverall(r);if(v!==null){sum+=v*w[r];wt+=w[r];}});return wt?sum/wt:null;}
+function countFilled(role){const n=condoList.length||1;let c=0;for(let ci=0;ci<n;ci++)ROLE_AREAS[role].forEach(a=>a.criteria.forEach((_,i)=>{if(gs(role,ci,a.key,i)!==null)c++;}));return c;}
 function totalCrit(role){return ROLE_AREAS[role].reduce((s,a)=>s+a.criteria.length,0)*(condoList.length||1);}
 
 function ic(v){
-  if(v===null||v===undefined) return{l:'Sin datos',c:'#A8A59E',b:'#ECEAE3'};
-  if(v>=4.5) return{l:'Excelencia',c:'#1A7A5E',b:'#D4EFE7'};
-  if(v>=3.5) return{l:'Buen desempeño',c:'#0C7490',b:'#CFFAFE'};
-  if(v>=2.5) return{l:'Cumple',c:'#92580A',b:'#FEF0C7'};
-  if(v>=1.5) return{l:'Necesita mejora',c:'#DC2626',b:'#FDE8E8'};
+  if(v===null||v===undefined)return{l:'Sin datos',c:'#A8A59E',b:'#ECEAE3'};
+  if(v>=4.5)return{l:'Excelencia',c:'#1A7A5E',b:'#D4EFE7'};
+  if(v>=3.5)return{l:'Buen desempeño',c:'#0C7490',b:'#CFFAFE'};
+  if(v>=2.5)return{l:'Cumple',c:'#92580A',b:'#FEF0C7'};
+  if(v>=1.5)return{l:'Necesita mejora',c:'#DC2626',b:'#FDE8E8'};
   return{l:'Deficiente',c:'#9B2020',b:'#FDE8E8'};
 }
-function badge(v){const i=ic(v);return '<span class="badge" style="background:'+i.b+';color:'+i.c+'">'+(v!==null?v.toFixed(1)+' ':'')+i.l+'</span>';}
+function badge(v){const i=ic(v);return'<span class="badge" style="background:'+i.b+';color:'+i.c+'">'+(v!==null?v.toFixed(1)+' ':'')+i.l+'</span>';}
 function moLabel(mo){return mo?new Date(mo+'-02').toLocaleDateString('es',{month:'long',year:'numeric'}):''}
 function notify(msg,type){
   const el=document.getElementById('notif');
-  const ico=type==='err'?'ti-circle-x':type==='info'?'ti-info-circle':'ti-circle-check';
-  el.innerHTML='<i class="ti '+ico+'"></i> '+msg;
+  el.innerHTML='<i class="ti '+(type==='err'?'ti-circle-x':type==='info'?'ti-info-circle':'ti-circle-check')+'"></i> '+msg;
   el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);
 }
 function goS(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));document.getElementById('scr-'+s).classList.add('on');}
 
-// ── STORAGE ───────────────────────────────────────────────────────
-function saveLocal(){
-  try{localStorage.setItem('h360_s',JSON.stringify(session));localStorage.setItem('h360_d',JSON.stringify(D));}catch(e){}
-}
+function saveLocal(){try{localStorage.setItem('h360_s',JSON.stringify(session));localStorage.setItem('h360_d',JSON.stringify(D));}catch(e){}}
 function loadLocal(){
   try{
     const s=localStorage.getItem('h360_s');const d=localStorage.getItem('h360_d');
     if(!s)return false;
-    const sv=JSON.parse(s);
-    if(session&&session.id!==sv.id)return false;
-    session=sv;condoList=parseCL(session.condos);
-    if(d)D=JSON.parse(d);
-    return true;
+    const sv=JSON.parse(s);if(session&&session.id!==sv.id)return false;
+    session=sv;condoList=parseCL(session.condos);if(d)D=JSON.parse(d);return true;
   }catch(e){return false;}
 }
 function parseCL(str){return str?str.split(',').map(c=>c.trim()).filter(Boolean):['Principal'];}
@@ -481,10 +244,8 @@ async function pushServer(){
 async function pullServer(code){
   if(!SERVER)return false;
   try{
-    const r=await fetch(SERVER+'/session/'+code);
-    if(!r.ok)return false;
-    const data=await r.json();
-    if(!data.session)return false;
+    const r=await fetch(SERVER+'/session/'+code);if(!r.ok)return false;
+    const data=await r.json();if(!data.session)return false;
     session=data.session;condoList=parseCL(session.condos);
     if(data.evalData){
       ['rh','cont','admin'].forEach(role=>{
@@ -499,7 +260,6 @@ async function pullServer(code){
   }catch(e){return false;}
 }
 
-// ── NAV ───────────────────────────────────────────────────────────
 function updateNav(){
   if(!session)return;
   document.getElementById('nav-sub').textContent=session.osm+' · '+moLabel(session.mo);
@@ -508,7 +268,6 @@ function updateNav(){
     '<span style="font-family:\'DM Mono\',monospace;font-size:13px;font-weight:700;background:var(--surf2);padding:4px 10px;border-radius:var(--rs);color:var(--ink2)">Código: '+session.id+'</span>';
 }
 
-// ── SETUP ─────────────────────────────────────────────────────────
 function addCondo(){condosInput.push('');renderCondoList();}
 function removeCondo(i){if(condosInput.length<=1)return;condosInput.splice(i,1);renderCondoList();}
 function renderCondoList(){
@@ -534,14 +293,12 @@ async function createSession(){
     frase:document.getElementById('s-frase').value.trim(),
     created:new Date().toISOString()};
   condoList=cl;
-  D={rh:{scores:{},comments:{},oqAnswers:{},submitted:false},
-     cont:{scores:{},comments:{},oqAnswers:{},submitted:false},
-     admin:{scores:{},comments:{},submitted:false}};
+  D={rh:{scores:{},comments:{},oqAnswers:{},submitted:false},cont:{scores:{},comments:{},oqAnswers:{},submitted:false},admin:{scores:{},comments:{},submitted:false}};
   saveLocal();
   await pushServer();
-  // Send email notifications
-  const erh=document.getElementById('s-email-rh').value.trim();
-  const econt=document.getElementById('s-email-cont').value.trim();
+  // Send emails to RH and Contabilidad
+  const erh=document.getElementById('s-email-rh').value.trim()||EMAIL_RH;
+  const econt=document.getElementById('s-email-cont').value.trim()||EMAIL_CONT;
   if(erh||econt){
     fetch(SERVER+'/notify/sesion',{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({osm:nm,condos:cl.join(', '),codigo:id,mes:moLabel(mo),emails:{rh:erh,cont:econt}})}).catch(()=>{});
@@ -550,7 +307,6 @@ async function createSession(){
   notify('Sesión creada — código: '+id);
 }
 
-// ── JOIN ──────────────────────────────────────────────────────────
 let joinRole=null;
 function startJoin(role){
   joinRole=role;
@@ -578,7 +334,6 @@ async function doJoin(){
   }else{notify('Código no encontrado. Verifica con la Responsable.','err');}
 }
 
-// ── EVAL ──────────────────────────────────────────────────────────
 function renderEval(role){
   const t=document.getElementById(role+'-title');const s=document.getElementById(role+'-sub');
   if(t)t.textContent=session?session.osm:'';
@@ -591,7 +346,7 @@ function renderCondoTabs(role){
   el.innerHTML='<div class="ctabs">'+condoList.map((c,i)=>{
     const avgs=ROLE_AREAS[role].map(a=>areaAvg(role,a.key,i)).filter(v=>v!==null);
     const avg=avgs.length?avgs.reduce((a,b)=>a+b)/avgs.length:null;
-    return '<button class="ctab'+(i===activeCondo[role]?' on':'')+'" onclick="switchCondo(\''+role+'\','+i+')">'+c+'<span class="cs">'+(avg!==null?avg.toFixed(1):'—')+'</span></button>';
+    return'<button class="ctab'+(i===activeCondo[role]?' on':'')+'" onclick="switchCondo(\''+role+'\','+i+')">'+c+'<span class="cs">'+(avg!==null?avg.toFixed(1):'—')+'</span></button>';
   }).join('')+'</div>';
 }
 function switchCondo(role,i){activeCondo[role]=i;renderCondoTabs(role);renderAreaBlocks(role);}
@@ -601,11 +356,9 @@ function updateProgress(role){
   if(fill)fill.style.width=p+'%';if(lbl)lbl.textContent=f+' de '+t+' criterios ('+p+'%)';
 }
 function renderAreaBlocks(role){
-  const ci=activeCondo[role]||0;
-  const el=document.getElementById('body-'+role);if(!el)return;
+  const ci=activeCondo[role]||0;const el=document.getElementById('body-'+role);if(!el)return;
   el.innerHTML=ROLE_AREAS[role].map(area=>{
-    const avg=areaAvg(role,area.key,ci);
-    const isOpen=openAreas[role+'|'+area.key]!==false;
+    const avg=areaAvg(role,area.key,ci);const isOpen=openAreas[role+'|'+area.key]!==false;
     let h='<div class="ablock">'+
       '<div class="ahdr" onclick="toggleArea(\''+role+'\',\''+area.key+'\')">'+
         '<div class="ahdr-l"><i class="ti '+area.icon+' area-ico"></i><span class="area-ttl">'+area.label+'</span></div>'+
@@ -625,14 +378,11 @@ function renderAreaBlocks(role){
       area.oq.forEach(oq=>{
         const val=(D[role].oqAnswers&&D[role].oqAnswers[oq.k]||'').replace(/"/g,'&quot;');
         h+='<div class="oq-item"><div class="oq-q">'+oq.q+'</div>'+
-          '<textarea rows="2" style="font-size:12px;padding:7px 10px;width:100%;border-radius:var(--rs);border:1px solid var(--bord);resize:vertical" placeholder="Respuesta opcional..." oninput="saveOQ(\''+role+'\',\''+oq.k+'\',this.value)">'+val+'</textarea>'+
-          '</div>';
+          '<textarea rows="2" style="font-size:12px;padding:7px 10px;width:100%;border-radius:var(--rs);border:1px solid var(--bord);resize:vertical" placeholder="Respuesta opcional..." oninput="saveOQ(\''+role+'\',\''+oq.k+'\',this.value)">'+val+'</textarea></div>';
       });
       h+='</div>';
     }
-    h+='<div class="ares"><span class="ares-lbl">'+area.label+'</span>'+
-      '<span class="ares-val" id="ares-'+role+'-'+area.key+'" style="color:'+ic(avg).c+'">'+(avg!==null?avg.toFixed(2):'—')+'</span>'+
-      '<span id="aresb-'+role+'-'+area.key+'">'+badge(avg)+'</span></div></div></div>';
+    h+='<div class="ares"><span class="ares-lbl">'+area.label+'</span><span class="ares-val" id="ares-'+role+'-'+area.key+'" style="color:'+ic(avg).c+'">'+(avg!==null?avg.toFixed(2):'—')+'</span><span id="aresb-'+role+'-'+area.key+'">'+badge(avg)+'</span></div></div></div>';
     return h;
   }).join('');
 }
@@ -657,94 +407,63 @@ function setSc(role,ak,idx,val,btn,ci){
 function saveCom(role,ak,idx,val,ci){D[role].comments['c|'+role+'|'+ci+'|'+ak+'|'+idx]=val;}
 function saveOQ(role,k,val){if(!D[role].oqAnswers)D[role].oqAnswers={};D[role].oqAnswers[k]=val;saveLocal();}
 
-// ── SUBMIT ────────────────────────────────────────────────────────
 async function doSubmit(role){
   D[role].submitted=true;saveLocal();
-  await pullServer(session.id);
-  D[role].submitted=true;saveLocal();
+  await pullServer(session.id);D[role].submitted=true;saveLocal();
   await pushServer();
   if(role==='admin'){goS('dash');_renderDash();return;}
   document.getElementById('done-msg').textContent='Gracias por evaluar a '+session.osm+' ('+moLabel(session.mo)+'). Tu perspectiva es parte del reporte 360°.';
   goS('done');notify('Evaluación enviada ✓');
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────────
-async function renderDash(){
-  if(!session){notify('No hay sesión activa','err');return;}
-  await pullServer(session.id);
-  _renderDash();
-}
+async function renderDash(){if(!session){notify('No hay sesión activa','err');return;}await pullServer(session.id);_renderDash();}
 function _renderDash(){
   if(!session)return;
-  const global=globalScore();
-  const rhOv=roleOverall('rh'),cOv=roleOverall('cont'),aOv=roleOverall('admin');
+  const global=globalScore(),rhOv=roleOverall('rh'),cOv=roleOverall('cont'),aOv=roleOverall('admin');
   document.getElementById('dash-title').textContent=session.osm+' — 360°';
   document.getElementById('dash-sub').textContent=moLabel(session.mo)+(session.condos?' · '+session.condos:'');
   updateNav();
   const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
   const roleColor=r=>({rh:'var(--plum)',cont:'var(--blue)',admin:'var(--green)'}[r]);
   const roleName=r=>({rh:'Carmen — RH',cont:'Contabilidad',admin:'Responsable OSMs'}[r]);
-  let h='';
-  // Status
-  h+='<div class="stat-grid">';
+  let h='<div class="stat-grid">';
   ['rh','cont','admin'].forEach(role=>{
     const ov=roleOverall(role);const done=D[role].submitted;const partial=countFilled(role)>0;
-    h+='<div class="stat-card" style="border-top-color:'+roleColor(role)+'">'+
-      '<div class="stat-name">'+roleName(role)+'</div>'+
-      '<div class="stat-pct" style="color:'+ic(ov).c+'">'+(ov!==null?ov.toFixed(2):'—')+'</div>'+
-      '<div class="stat-lbl"><span class="sdot '+(done?'sdot-done':partial?'sdot-part':'sdot-empty')+'"></span>'+(done?'Completado':partial?'En progreso':'Sin iniciar')+'</div></div>';
+    h+='<div class="stat-card" style="border-top-color:'+roleColor(role)+'"><div class="stat-name">'+roleName(role)+'</div><div class="stat-pct" style="color:'+ic(ov).c+'">'+(ov!==null?ov.toFixed(2):'—')+'</div><div class="stat-lbl"><span class="sdot '+(done?'sdot-done':partial?'sdot-part':'sdot-empty')+'"></span>'+(done?'Completado':partial?'En progreso':'Sin iniciar')+'</div></div>';
   });
-  h+='</div>';
-  // Metrics
-  h+='<div class="mc-grid">';
+  h+='</div><div class="mc-grid">';
   h+='<div class="mc" style="border-top:3px solid '+ic(global).c+'"><div class="mc-lbl">Score 360° Global</div><div class="mc-val" style="color:'+ic(global).c+'">'+(global!==null?global.toFixed(2):'—')+'</div><div class="mc-sub">'+badge(global)+'</div></div>';
   [{l:'RH / Personas (30%)',v:rhOv},{l:'Contabilidad (30%)',v:cOv},{l:'Operaciones (40%)',v:aOv}].forEach(x=>{
     h+='<div class="mc"><div class="mc-lbl">'+x.l+'</div><div class="mc-val" style="color:'+ic(x.v).c+'">'+(x.v!==null?x.v.toFixed(2):'—')+'</div><div class="mc-sub">'+badge(x.v)+'</div></div>';
   });
-  h+='</div>';
-  // Bars + Radar
-  h+='<div class="two-col"><div class="panel"><div class="panel-ttl">Scores por área</div>';
+  h+='</div><div class="two-col"><div class="panel"><div class="panel-ttl">Scores por área</div>';
   allAreas.forEach(a=>{const v=areaAvg(getRoleForArea(a.key),a.key);const p=v!==null?Math.round(v/5*100):0;
     h+='<div class="bar-row"><span class="bar-name">'+a.label+'</span><div class="bar-track"><div class="bar-fill" style="width:'+p+'%;background:'+ic(v).c+'"></div></div><span class="bar-val" style="color:'+ic(v).c+'">'+(v!==null?v.toFixed(1):'—')+'</span></div>';
   });
   h+='</div><div class="panel"><div class="panel-ttl">Perfil de desempeño</div><div style="position:relative;height:280px"><canvas id="radar-cv"></canvas></div></div></div>';
   document.getElementById('dash-body').innerHTML=h;
-  // Radar
   setTimeout(()=>{
     const el=document.getElementById('radar-cv');if(!el)return;
     if(radarChart){try{radarChart.destroy();}catch(e){}}
-    radarChart=new Chart(el,{type:'radar',
-      data:{labels:allAreas.map(a=>a.label),datasets:[{label:'Score',
-        data:allAreas.map(a=>{const v=areaAvg(getRoleForArea(a.key),a.key);return v!==null?parseFloat(v.toFixed(2)):0;}),
-        borderColor:'#1A7A5E',backgroundColor:'rgba(26,122,94,0.1)',pointBackgroundColor:'#1A7A5E',pointRadius:3,borderWidth:2}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-        scales:{r:{min:0,max:5,ticks:{stepSize:1,font:{size:9},backdropColor:'transparent'},
-        grid:{color:'rgba(0,0,0,0.06)'},angleLines:{color:'rgba(0,0,0,0.06)'},pointLabels:{font:{size:9}}}}}});
+    radarChart=new Chart(el,{type:'radar',data:{labels:allAreas.map(a=>a.label),datasets:[{label:'Score',data:allAreas.map(a=>{const v=areaAvg(getRoleForArea(a.key),a.key);return v!==null?parseFloat(v.toFixed(2)):0;}),borderColor:'#1A7A5E',backgroundColor:'rgba(26,122,94,0.1)',pointBackgroundColor:'#1A7A5E',pointRadius:3,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{r:{min:0,max:5,ticks:{stepSize:1,font:{size:9},backdropColor:'transparent'},grid:{color:'rgba(0,0,0,0.06)'},angleLines:{color:'rgba(0,0,0,0.06)'},pointLabels:{font:{size:9}}}}}});
   },80);
 }
 
-// ── REPORT ────────────────────────────────────────────────────────
 function genReport(){
   const zone=document.getElementById('report-zone');
   if(!zone){notify('Error interno','err');return;}
-  const global=globalScore();
-  if(global===null){
+  if(globalScore()===null){
     zone.innerHTML='<div class="rep-card"><p style="color:var(--red);font-size:13px"><i class="ti ti-alert-circle"></i> Completa al menos una sección de evaluación para generar el reporte.</p></div>';
     zone.scrollIntoView({behavior:'smooth'});return;
   }
   try{
-    const d=buildData();
-    zone.innerHTML='<div class="rep-card">'+
-      '<div class="rep-hdr">'+
-        '<span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte — '+d.nm+'</span>'+
-        '<div style="display:flex;gap:6px">'+
-          '<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px" onclick="doPrint()"><i class="ti ti-printer"></i> PDF</button>'+
-          '<button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="genAI()"><i class="ti ti-sparkles"></i> Análisis con IA</button>'+
-        '</div></div>'+
-      '<div id="printable-report">'+buildHTML(d)+'</div></div>';
+    const d=buildData(),repHTML=buildHTML(d);
     window._rd=d;
-    zone.scrollIntoView({behavior:'smooth'});
-    notify('Reporte generado ✓');
+    zone.innerHTML='<div class="rep-card">'+
+      '<div class="rep-hdr"><span class="rep-ttl"><i class="ti ti-file-text"></i> Reporte — '+d.nm+'</span>'+
+      '<button class="btn btn-green" style="padding:5px 10px;font-size:12px" onclick="doPrint()"><i class="ti ti-printer"></i> Descargar PDF</button></div>'+
+      '<div id="printable-report">'+repHTML+'</div></div>';
+    zone.scrollIntoView({behavior:'smooth'});notify('Reporte generado ✓');
   }catch(err){
     zone.innerHTML='<div class="rep-card"><p style="color:var(--red);font-size:13px">Error: '+err.message+'</p></div>';
   }
@@ -752,35 +471,24 @@ function genReport(){
 
 function buildData(){
   const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
-  const global=globalScore();
-  const rhOv=roleOverall('rh'),cOv=roleOverall('cont'),aOv=roleOverall('admin');
+  const global=globalScore(),rhOv=roleOverall('rh'),cOv=roleOverall('cont'),aOv=roleOverall('admin');
   const areaDetails=allAreas.map(area=>{
-    const role=getRoleForArea(area.key);const avg=areaAvg(role,area.key);
-    const n=condoList.length||1;
+    const role=getRoleForArea(area.key),avg=areaAvg(role,area.key),n=condoList.length||1;
     const criteria=area.criteria.map((cr,idx)=>{
       let vals=[],coms=[];
-      for(let ci=0;ci<n;ci++){
-        const v=gs(role,ci,area.key,idx);if(v!==null)vals.push(v);
-        const c=D[role].comments['c|'+role+'|'+ci+'|'+area.key+'|'+idx];if(c)coms.push(c);
-      }
-      const avg=vals.length?vals.reduce((a,b)=>a+b)/vals.length:null;
-      return{cr,avg,coms};
+      for(let ci=0;ci<n;ci++){const v=gs(role,ci,area.key,idx);if(v!==null)vals.push(v);const c=D[role].comments['c|'+role+'|'+ci+'|'+area.key+'|'+idx];if(c)coms.push(c);}
+      return{cr,avg:vals.length?vals.reduce((a,b)=>a+b)/vals.length:null,coms};
     }).filter(x=>x.avg!==null);
-    const i=ic(avg);
-    return{label:area.label,role,avg,interp:i.l,criteria};
+    return{label:area.label,role,avg,interp:ic(avg).l,criteria};
   });
   const oqAll={};
   ['rh','cont'].forEach(role=>{if(D[role].oqAnswers)Object.entries(D[role].oqAnswers).forEach(([k,v])=>{if(v)oqAll[k]=v;});});
-  return{nm:session.osm,mes:moLabel(session.mo),resp:session.admin||'—',
-    cond:session.condos||'—',obs:session.obs||'',comp:session.comp||'',frase:session.frase||'',
-    global,rhOv,cOv,aOv,areaDetails,oqAll};
+  return{nm:session.osm,mes:moLabel(session.mo),resp:session.admin||'—',cond:session.condos||'—',obs:session.obs||'',comp:session.comp||'',frase:session.frase||'',global,rhOv,cOv,aOv,areaDetails,oqAll};
 }
 
 function buildHTML(d){
   const fecha=new Date().toLocaleDateString('es',{day:'2-digit',month:'long',year:'numeric'});
-  const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];
-  let h='';
-  // Header
+  const allAreas=[...AREAS_RH,...AREAS_CONT,...AREAS_ADMIN];let h='';
   h+='<div style="background:#1C1B19;border-radius:10px;padding:22px 24px 20px;margin-bottom:20px;position:relative">'+
     '<div style="position:absolute;left:0;top:0;width:5px;height:100%;background:#8A7D6B;border-radius:10px 0 0 10px"></div>'+
     '<div style="font-size:7px;font-weight:700;letter-spacing:.12em;color:#C4B9A8;margin-left:8px;margin-bottom:10px">EVALUACIÓN MENSUAL · ON SITE MANAGER · HESTIA MANAGEMENT CO.</div>'+
@@ -791,97 +499,29 @@ function buildHTML(d){
       '<div style="background:'+ic(d.global).c+';padding:14px 18px;border-radius:8px;text-align:center;min-width:90px;border-top:4px solid rgba(255,255,255,0.3)">'+
         '<div style="font-size:7px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:.1em;margin-bottom:4px">SCORE GLOBAL</div>'+
         '<div style="font-size:28px;font-weight:700;color:#fff">'+(d.global!==null?d.global.toFixed(2):'—')+'</div>'+
-        '<div style="font-size:9px;color:rgba(255,255,255,0.85)">'+ic(d.global).l+'</div></div>'+
-    '</div></div>';
-  // 3 scores
+        '<div style="font-size:9px;color:rgba(255,255,255,0.85)">'+ic(d.global).l+'</div></div></div></div>';
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">';
   [{l:'RH / Personas · 30%',v:d.rhOv},{l:'Contabilidad · 30%',v:d.cOv},{l:'Operaciones · 40%',v:d.aOv}].forEach(x=>{
-    h+='<div style="background:'+ic(x.v).b+';border-radius:8px;padding:10px 12px;border-top:3px solid '+ic(x.v).c+'">'+
-      '<div style="font-size:7px;font-weight:700;color:'+ic(x.v).c+';text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">'+x.l+'</div>'+
-      '<div style="font-size:20px;font-weight:700;color:'+ic(x.v).c+'">'+(x.v!==null?x.v.toFixed(2):'—')+'</div>'+
-      '<div style="font-size:9px;color:'+ic(x.v).c+'">'+ic(x.v).l+'</div></div>';
+    h+='<div style="background:'+ic(x.v).b+';border-radius:8px;padding:10px 12px;border-top:3px solid '+ic(x.v).c+'"><div style="font-size:7px;font-weight:700;color:'+ic(x.v).c+';text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">'+x.l+'</div><div style="font-size:20px;font-weight:700;color:'+ic(x.v).c+'">'+(x.v!==null?x.v.toFixed(2):'—')+'</div><div style="font-size:9px;color:'+ic(x.v).c+'">'+ic(x.v).l+'</div></div>';
   });
-  h+='</div>';
-  // Bars
-  h+='<div class="rdiv">SCORES POR ÁREA</div>';
+  h+='</div><div class="rdiv">SCORES POR ÁREA</div>';
   allAreas.forEach(a=>{const v=areaAvg(getRoleForArea(a.key),a.key);const p=v!==null?Math.round(v/5*100):0;
-    h+='<div style="display:grid;grid-template-columns:140px 1fr 36px;align-items:center;gap:8px;margin-bottom:7px">'+
-      '<span style="font-size:9px;color:#46443F">'+a.label+'</span>'+
-      '<div style="height:9px;background:#ECEAE3;border-radius:5px;overflow:hidden"><div style="width:'+p+'%;height:100%;background:'+ic(v).c+';border-radius:5px"></div></div>'+
-      '<span style="font-size:10px;font-weight:700;color:'+ic(v).c+';text-align:right">'+(v!==null?v.toFixed(1):'—')+'</span></div>';
+    h+='<div style="display:grid;grid-template-columns:140px 1fr 36px;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:9px;color:#46443F">'+a.label+'</span><div style="height:9px;background:#ECEAE3;border-radius:5px;overflow:hidden"><div style="width:'+p+'%;height:100%;background:'+ic(v).c+';border-radius:5px"></div></div><span style="font-size:10px;font-weight:700;color:'+ic(v).c+';text-align:right">'+(v!==null?v.toFixed(1):'—')+'</span></div>';
   });
-  // AI zone placeholder
-  h+='<div id="ai-content-zone" style="margin-top:18px"></div>';
-  // Obs
   if(d.obs)h+='<div class="rdiv">OBSERVACIONES DEL PERÍODO</div><p style="font-size:13px;color:#46443F;text-align:justify;margin-bottom:10px">'+d.obs+'</p>';
-  // Comp
-  if(d.comp)h+='<div style="background:#F0EBE3;border-radius:8px;padding:14px 16px;margin:14px 0;border-left:4px solid #8A7D6B;border-top:3px solid #8A7D6B">'+
-    '<div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase">COMPROMISO DEL MES</div>'+
-    '<p style="margin:0;font-size:13px;color:#1C1B19;text-align:justify">'+d.comp+'</p></div>';
-  // Frase
+  if(d.comp)h+='<div style="background:#F0EBE3;border-radius:8px;padding:14px 16px;margin:14px 0;border-left:4px solid #8A7D6B;border-top:3px solid #8A7D6B"><div style="font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase">COMPROMISO DEL MES</div><p style="margin:0;font-size:13px;color:#1C1B19;text-align:justify">'+d.comp+'</p></div>';
   if(d.frase)h+='<div style="text-align:center;padding:14px 20px"><p style="margin:0;font-style:italic;font-size:12px;color:#8A7D6B">"'+d.frase+'"</p></div>';
-  // Footer
-  h+='<div style="border-top:1px solid #D8D4CA;padding-top:8px;display:flex;justify-content:space-between;font-size:8px;color:#7A7670;margin-top:12px">'+
-    '<span>Hestia Management Co. · Evaluación Mensual OSM · '+d.mes+'</span>'+
-    '<span>'+d.nm+' · Documento confidencial · '+fecha+'</span></div>';
+  h+='<div style="border-top:1px solid #D8D4CA;padding-top:8px;display:flex;justify-content:space-between;font-size:8px;color:#7A7670;margin-top:12px"><span>Hestia Management Co. · Evaluación Mensual OSM · '+d.mes+'</span><span>'+d.nm+' · Documento confidencial · '+fecha+'</span></div>';
   return h;
-}
-
-async function genAI(){
-  const zone=document.getElementById('ai-content-zone');if(!zone)return;
-  const d=window._rd;if(!d){notify('Genera el reporte primero','err');return;}
-  zone.innerHTML='<div style="background:#F0EBE3;border-radius:8px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:13px;color:#46443F">'+
-    '<i class="ti ti-loader spin" style="font-size:20px;color:#8A7D6B"></i> Generando análisis con IA...</div>';
-  const areaLines=d.areaDetails.map(a=>
-    '  '+a.label+' ('+a.interp+', '+(a.avg!==null?a.avg.toFixed(2):'—')+'/5):\n'+
-    a.criteria.map(c=>'    • '+c.cr+': '+(c.avg!==null?c.avg.toFixed(1):'—')+'/5'+(c.coms.length?' | '+c.coms.join(' / '):'')
-    ).join('\n')).join('\n');
-  const oqLines=Object.entries(d.oqAll||{}).filter(([k,v])=>v).map(([k,v])=>'  - '+k.replace('oq_','').replace(/_/g,' ')+': "'+v+'"').join('\n');
-  const prompt='Eres un consultor senior especializado en gestión de condominios y desarrollo de On Site Managers.\n\nEVALUACIÓN:\nColaborador: '+d.nm+'\nPeríodo: '+d.mes+'\nCondominios: '+d.cond+'\nScore global: '+(d.global!==null?d.global.toFixed(2):'—')+'/5.00 (RH 30%: '+(d.rhOv!==null?d.rhOv.toFixed(2):'—')+' | Cont 30%: '+(d.cOv!==null?d.cOv.toFixed(2):'—')+' | Op 40%: '+(d.aOv!==null?d.aOv.toFixed(2):'—')+')\n'+(d.obs?'Observaciones: '+d.obs+'\n':'')+(oqLines?'Observaciones cualitativas:\n'+oqLines+'\n':'')+'\nSCORES:\n'+areaLines+'\n\nRedacta el análisis en EXACTAMENTE estas 4 secciones con párrafos narrativos (no bullets):\n\n## Lo que está funcionando bien\nIdentifica 2-3 fortalezas reales con impacto operativo concreto. Sé específico.\n\n## Áreas de oportunidad\nPara cada área bajo 3.5: qué pasa, por qué importa, qué riesgo hay si no se atiende.\n\n## Secuencia de trabajo para este mes\n3-4 acciones concretas en orden de prioridad: qué hacer, cómo se mide, en qué semana.\n\n## Perspectiva de desarrollo\n2-3 oraciones: dónde está este OSM, hacia dónde va, qué necesita.\n\nTONO: Profesional, directo, cálido. '+d.nm.split(' ')[0]+' en tercera persona. Español neutro. 400-550 palabras.';
-  try{
-    const res=await fetch(SERVER+'/ai/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
-    if(!res.ok)throw new Error('Error del servidor: '+res.status);
-    const data=await res.json();
-    if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
-    const text=data.content?data.content.map(x=>x.text||'').join(''):'';
-    const secs=[
-      {k:'## Lo que está funcionando bien',c:'#1A7A5E',b:'#D4EFE7',i:'ti-star'},
-      {k:'## Áreas de oportunidad',c:'#92580A',b:'#FEF0C7',i:'ti-target'},
-      {k:'## Secuencia de trabajo para este mes',c:'#1A4A8A',b:'#E8EFF8',i:'ti-list-check'},
-      {k:'## Perspectiva de desarrollo',c:'#5B21B6',b:'#EDE9FE',i:'ti-trending-up'}
-    ];
-    let out='';
-    secs.forEach((sec,idx)=>{
-      const start=text.indexOf(sec.k);if(start===-1)return;
-      const nextKey=secs[idx+1]?secs[idx+1].k:null;
-      const end=nextKey?text.indexOf(nextKey):text.length;
-      const content=text.slice(start+sec.k.length,end>-1?end:undefined).trim();
-      if(!content)return;
-      const fmt=content.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n\n+/g,'</p><p style="margin:0 0 8px;text-align:justify">').replace(/\n/g,' ');
-      out+='<div style="background:'+sec.b+';border-radius:8px;padding:14px 16px;margin-bottom:10px;border-left:4px solid '+sec.c+'">'+
-        '<div style="font-size:7.5px;font-weight:700;color:'+sec.c+';letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">'+
-          '<i class="ti '+sec.i+'"></i> '+sec.k.replace('## ','')+'</div>'+
-        '<div style="font-size:13px;color:#1C1B19;line-height:1.7"><p style="margin:0 0 8px;text-align:justify">'+fmt+'</p></div></div>';
-    });
-    zone.innerHTML=out||'<div style="background:#F0EBE3;border-radius:8px;padding:14px;font-size:13px;color:#1C1B19">'+text.replace(/\n\n/g,'<br><br>')+'</div>';
-    notify('Análisis generado ✓');
-  }catch(e){
-    zone.innerHTML='<div style="background:#FDE8E8;border-radius:8px;padding:14px;font-size:13px;color:#9B2020"><i class="ti ti-alert-circle"></i> '+e.message+'</div>';
-  }
 }
 
 function doPrint(){
   const el=document.getElementById('printable-report');if(!el)return;
   const win=window.open('','_blank');
-  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8">'+
-    '<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">'+
-    '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">'+
-    '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:"DM Sans",sans-serif;font-size:13px;color:#1C1B19;padding:32px 40px;max-width:820px;margin:0 auto;line-height:1.65}p{margin-bottom:8px}strong{font-weight:600}.rdiv{font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;border-bottom:1px solid #D8D4CA;padding-bottom:3px;margin:14px 0 8px;text-transform:uppercase}@media print{body{padding:20px 28px}@page{margin:15mm 20mm;size:A4}}</style>'+
-    '</head><body>'+el.innerHTML+'</body></html>');
+  win.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:"DM Sans",sans-serif;font-size:13px;color:#1C1B19;padding:32px 40px;max-width:820px;margin:0 auto;line-height:1.65}p{margin-bottom:8px}strong{font-weight:600}.rdiv{font-size:7.5px;font-weight:700;color:#8A7D6B;letter-spacing:.1em;border-bottom:1px solid #D8D4CA;padding-bottom:3px;margin:14px 0 8px;text-transform:uppercase}@media print{body{padding:20px 28px}@page{margin:15mm 20mm;size:A4}}</style></head><body>'+el.innerHTML+'</body></html>');
   win.document.close();setTimeout(()=>{win.focus();win.print();},900);
 }
 
-// ── HISTORIAL ─────────────────────────────────────────────────────
 async function openHist(){
   goS('hist');
   const body=document.getElementById('hist-body');
@@ -892,16 +532,12 @@ async function openHist(){
     if(!rows||!rows.length){body.innerHTML='<div style="text-align:center;padding:40px 0;color:var(--ink3);font-size:13px">No hay evaluaciones registradas todavía.</div>';return;}
     let h='<div class="info-box" style="margin-bottom:16px"><strong>'+rows.length+' evaluación(es)</strong> registradas en el servidor.</div>';
     h+='<div style="background:var(--surf);border:1px solid var(--bord);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)">';
-    h+='<table class="hist-table"><thead><tr>'+
-      '<th>OSM</th><th>Período</th><th>Código</th><th>Guardado</th><th style="text-align:center">Acciones</th>'+
-      '</tr></thead><tbody>';
+    h+='<table class="hist-table"><thead><tr><th>OSM</th><th>Período</th><th>Código</th><th>Guardado</th><th style="text-align:center">Acciones</th></tr></thead><tbody>';
     rows.forEach(row=>{
       const mo=row.mo?new Date(row.mo+'-02').toLocaleDateString('es',{month:'long',year:'numeric'}):'';
       const dt=new Date(row.updated*1000).toLocaleDateString('es',{day:'2-digit',month:'short',year:'numeric'});
-      const osmSafe=(row.osm||'').replace(/'/g,'');
-      h+='<tr>'+
-        '<td style="font-weight:600;color:var(--ink)">'+(row.osm||'—')+'</td>'+
-        '<td style="color:var(--ink2)">'+mo+'</td>'+
+      const osmSafe=(row.osm||'').replace(/'/g,'').replace(/"/g,'');
+      h+='<tr><td style="font-weight:600;color:var(--ink)">'+(row.osm||'—')+'</td><td style="color:var(--ink2)">'+mo+'</td>'+
         '<td style="font-family:\'DM Mono\',monospace;font-weight:700;letter-spacing:.08em">'+row.id+'</td>'+
         '<td style="color:var(--ink3);font-size:12px">'+dt+'</td>'+
         '<td style="text-align:center"><div style="display:flex;gap:6px;justify-content:center">'+
@@ -931,7 +567,6 @@ async function delSession(id,osm){
   }catch(e){notify('No se pudo eliminar: '+e.message,'err');}
 }
 
-// ── INIT ──────────────────────────────────────────────────────────
 document.getElementById('s-month').value=new Date().toISOString().slice(0,7);
 condosInput=[''];renderCondoList();
 loadLocal();if(session)updateNav();
