@@ -91,6 +91,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green)}
     <div style="margin-bottom:14px"><div class="fl">Código de sesión</div><input type="text" id="join-code" class="code-input" placeholder="Ej. A3B7C2" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')doJoin()"/></div>
     <div id="join-status" style="font-size:12px;color:var(--ink2);min-height:20px;margin-bottom:12px"></div>
     <div style="display:flex;gap:8px"><button class="btn btn-ghost" onclick="goS('home')"><i class="ti ti-arrow-left"></i> Volver</button><button class="btn btn-primary" style="flex:1;justify-content:center" onclick="doJoin()"><i class="ti ti-arrow-right"></i> Entrar</button></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bord);text-align:center">
+      <button class="btn btn-ghost" style="font-size:12px;color:var(--ink3)" onclick="clearLocalAndRetry()"><i class="ti ti-refresh"></i> Limpiar datos guardados e intentar de nuevo</button>
+    </div>
   </div></div>
 </div>
 <!-- SETUP -->
@@ -307,6 +310,18 @@ async function createSession(){
   notify('Sesión creada — código: '+id);
 }
 
+function clearLocalAndRetry(){
+  // Wipe all local storage for this app
+  localStorage.removeItem('h360_s');
+  localStorage.removeItem('h360_d');
+  session=null;condoList=[];
+  D={rh:{scores:{},comments:{},oqAnswers:{},submitted:false},
+     cont:{scores:{},comments:{},oqAnswers:{},submitted:false},
+     admin:{scores:{},comments:{},submitted:false}};
+  document.getElementById('join-status').textContent='';
+  notify('Datos locales borrados. Ahora ingresa el código.');
+}
+
 let joinRole=null;
 function startJoin(role){
   joinRole=role;
@@ -319,19 +334,45 @@ async function doJoin(){
   const code=document.getElementById('join-code').value.trim().toUpperCase();
   if(!code){notify('Ingresa el código','err');return;}
   const st=document.getElementById('join-status');
-  st.innerHTML='<i class="ti ti-loader spin"></i> Buscando sesión...';
-  loadLocal();
-  if(session&&session.id===code){
-    st.textContent='';
-    if(D[joinRole].submitted){notify('Ya enviaste tu evaluación. ¡Gracias!','info');return;}
-    renderEval(joinRole);goS(joinRole);updateNav();return;
+
+  // If the code is DIFFERENT from what's in localStorage, reset D completely
+  const savedSession=JSON.parse(localStorage.getItem('h360_s')||'null');
+  if(savedSession && savedSession.id !== code){
+    // Different session — clear everything local before loading new one
+    D={rh:{scores:{},comments:{},oqAnswers:{},submitted:false},
+       cont:{scores:{},comments:{},oqAnswers:{},submitted:false},
+       admin:{scores:{},comments:{},submitted:false}};
+    session=null;
   }
+
+  st.innerHTML='<i class="ti ti-loader spin"></i> Conectando al servidor... (puede tardar hasta 60 seg la primera vez)';
+
+  // Always go to server first — don't trust localStorage for submitted status
   const ok=await pullServer(code);
   st.textContent='';
   if(ok){
-    if(D[joinRole].submitted){notify('Ya enviaste tu evaluación. ¡Gracias!','info');return;}
+    // Check submitted status from server data only
+    const serverSubmitted = D[joinRole] && D[joinRole].submitted;
+    if(serverSubmitted){
+      notify('Ya enviaste tu evaluación este mes. ¡Gracias!','info');
+      return;
+    }
     renderEval(joinRole);goS(joinRole);updateNav();notify('Sesión cargada ✓');
-  }else{notify('Código no encontrado. Verifica con la Responsable.','err');}
+  } else {
+    // Server not available — try localStorage as fallback
+    if(savedSession && savedSession.id===code){
+      session=savedSession;
+      condoList=parseCL(session.condos);
+      const savedD=JSON.parse(localStorage.getItem('h360_d')||'null');
+      if(savedD) D=savedD;
+      // In fallback mode, never block — let them fill the form
+      D[joinRole].submitted=false;
+      renderEval(joinRole);goS(joinRole);updateNav();
+      notify('Sin conexión al servidor — trabajando en modo local','info');
+    } else {
+      notify('No se encontró la sesión. El servidor puede estar iniciando — espera 60 seg e intenta de nuevo.','err');
+    }
+  }
 }
 
 function renderEval(role){
